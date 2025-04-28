@@ -3,11 +3,19 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 2,
             "patches": [
                 {
                     "date": 1745880421802,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1745880496799,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,9 +3,9 @@\n const morgan = require(\"morgan\");\r\n const routes = require(\"./routes\");\r\n const { errorHandler } = require(\"./middlewares/errorHandler\");\r\n const { sequelize } = require(\"./models\");\r\n-const createInitialData = require('./seeders/init');\r\n+const createInitialData = require(\"./seeders/init\");\r\n \r\n const app = express();\r\n app.use(express.json());\r\n app.use(morgan(\"dev\"));\r\n@@ -18,25 +18,25 @@\n async function bootstrap() {\r\n   try {\r\n     // 同步数据库结构\r\n     await sequelize.sync({ alter: true });\r\n-    \r\n+\r\n     // 检查是否需要初始化数据\r\n     const adminExists = await sequelize.models.User.findOne({\r\n-      where: { username: 'admin' }\r\n+      where: { username: \"admin\" },\r\n     });\r\n-    \r\n+\r\n     if (!adminExists) {\r\n-      console.log('Initializing database with seed data...');\r\n+      console.log(\"Initializing database with seed data...\");\r\n       await createInitialData();\r\n     }\r\n \r\n     // 启动服务器\r\n     app.listen(PORT, () => {\r\n       console.log(`Server running on port ${PORT}`);\r\n     });\r\n   } catch (error) {\r\n-    console.error('Error starting server:', error);\r\n+    console.error(\"Error starting server:\", error);\r\n     process.exit(1);\r\n   }\r\n }\r\n \r\n"
+                },
+                {
+                    "date": 1745880625377,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,9 +17,9 @@\n // 启动服务器并初始化数据\r\n async function bootstrap() {\r\n   try {\r\n     // 同步数据库结构\r\n-    await sequelize.sync({ alter: true });\r\n+    await sequelize.sync({ force: true });\r\n \r\n     // 检查是否需要初始化数据\r\n     const adminExists = await sequelize.models.User.findOne({\r\n       where: { username: \"admin\" },\r\n"
                 }
             ],
             "date": 1745880421802,

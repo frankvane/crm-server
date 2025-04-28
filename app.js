@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 3000;
 async function bootstrap() {
   try {
     // 同步数据库结构
-    await sequelize.sync({ alter: true });
+    await sequelize.sync({ force: true });
 
     // 检查是否需要初始化数据
     const adminExists = await sequelize.models.User.findOne({

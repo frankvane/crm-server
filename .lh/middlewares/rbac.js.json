@@ -1,0 +1,22 @@
+{
+    "sourceFile": "middlewares/rbac.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1745881514569,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1745881537072,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,14 +2,19 @@\n \r\n module.exports = (requiredPermission) => {\r\n   return async (req, res, next) => {\r\n     try {\r\n-      const hasPermission = await rbacService.checkPermission(req.user.id, requiredPermission);\r\n-      \r\n+      const hasPermission = await rbacService.checkPermission(\r\n+        req.user.id,\r\n+        requiredPermission\r\n+      );\r\n+\r\n       if (!hasPermission) {\r\n-        return res.status(403).json({ message: \"Forbidden: Insufficient permissions\" });\r\n+        return res\r\n+          .status(403)\r\n+          .json({ message: \"Forbidden: Insufficient permissions\" });\r\n       }\r\n-      \r\n+\r\n       next();\r\n     } catch (error) {\r\n       console.error(\"RBAC Error:\", error);\r\n       res.status(500).json({ message: \"Internal server error\" });\r\n"
+                }
+            ],
+            "date": 1745881514569,
+            "name": "Commit-0",
+            "content": "const rbacService = require(\"../services/rbac.service\");\r\n\r\nmodule.exports = (requiredPermission) => {\r\n  return async (req, res, next) => {\r\n    try {\r\n      const hasPermission = await rbacService.checkPermission(req.user.id, requiredPermission);\r\n      \r\n      if (!hasPermission) {\r\n        return res.status(403).json({ message: \"Forbidden: Insufficient permissions\" });\r\n      }\r\n      \r\n      next();\r\n    } catch (error) {\r\n      console.error(\"RBAC Error:\", error);\r\n      res.status(500).json({ message: \"Internal server error\" });\r\n    }\r\n  };\r\n};\r\n"
+        }
+    ]
+}

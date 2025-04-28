@@ -3,11 +3,19 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 2,
             "patches": [
                 {
                     "date": 1745880383418,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1745880496795,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,22 +1,22 @@\n-const express = require('express');\r\n+const express = require(\"express\");\r\n const router = express.Router();\r\n-const userController = require('../controllers/user.controller');\r\n-const auth = require('../middlewares/auth');\r\n-const rbac = require('../middlewares/rbac');\r\n+const userController = require(\"../controllers/user.controller\");\r\n+const auth = require(\"../middlewares/auth\");\r\n+const rbac = require(\"../middlewares/rbac\");\r\n \r\n // 创建用户（需要admin权限）\r\n-router.post('/', [auth, rbac('create_user')], userController.create);\r\n+router.post(\"/\", [auth, rbac(\"create_user\")], userController.create);\r\n \r\n // 获取用户列表（需要view_users权限）\r\n-router.get('/', [auth, rbac('view_users')], userController.list);\r\n+router.get(\"/\", [auth, rbac(\"view_users\")], userController.list);\r\n \r\n // 获取单个用户（需要view_users权限）\r\n-router.get('/:id', [auth, rbac('view_users')], userController.getById);\r\n+router.get(\"/:id\", [auth, rbac(\"view_users\")], userController.getById);\r\n \r\n\\ No newline at end of file\n // 更新用户（需要update_user权限）\r\n-router.put('/:id', [auth, rbac('update_user')], userController.update);\r\n+router.put(\"/:id\", [auth, rbac(\"update_user\")], userController.update);\r\n \r\n // 删除用户（需要delete_user权限）\r\n-router.delete('/:id', [auth, rbac('delete_user')], userController.delete);\r\n+router.delete(\"/:id\", [auth, rbac(\"delete_user\")], userController.delete);\r\n \r\n-module.exports = router;\n+module.exports = router;\r\n"
+                },
+                {
+                    "date": 1745880710248,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -18,5 +18,5 @@\n \r\n // 删除用户（需要delete_user权限）\r\n router.delete(\"/:id\", [auth, rbac(\"delete_user\")], userController.delete);\r\n \r\n-module.exports = router;\n\\ No newline at end of file\n+module.exports = router;\r\n"
                 }
             ],
             "date": 1745880383418,
