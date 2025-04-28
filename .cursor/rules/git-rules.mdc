@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Git 提交规则
+
+- 每次修改完代码以后就进行git代码仓库的自动提交
+- 提交代码时需要有前缀信息，比如feat、fix、style、revert、refactor、docs、chore、perf等
