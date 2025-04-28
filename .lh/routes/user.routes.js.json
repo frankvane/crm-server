@@ -1,0 +1,18 @@
+{
+    "sourceFile": "routes/user.routes.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1745880383418,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1745880383418,
+            "name": "Commit-0",
+            "content": "const express = require('express');\r\nconst router = express.Router();\r\nconst userController = require('../controllers/user.controller');\r\nconst auth = require('../middlewares/auth');\r\nconst rbac = require('../middlewares/rbac');\r\n\r\n// 创建用户（需要admin权限）\r\nrouter.post('/', [auth, rbac('create_user')], userController.create);\r\n\r\n// 获取用户列表（需要view_users权限）\r\nrouter.get('/', [auth, rbac('view_users')], userController.list);\r\n\r\n// 获取单个用户（需要view_users权限）\r\nrouter.get('/:id', [auth, rbac('view_users')], userController.getById);\r\n\r\n// 更新用户（需要update_user权限）\r\nrouter.put('/:id', [auth, rbac('update_user')], userController.update);\r\n\r\n// 删除用户（需要delete_user权限）\r\nrouter.delete('/:id', [auth, rbac('delete_user')], userController.delete);\r\n\r\nmodule.exports = router;"
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "db-connection-test.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1745880055701,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1745880055701,
+            "name": "Commit-0",
+            "content": "const sql = require(\"mssql\");\r\n\r\n// 配置连接信息\r\nconst config = {\r\n  user: \"sa\",\r\n  password: \"chinavane\",\r\n  server: \"localhost\", // 或你的服务器IP/名称\r\n  database: \"crm\", // 默认连接master数据库\r\n  port: 1433,\r\n  options: {\r\n    encrypt: false, // 如果使用Azure SQL需要设为true\r\n    trustServerCertificate: true, // 本地开发环境可以设为true\r\n  },\r\n};\r\n\r\nasync function testConnection() {\r\n  try {\r\n    // 建立连接\r\n    await sql.connect(config);\r\n    console.log(\"连接SQL Server成功!\");\r\n\r\n    // 执行一个简单查询\r\n    const result = await sql.query`SELECT @@VERSION AS 'SQL Server Version'`;\r\n    console.log(\"SQL Server版本:\", result.recordset[0][\"SQL Server Version\"]);\r\n  } catch (err) {\r\n    console.error(\"连接失败:\", err);\r\n  } finally {\r\n    // 关闭连接\r\n    sql.close();\r\n  }\r\n}\r\n\r\n// 执行测试\r\ntestConnection();\r\n"
+        }
+    ]
+}

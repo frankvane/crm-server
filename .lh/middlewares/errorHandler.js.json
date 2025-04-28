@@ -1,0 +1,18 @@
+{
+    "sourceFile": "middlewares/errorHandler.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1745851267064,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1745851267064,
+            "name": "Commit-0",
+            "content": "function errorHandler(err, req, res, next) {\r\n  console.error(err);\r\n  res.status(err.status || 500).json({ message: err.message || 'Internal Server Error' });\r\n}\r\nmodule.exports = { errorHandler };\r\n"
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "routes/index.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1745880394978,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1745880394978,
+            "name": "Commit-0",
+            "content": "const express = require(\"express\");\r\nconst router = express.Router();\r\n\r\nrouter.use(\"/auth\", require(\"./auth.routes\"));\r\nrouter.use(\"/users\", require(\"./user.routes\"));\r\nrouter.use(\"/category\", require(\"./category.routes\"));\r\n\r\nmodule.exports = router;\r\n"
+        }
+    ]
+}

@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const routes = require("./routes");
 const { errorHandler } = require("./middlewares/errorHandler");
 const { sequelize } = require("./models");
+const createInitialData = require("./seeders/init");
 
 const app = express();
 app.use(express.json());
@@ -12,8 +13,31 @@ app.use("/api", routes);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
-sequelize.sync({ alter: true }).then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-});
+
+// 启动服务器并初始化数据
+async function bootstrap() {
+  try {
+    // 同步数据库结构
+    await sequelize.sync({ alter: true });
+
+    // 检查是否需要初始化数据
+    const adminExists = await sequelize.models.User.findOne({
+      where: { username: "admin" },
+    });
+
+    if (!adminExists) {
+      console.log("Initializing database with seed data...");
+      await createInitialData();
+    }
+
+    // 启动服务器
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Error starting server:", error);
+    process.exit(1);
+  }
+}
+
+bootstrap();

@@ -32,9 +32,11 @@
 │   └── tokenBlacklist.model.js
 ├── controllers/
 │   ├── auth.controller.js
+│   ├── user.controller.js
 │   ├── category.controller.js
 ├── routes/
 │   ├── auth.routes.js
+│   ├── user.routes.js
 │   ├── category.routes.js
 │   └── index.js
 ├── middlewares/
@@ -47,6 +49,8 @@
 ├── utils/
 │   ├── jwt.js
 │   └── response.js
+├── seeders/
+│   └── init.js
 ```
 
 ## 环境配置
@@ -60,6 +64,11 @@
 ```bash
 npm start
 ```
+
+## 默认账户
+
+- 管理员账号：admin
+- 管理员密码：admin123
 
 ## API 接口文档
 
@@ -125,6 +134,174 @@ npm start
   ```
 - **错误**：
   - 401: "No refresh token"
+  - 500: "Internal Server Error"
+
+### 用户管理接口
+
+#### 1. 创建用户
+
+- **接口**：`POST /api/users`
+- **描述**：创建新用户（需要 create_user 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **请求头**：
+  ```
+  Authorization: Bearer <accessToken>
+  ```
+- **请求体**：
+  ```json
+  {
+    "username": "string",
+    "password": "string",
+    "email": "string",
+    "roleIds": "number[]"
+  }
+  ```
+- **响应**：
+  ```json
+  {
+    "id": "number",
+    "username": "string",
+    "email": "string",
+    "status": "boolean",
+    "createdAt": "string",
+    "updatedAt": "string",
+    "Roles": [
+      {
+        "id": "number",
+        "name": "string",
+        "description": "string"
+      }
+    ]
+  }
+  ```
+- **错误**：
+  - 400: "Username already exists"
+  - 401: "No token provided" / "Invalid or expired token"
+  - 403: "Forbidden"
+  - 500: "Internal Server Error"
+
+#### 2. 获取用户列表
+
+- **接口**：`GET /api/users`
+- **描述**：获取用户列表（需要 view_users 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **请求头**：
+  ```
+  Authorization: Bearer <accessToken>
+  ```
+- **查询参数**：
+  - page: 页码（默认：1）
+  - limit: 每页数量（默认：10）
+  - search: 搜索关键词
+- **响应**：
+  ```json
+  {
+    "total": "number",
+    "pages": "number",
+    "currentPage": "number",
+    "data": [
+      {
+        "id": "number",
+        "username": "string",
+        "email": "string",
+        "status": "boolean",
+        "createdAt": "string",
+        "updatedAt": "string",
+        "Roles": [
+          {
+            "id": "number",
+            "name": "string",
+            "description": "string"
+          }
+        ]
+      }
+    ]
+  }
+  ```
+- **错误**：
+  - 401: "No token provided" / "Invalid or expired token"
+  - 403: "Forbidden"
+  - 500: "Internal Server Error"
+
+#### 3. 获取单个用户
+
+- **接口**：`GET /api/users/:id`
+- **描述**：获取指定用户信息（需要 view_users 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **请求头**：
+  ```
+  Authorization: Bearer <accessToken>
+  ```
+- **响应**：
+  ```json
+  {
+    "id": "number",
+    "username": "string",
+    "email": "string",
+    "status": "boolean",
+    "createdAt": "string",
+    "updatedAt": "string",
+    "Roles": [
+      {
+        "id": "number",
+        "name": "string",
+        "description": "string"
+      }
+    ]
+  }
+  ```
+- **错误**：
+  - 401: "No token provided" / "Invalid or expired token"
+  - 403: "Forbidden"
+  - 404: "User not found"
+  - 500: "Internal Server Error"
+
+#### 4. 更新用户
+
+- **接口**：`PUT /api/users/:id`
+- **描述**：更新指定用户信息（需要 update_user 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **请求头**：
+  ```
+  Authorization: Bearer <accessToken>
+  ```
+- **请求体**：
+  ```json
+  {
+    "username": "string",
+    "password": "string",
+    "email": "string",
+    "status": "boolean",
+    "roleIds": "number[]"
+  }
+  ```
+- **响应**：与获取单个用户接口相同
+- **错误**：
+  - 400: "Username already exists"
+  - 401: "No token provided" / "Invalid or expired token"
+  - 403: "Forbidden"
+  - 404: "User not found"
+  - 500: "Internal Server Error"
+
+#### 5. 删除用户
+
+- **接口**：`DELETE /api/users/:id`
+- **描述**：删除指定用户（需要 delete_user 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **请求头**：
+  ```
+  Authorization: Bearer <accessToken>
+  ```
+- **响应**：
+  ```json
+  {
+    "message": "User deleted successfully"
+  }
+  ```
+- **错误**：
+  - 401: "No token provided" / "Invalid or expired token"
+  - 403: "Forbidden"
+  - 404: "User not found"
   - 500: "Internal Server Error"
 
 ### 分类接口
@@ -195,6 +372,13 @@ npm start
   - 500: "Internal Server Error"
 
 ## 更新日志（Changelog）
+
+### v1.0.1 (2024-03-19)
+
+- 添加用户管理模块（CRUD 接口）
+- 实现数据库初始化脚本
+- 添加默认管理员账户
+- 完善接口文档
 
 ### v1.0.0
 
