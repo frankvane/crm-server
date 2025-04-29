@@ -1,7 +1,8 @@
 const jwt = require("../utils/jwt");
+const { User, Role, Permission } = require("../models");
 const ResponseUtil = require("../utils/response");
 
-module.exports = async (req, res, next) => {
+const verifyToken = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
@@ -28,4 +29,50 @@ module.exports = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+};
+
+const hasPermission = (permission) => {
+  return async (req, res, next) => {
+    try {
+      const userId = req.user.id;
+
+      // 获取用户及其角色和权限
+      const user = await User.findByPk(userId, {
+        include: [
+          {
+            model: Role,
+            include: [
+              {
+                model: Permission,
+              },
+            ],
+          },
+        ],
+      });
+
+      if (!user) {
+        return res.status(403).json(ResponseUtil.error("User not found", 403));
+      }
+
+      // 检查用户的所有角色中是否有所需权限
+      const hasRequiredPermission = user.Roles.some((role) =>
+        role.Permissions.some((p) => p.name === permission)
+      );
+
+      if (!hasRequiredPermission) {
+        return res
+          .status(403)
+          .json(ResponseUtil.error("Permission denied", 403));
+      }
+
+      next();
+    } catch (err) {
+      next(err);
+    }
+  };
+};
+
+module.exports = {
+  verifyToken,
+  hasPermission,
 };
