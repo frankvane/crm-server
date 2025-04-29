@@ -350,7 +350,7 @@ npm start
   - 404: "User not found"
   - 500: "Internal Server Error"
 
-### 分类接口
+### 分类类型接口
 
 #### 1. 创建分类类型
 
@@ -407,7 +407,7 @@ npm start
 - **查询参数**：
   - `page`: 页码（默认：1）
   - `pageSize`: 每页数量（默认：10）
-  - `status`: 状态过滤（可选）
+  - `status`: 状态过滤（可选，true/false）
 - **响应**：
   ```json
   {
@@ -425,12 +425,135 @@ npm start
           "createdAt": "string",
           "updatedAt": "string"
         }
-      ]
+      ],
+      "currentPage": "number",
+      "pageSize": "number",
+      "totalPages": "number"
     }
   }
   ```
 
-#### 3. 创建分类
+#### 3. 获取单个分类类型
+
+- **接口**：`GET /api/category-types/:id`
+- **描述**：获取指定分类类型的详细信息
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **请求头**：
+  ```
+  Authorization: Bearer <accessToken>
+  ```
+- **响应**：
+  ```json
+  {
+    "code": 200,
+    "message": "Success",
+    "data": {
+      "id": "number",
+      "name": "string",
+      "code": "string",
+      "description": "string",
+      "status": "boolean",
+      "createdAt": "string",
+      "updatedAt": "string"
+    }
+  }
+  ```
+- **错误响应**：
+  ```json
+  {
+    "code": 404,
+    "message": "Category type not found",
+    "data": null
+  }
+  ```
+
+#### 4. 更新分类类型
+
+- **接口**：`PUT /api/category-types/:id`
+- **描述**：更新指定分类类型（需要 manage_categories 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **请求头**：
+  ```
+  Authorization: Bearer <accessToken>
+  ```
+- **请求体**：
+  ```json
+  {
+    "name": "string",
+    "code": "string",
+    "description": "string",
+    "status": "boolean"
+  }
+  ```
+- **响应**：
+  ```json
+  {
+    "code": 200,
+    "message": "Category type updated successfully",
+    "data": {
+      "id": "number",
+      "name": "string",
+      "code": "string",
+      "description": "string",
+      "status": "boolean",
+      "updatedAt": "string"
+    }
+  }
+  ```
+- **错误响应**：
+  ```json
+  {
+    "code": 400,
+    "message": "Category type code already exists",
+    "data": null
+  }
+  ```
+  或
+  ```json
+  {
+    "code": 404,
+    "message": "Category type not found",
+    "data": null
+  }
+  ```
+
+#### 5. 删除分类类型
+
+- **接口**：`DELETE /api/category-types/:id`
+- **描述**：删除指定分类类型（需要 manage_categories 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **请求头**：
+  ```
+  Authorization: Bearer <accessToken>
+  ```
+- **响应**：
+  ```json
+  {
+    "code": 200,
+    "message": "Category type deleted successfully",
+    "data": null
+  }
+  ```
+- **错误响应**：
+  ```json
+  {
+    "code": 400,
+    "message": "Cannot delete category type with associated categories",
+    "data": null
+  }
+  ```
+  或
+  ```json
+  {
+    "code": 404,
+    "message": "Category type not found",
+    "data": null
+  }
+  ```
+
+### 分类接口
+
+#### 1. 创建分类
 
 - **接口**：`POST /api/categories`
 - **描述**：创建新的分类（需要 manage_categories 权限）
@@ -477,7 +600,7 @@ npm start
   }
   ```
 
-#### 4. 获取分类树
+#### 2. 获取分类树
 
 - **接口**：`GET /api/categories/tree`
 - **描述**：获取指定类型的分类树结构
@@ -517,7 +640,7 @@ npm start
   }
   ```
 
-#### 5. 更新分类
+#### 3. 更新分类
 
 - **接口**：`PUT /api/categories/:id`
 - **描述**：更新指定分类（需要 manage_categories 权限）
@@ -554,7 +677,7 @@ npm start
   }
   ```
 
-#### 6. 删除分类
+#### 4. 删除分类
 
 - **接口**：`DELETE /api/categories/:id`
 - **描述**：删除指定分类（需要 manage_categories 权限）
