@@ -602,15 +602,19 @@ npm start
 
 #### 2. 获取分类树
 
-- **接口**：`GET /api/categories/tree`
+- **接口**：`GET /api/categories/tree?typeId={typeId}`
 - **描述**：获取指定类型的分类树结构
 - **认证**：需要有效的访问令牌（Bearer Token）
 - **请求头**：
   ```
   Authorization: Bearer <accessToken>
   ```
-- **查询参数**：
-  - `typeId`: 分类类型 ID（必填）
+- **请求参数**：
+  - `typeId`: 分类类型 ID（必填，需要在 URL 中指定）
+- **示例请求**：
+  ```
+  GET /api/categories/tree?typeId=1
+  ```
 - **响应**：
   ```json
   {
@@ -637,6 +641,14 @@ npm start
         ]
       }
     ]
+  }
+  ```
+- **错误响应**：
+  ```json
+  {
+    "code": 400,
+    "message": "TypeId is required",
+    "data": null
   }
   ```
 
