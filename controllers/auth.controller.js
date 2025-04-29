@@ -15,7 +15,13 @@ exports.login = async (req, res, next) => {
       include: [
         {
           model: Role,
-          include: [Permission],
+          as: "Roles",
+          include: [
+            {
+              model: Permission,
+              through: { attributes: [] },
+            },
+          ],
         },
       ],
     });
