@@ -14,6 +14,10 @@ const generateAccessToken = (user) => {
       })) || [],
   };
 
+  if (!config.jwtSecret) {
+    console.error("JWT secret is not defined in configuration!");
+  }
+
   return jwt.sign(payload, config.jwtSecret, {
     expiresIn: config.jwtExpiration,
   });
@@ -26,6 +30,10 @@ const generateRefreshToken = (user) => {
     username: user.username,
   };
 
+  if (!config.refreshTokenSecret) {
+    console.error("JWT refresh token secret is not defined in configuration!");
+  }
+
   return jwt.sign(payload, config.refreshTokenSecret, {
     expiresIn: config.refreshTokenExpiration,
   });
@@ -33,12 +41,32 @@ const generateRefreshToken = (user) => {
 
 // 验证访问令牌
 const verifyAccessToken = (token) => {
-  return jwt.verify(token, config.jwtSecret);
+  try {
+    if (!config.jwtSecret) {
+      console.error("JWT secret is not defined in configuration!");
+    }
+
+    return jwt.verify(token, config.jwtSecret);
+  } catch (error) {
+    console.error("JWT Token verification failed:", error.message);
+    throw error;
+  }
 };
 
 // 验证刷新令牌
 const verifyRefreshToken = (token) => {
-  return jwt.verify(token, config.refreshTokenSecret);
+  try {
+    if (!config.refreshTokenSecret) {
+      console.error(
+        "JWT refresh token secret is not defined in configuration!"
+      );
+    }
+
+    return jwt.verify(token, config.refreshTokenSecret);
+  } catch (error) {
+    console.error("JWT Refresh Token verification failed:", error.message);
+    throw error;
+  }
 };
 
 module.exports = {

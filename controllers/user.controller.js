@@ -31,7 +31,7 @@ exports.create = async (req, res, next) => {
 
     // 获取包含角色的完整用户信息
     const userWithRoles = await User.findByPk(user.id, {
-      include: [{ model: Role, through: { attributes: [] } }],
+      include: [{ model: Role, as: "Roles", through: { attributes: [] } }],
       attributes: { exclude: ["password"] },
     });
 
@@ -59,7 +59,7 @@ exports.list = async (req, res, next) => {
 
     const { count, rows } = await User.findAndCountAll({
       where,
-      include: [{ model: Role, through: { attributes: [] } }],
+      include: [{ model: Role, as: "Roles", through: { attributes: [] } }],
       attributes: { exclude: ["password"] },
       offset,
       limit: parseInt(pageSize),
@@ -78,7 +78,7 @@ exports.list = async (req, res, next) => {
 exports.getById = async (req, res, next) => {
   try {
     const user = await User.findByPk(req.params.id, {
-      include: [{ model: Role, through: { attributes: [] } }],
+      include: [{ model: Role, as: "Roles", through: { attributes: [] } }],
       attributes: { exclude: ["password"] },
     });
 
@@ -127,7 +127,7 @@ exports.update = async (req, res, next) => {
 
     // 获取更新后的用户信息（包含角色）
     const updatedUser = await User.findByPk(user.id, {
-      include: [{ model: Role, through: { attributes: [] } }],
+      include: [{ model: Role, as: "Roles", through: { attributes: [] } }],
       attributes: { exclude: ["password"] },
     });
 
@@ -148,6 +148,104 @@ exports.delete = async (req, res, next) => {
 
     await user.destroy();
     res.json(ResponseUtil.success(null, "User deleted successfully"));
+  } catch (err) {
+    next(err);
+  }
+};
+
+// 修改用户密码
+exports.changePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.params.id;
+
+    // 检查是否是用户本人修改密码，或者是管理员
+    const isAdmin =
+      req.user.roles && req.user.roles.some((role) => role.name === "admin");
+    const isSelfUpdate = req.user.id === parseInt(userId);
+
+    if (!isAdmin && !isSelfUpdate) {
+      return res
+        .status(403)
+        .json(ResponseUtil.error("You can only change your own password", 403));
+    }
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json(ResponseUtil.error("User not found", 404));
+    }
+
+    // 如果是用户本人修改，需要验证当前密码
+    if (isSelfUpdate && currentPassword) {
+      const isValidPassword = await bcrypt.compare(
+        currentPassword,
+        user.password
+      );
+      if (!isValidPassword) {
+        return res
+          .status(400)
+          .json(ResponseUtil.error("Current password is incorrect", 400));
+      }
+    }
+
+    // 更新密码
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    res.json(ResponseUtil.success(null, "Password changed successfully"));
+  } catch (err) {
+    next(err);
+  }
+};
+
+// 切换用户状态（启用/禁用）
+exports.toggleStatus = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).json(ResponseUtil.error("User not found", 404));
+    }
+
+    // 切换状态
+    user.status = !user.status;
+    await user.save();
+
+    const statusMessage = user.status ? "enabled" : "disabled";
+    res.json(
+      ResponseUtil.success(
+        { id: user.id, status: user.status },
+        `User ${statusMessage} successfully`
+      )
+    );
+  } catch (err) {
+    next(err);
+  }
+};
+
+// 批量删除用户
+exports.batchDelete = async (req, res, next) => {
+  try {
+    const { ids } = req.body;
+
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+      return res
+        .status(400)
+        .json(ResponseUtil.error("Invalid user IDs provided", 400));
+    }
+
+    // 批量删除
+    const result = await User.destroy({
+      where: { id: { [Op.in]: ids } },
+    });
+
+    res.json(
+      ResponseUtil.success(
+        { deletedCount: result },
+        `${result} users deleted successfully`
+      )
+    );
   } catch (err) {
     next(err);
   }
