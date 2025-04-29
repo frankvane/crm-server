@@ -1,5 +1,5 @@
 const { Role, Permission } = require("../models");
-const { sendResponse } = require("../utils/response");
+const ResponseUtil = require("../utils/response");
 
 // 创建角色
 exports.createRole = async (req, res) => {
@@ -9,7 +9,7 @@ exports.createRole = async (req, res) => {
     // 检查角色名是否已存在
     const existingRole = await Role.findOne({ where: { name } });
     if (existingRole) {
-      return sendResponse(res, 400, "角色名已存在");
+      return res.status(400).json(ResponseUtil.error("角色名已存在", 400));
     }
 
     // 创建角色
@@ -32,10 +32,12 @@ exports.createRole = async (req, res) => {
       ],
     });
 
-    return sendResponse(res, 200, "角色创建成功", roleWithPermissions);
+    return res
+      .status(200)
+      .json(ResponseUtil.success(roleWithPermissions, "角色创建成功"));
   } catch (error) {
     console.error("创建角色失败:", error);
-    return sendResponse(res, 500, "创建角色失败");
+    return res.status(500).json(ResponseUtil.error("创建角色失败", 500));
   }
 };
 
@@ -64,15 +66,12 @@ exports.getRoles = async (req, res) => {
       ],
     });
 
-    return sendResponse(res, 200, "获取角色列表成功", {
-      total: count,
-      pages: Math.ceil(count / limit),
-      currentPage: parseInt(page),
-      data: rows,
-    });
+    return res
+      .status(200)
+      .json(ResponseUtil.page(rows, count, parseInt(page), parseInt(limit)));
   } catch (error) {
     console.error("获取角色列表失败:", error);
-    return sendResponse(res, 500, "获取角色列表失败");
+    return res.status(500).json(ResponseUtil.error("获取角色列表失败", 500));
   }
 };
 
@@ -93,13 +92,13 @@ exports.getRole = async (req, res) => {
     });
 
     if (!role) {
-      return sendResponse(res, 404, "角色不存在");
+      return res.status(404).json(ResponseUtil.error("角色不存在", 404));
     }
 
-    return sendResponse(res, 200, "获取角色成功", role);
+    return res.status(200).json(ResponseUtil.success(role, "获取角色成功"));
   } catch (error) {
     console.error("获取角色失败:", error);
-    return sendResponse(res, 500, "获取角色失败");
+    return res.status(500).json(ResponseUtil.error("获取角色失败", 500));
   }
 };
 
@@ -111,14 +110,14 @@ exports.updateRole = async (req, res) => {
 
     const role = await Role.findByPk(id);
     if (!role) {
-      return sendResponse(res, 404, "角色不存在");
+      return res.status(404).json(ResponseUtil.error("角色不存在", 404));
     }
 
     // 检查新角色名是否与其他角色重复
     if (name && name !== role.name) {
       const existingRole = await Role.findOne({ where: { name } });
       if (existingRole) {
-        return sendResponse(res, 400, "角色名已存在");
+        return res.status(400).json(ResponseUtil.error("角色名已存在", 400));
       }
     }
 
@@ -142,10 +141,12 @@ exports.updateRole = async (req, res) => {
       ],
     });
 
-    return sendResponse(res, 200, "角色更新成功", updatedRole);
+    return res
+      .status(200)
+      .json(ResponseUtil.success(updatedRole, "角色更新成功"));
   } catch (error) {
     console.error("更新角色失败:", error);
-    return sendResponse(res, 500, "更新角色失败");
+    return res.status(500).json(ResponseUtil.error("更新角色失败", 500));
   }
 };
 
@@ -156,19 +157,21 @@ exports.deleteRole = async (req, res) => {
 
     const role = await Role.findByPk(id);
     if (!role) {
-      return sendResponse(res, 404, "角色不存在");
+      return res.status(404).json(ResponseUtil.error("角色不存在", 404));
     }
 
     // 检查角色是否有关联的用户
     const userCount = await role.countUsers();
     if (userCount > 0) {
-      return sendResponse(res, 400, "无法删除，该角色下存在用户");
+      return res
+        .status(400)
+        .json(ResponseUtil.error("无法删除，该角色下存在用户", 400));
     }
 
     await role.destroy();
-    return sendResponse(res, 200, "角色删除成功");
+    return res.status(200).json(ResponseUtil.success(null, "角色删除成功"));
   } catch (error) {
     console.error("删除角色失败:", error);
-    return sendResponse(res, 500, "删除角色失败");
+    return res.status(500).json(ResponseUtil.error("删除角色失败", 500));
   }
 };
