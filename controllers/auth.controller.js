@@ -1,8 +1,8 @@
-const bcrypt = require("bcryptjs");
 const { User, Role, Permission, RefreshToken } = require("../models");
-const jwt = require("../utils/jwt");
-const ResponseUtil = require("../utils/response");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const config = require("../config/auth");
+const ResponseUtil = require("../utils/response");
 
 // 用户登录
 exports.login = async (req, res, next) => {
@@ -15,12 +15,11 @@ exports.login = async (req, res, next) => {
       include: [
         {
           model: Role,
-          include: [{ model: Permission }],
+          include: [Permission],
         },
       ],
     });
 
-    // 验证用户是否存在
     if (!user) {
       return res.status(401).json(ResponseUtil.error("User not found", 401));
     }
@@ -31,34 +30,30 @@ exports.login = async (req, res, next) => {
       return res.status(401).json(ResponseUtil.error("Invalid password", 401));
     }
 
-    // 生成令牌
-    const accessToken = jwt.generateAccessToken(user);
-    const refreshToken = jwt.generateRefreshToken(user);
+    // 生成访问令牌和刷新令牌
+    const accessToken = jwt.sign({ id: user.id }, config.secret, {
+      expiresIn: config.accessTokenExpiry,
+    });
 
-    // 计算刷新令牌过期时间
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7); // 7天后过期
+    const refreshToken = jwt.sign({ id: user.id }, config.refreshSecret, {
+      expiresIn: config.refreshTokenExpiry,
+    });
 
     // 保存刷新令牌
     await RefreshToken.create({
       token: refreshToken,
       userId: user.id,
-      expiresAt: expiresAt,
+      expiresAt: new Date(Date.now() + config.refreshTokenExpiry * 1000),
     });
 
-    // 返回令牌和用户信息（不包含密码）
-    const userWithoutPassword = {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      status: user.status,
-      roles: user.Roles,
-    };
+    // 准备用户数据（排除密码）
+    const userData = user.toJSON();
+    delete userData.password;
 
     res.json(
       ResponseUtil.success(
         {
-          user: userWithoutPassword,
+          user: userData,
           accessToken,
           refreshToken,
         },
@@ -82,29 +77,40 @@ exports.refresh = async (req, res, next) => {
     }
 
     // 验证刷新令牌
-    const tokenDoc = await RefreshToken.findOne({
+    const storedToken = await RefreshToken.findOne({
       where: { token: refreshToken },
-      include: [
-        {
-          model: User,
-          include: [{ model: Role }],
-        },
-      ],
     });
 
-    if (!tokenDoc) {
+    if (!storedToken) {
       return res
         .status(401)
         .json(ResponseUtil.error("Invalid refresh token", 401));
     }
 
+    if (new Date() > storedToken.expiresAt) {
+      await storedToken.destroy();
+      return res
+        .status(401)
+        .json(ResponseUtil.error("Refresh token expired", 401));
+    }
+
+    // 验证并解码令牌
+    const decoded = jwt.verify(refreshToken, config.refreshSecret);
+
     // 生成新的访问令牌
-    const accessToken = jwt.generateAccessToken(tokenDoc.User);
+    const accessToken = jwt.sign({ id: decoded.id }, config.secret, {
+      expiresIn: config.accessTokenExpiry,
+    });
 
     res.json(
       ResponseUtil.success({ accessToken }, "Token refreshed successfully")
     );
   } catch (err) {
+    if (err.name === "JsonWebTokenError") {
+      return res
+        .status(401)
+        .json(ResponseUtil.error("Invalid refresh token", 401));
+    }
     next(err);
   }
 };
