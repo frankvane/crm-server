@@ -1,35 +1,32 @@
 const express = require("express");
 const router = express.Router();
 const categoryTypeController = require("../controllers/categoryType.controller");
-const { authJwt, rbac } = require("../middlewares");
+const { authJwt } = require("../middlewares");
 
-// 所有路由都需要JWT认证
-router.use(authJwt.verifyToken);
-
-// 创建分类类型
+// 创建分类类型（需要manage_categories权限）
 router.post(
   "/",
-  [rbac.checkPermission("manage_categories")],
+  [authJwt.verifyToken, authJwt.hasPermission("manage_categories")],
   categoryTypeController.create
 );
 
 // 获取分类类型列表
-router.get("/", categoryTypeController.findAll);
+router.get("/", [authJwt.verifyToken], categoryTypeController.findAll);
 
 // 获取单个分类类型
-router.get("/:id", categoryTypeController.findOne);
+router.get("/:id", [authJwt.verifyToken], categoryTypeController.findOne);
 
-// 更新分类类型
+// 更新分类类型（需要manage_categories权限）
 router.put(
   "/:id",
-  [rbac.checkPermission("manage_categories")],
+  [authJwt.verifyToken, authJwt.hasPermission("manage_categories")],
   categoryTypeController.update
 );
 
-// 删除分类类型
+// 删除分类类型（需要manage_categories权限）
 router.delete(
   "/:id",
-  [rbac.checkPermission("manage_categories")],
+  [authJwt.verifyToken, authJwt.hasPermission("manage_categories")],
   categoryTypeController.delete
 );
 
