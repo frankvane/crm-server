@@ -56,8 +56,78 @@
 ## 环境配置
 
 1. 安装依赖：`npm install`
-2. 配置 `.env` 文件，填写数据库和 JWT 密钥等信息
+2. 配置 `.env` 文件，填写数据库和 JWT 密钥等信息：
+   ```env
+   PORT=3000
+   DB_HOST=localhost
+   DB_PORT=1433
+   DB_USER=sa
+   DB_PASS=chinavane
+   DB_NAME=crm
+   JWT_SECRET=dev_jwt_secret
+   JWT_REFRESH_SECRET=dev_refresh_secret
+   ACCESS_TOKEN_EXPIRES_IN=1d
+   REFRESH_TOKEN_EXPIRES_IN=7d
+   ```
 3. 启动 SQL Server 并创建数据库
+
+## 数据库初始化
+
+### 方式一：自动初始化（推荐）
+
+启动应用时会自动执行数据库同步和初始化：
+
+```bash
+npm start
+```
+
+### 方式二：手动初始化
+
+如果需要单独执行数据库初始化，可以按以下步骤操作：
+
+1. 安装 sequelize-cli（如果未安装）：
+
+   ```bash
+   npm install -g sequelize-cli
+   ```
+
+2. 创建数据库（如果不存在）：
+
+   ```sql
+   CREATE DATABASE crm;
+   ```
+
+3. 执行数据库迁移（创建表结构）：
+
+   ```bash
+   npx sequelize-cli db:migrate
+   ```
+
+4. 执行种子数据脚本（创建初始数据）：
+   ```bash
+   npx sequelize-cli db:seed:all
+   ```
+
+### 重置数据库
+
+如果需要重置数据库，可以执行以下命令：
+
+1. 回滚所有迁移：
+
+   ```bash
+   npx sequelize-cli db:migrate:undo:all
+   ```
+
+2. 重新执行迁移：
+
+   ```bash
+   npx sequelize-cli db:migrate
+   ```
+
+3. 重新执行种子数据脚本：
+   ```bash
+   npx sequelize-cli db:seed:all
+   ```
 
 ## 启动方式
 
@@ -1052,3 +1122,14 @@ npm start
   - JWT 双 Token 认证
   - 用户管理功能
   - 角色权限管理
+
+### v1.0.4 (2024-03-20)
+
+- 优化数据库初始化流程
+  - 添加手动数据库初始化说明
+  - 添加数据库重置说明
+  - 完善环境配置文档
+- 修复数据库连接配置
+  - 更新 SQL Server 连接参数
+  - 添加连接超时和重试机制
+  - 优化错误处理
