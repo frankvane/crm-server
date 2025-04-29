@@ -45,6 +45,7 @@ const hasPermission = (permission) => {
             include: [
               {
                 model: Permission,
+                as: "Permissions",
                 through: { attributes: [] },
               },
             ],
