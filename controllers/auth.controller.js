@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const { User, Role, Permission, RefreshToken } = require("../models");
 const jwt = require("../utils/jwt");
 const ResponseUtil = require("../utils/response");
+const config = require("../config/auth");
 
 // 用户登录
 exports.login = async (req, res, next) => {
@@ -34,10 +35,15 @@ exports.login = async (req, res, next) => {
     const accessToken = jwt.generateAccessToken(user);
     const refreshToken = jwt.generateRefreshToken(user);
 
+    // 计算刷新令牌过期时间
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7); // 7天后过期
+
     // 保存刷新令牌
     await RefreshToken.create({
       token: refreshToken,
       userId: user.id,
+      expiresAt: expiresAt,
     });
 
     // 返回令牌和用户信息（不包含密码）

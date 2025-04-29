@@ -3,11 +3,15 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 1,
             "patches": [
                 {
                     "date": 1745924033360,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1745924080672,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,12 +3,13 @@\n module.exports = {\r\n   // JWT 配置\r\n   jwtSecret: process.env.JWT_SECRET || \"your-jwt-secret\",\r\n   jwtExpiration: process.env.JWT_EXPIRATION || \"1h\", // 1小时\r\n-  \r\n+\r\n   // 刷新令牌配置\r\n-  refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET || \"your-refresh-token-secret\",\r\n+  refreshTokenSecret:\r\n+    process.env.REFRESH_TOKEN_SECRET || \"your-refresh-token-secret\",\r\n   refreshTokenExpiration: process.env.REFRESH_TOKEN_EXPIRATION || \"7d\", // 7天\r\n-  \r\n+\r\n   // 密码加密配置\r\n-  saltRounds: 10\r\n+  saltRounds: 10,\r\n };\r\n"
                 }
             ],
             "date": 1745924033360,

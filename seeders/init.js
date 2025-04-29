@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const { User, Role, Permission } = require("../models");
+const { User, Role, Permission, CategoryType } = require("../models");
 
 async function createInitialData() {
   try {
@@ -72,6 +72,28 @@ async function createInitialData() {
 
     // 5. 为管理员分配角色
     await adminUser.setRoles([adminRole.id]);
+
+    // 6. 创建默认分类类型
+    await CategoryType.bulkCreate([
+      {
+        name: "菜单分类",
+        code: "menu",
+        description: "系统菜单分类",
+        status: true,
+      },
+      {
+        name: "产品分类",
+        code: "product",
+        description: "产品管理分类",
+        status: true,
+      },
+      {
+        name: "资讯分类",
+        code: "article",
+        description: "资讯文章分类",
+        status: true,
+      },
+    ]);
 
     console.log("Initial data created successfully!");
     return { adminUser, adminRole, userRole, permissions };

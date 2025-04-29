@@ -3,11 +3,15 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 1,
             "patches": [
                 {
                     "date": 1745924047243,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1745924080665,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,33 +4,27 @@\n module.exports = async (req, res, next) => {\r\n   try {\r\n     const authHeader = req.headers.authorization;\r\n     if (!authHeader) {\r\n-      return res.status(401).json(\r\n-        ResponseUtil.error(\"No token provided\", 401)\r\n-      );\r\n+      return res.status(401).json(ResponseUtil.error(\"No token provided\", 401));\r\n     }\r\n \r\n     const token = authHeader.split(\" \")[1];\r\n     if (!token) {\r\n-      return res.status(401).json(\r\n-        ResponseUtil.error(\"Invalid token format\", 401)\r\n-      );\r\n+      return res\r\n+        .status(401)\r\n+        .json(ResponseUtil.error(\"Invalid token format\", 401));\r\n     }\r\n \r\n     try {\r\n       const decoded = jwt.verifyAccessToken(token);\r\n       req.user = decoded;\r\n       next();\r\n     } catch (err) {\r\n       if (err.name === \"TokenExpiredError\") {\r\n-        return res.status(401).json(\r\n-          ResponseUtil.error(\"Token expired\", 401)\r\n-        );\r\n+        return res.status(401).json(ResponseUtil.error(\"Token expired\", 401));\r\n       }\r\n-      return res.status(401).json(\r\n-        ResponseUtil.error(\"Invalid token\", 401)\r\n-      );\r\n+      return res.status(401).json(ResponseUtil.error(\"Invalid token\", 401));\r\n     }\r\n   } catch (err) {\r\n     next(err);\r\n   }\r\n"
                 }
             ],
             "date": 1745924047243,

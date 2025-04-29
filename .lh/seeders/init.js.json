@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 2,
+            "activePatchIndex": 3,
             "patches": [
                 {
                     "date": 1745880408862,
@@ -16,6 +16,10 @@
                 {
                     "date": 1745880703110,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -80,5 +80,5 @@\n     throw error;\r\n   }\r\n }\r\n \r\n-module.exports = createInitialData;\n\\ No newline at end of file\n+module.exports = createInitialData;\r\n"
+                },
+                {
+                    "date": 1745924862629,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n const bcrypt = require(\"bcryptjs\");\r\n-const { User, Role, Permission } = require(\"../models\");\r\n+const { User, Role, Permission, CategoryType } = require(\"../models\");\r\n \r\n async function createInitialData() {\r\n   try {\r\n     // 1. 创建权限\r\n@@ -72,8 +72,30 @@\n \r\n     // 5. 为管理员分配角色\r\n     await adminUser.setRoles([adminRole.id]);\r\n \r\n+    // 6. 创建默认分类类型\r\n+    await CategoryType.bulkCreate([\r\n+      {\r\n+        name: \"菜单分类\",\r\n+        code: \"menu\",\r\n+        description: \"系统菜单分类\",\r\n+        status: true\r\n+      },\r\n+      {\r\n+        name: \"产品分类\",\r\n+        code: \"product\",\r\n+        description: \"产品管理分类\",\r\n+        status: true\r\n+      },\r\n+      {\r\n+        name: \"资讯分类\",\r\n+        code: \"article\",\r\n+        description: \"资讯文章分类\",\r\n+        status: true\r\n+      }\r\n+    ]);\r\n+\r\n     console.log(\"Initial data created successfully!\");\r\n     return { adminUser, adminRole, userRole, permissions };\r\n   } catch (error) {\r\n     console.error(\"Error creating initial data:\", error);\r\n"
                 }
             ],
             "date": 1745880408862,

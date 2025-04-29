@@ -3,11 +3,15 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 1,
             "patches": [
                 {
                     "date": 1745924019557,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1745924080703,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -5,29 +5,30 @@\n const generateAccessToken = (user) => {\r\n   const payload = {\r\n     id: user.id,\r\n     username: user.username,\r\n-    roles: user.Roles?.map(role => ({\r\n-      id: role.id,\r\n-      name: role.name,\r\n-      permissions: role.Permissions?.map(p => p.name) || []\r\n-    })) || []\r\n+    roles:\r\n+      user.Roles?.map((role) => ({\r\n+        id: role.id,\r\n+        name: role.name,\r\n+        permissions: role.Permissions?.map((p) => p.name) || [],\r\n+      })) || [],\r\n   };\r\n-  \r\n+\r\n   return jwt.sign(payload, config.jwtSecret, {\r\n-    expiresIn: config.jwtExpiration\r\n+    expiresIn: config.jwtExpiration,\r\n   });\r\n };\r\n \r\n // 生成刷新令牌\r\n const generateRefreshToken = (user) => {\r\n   const payload = {\r\n     id: user.id,\r\n-    username: user.username\r\n+    username: user.username,\r\n   };\r\n-  \r\n+\r\n   return jwt.sign(payload, config.refreshTokenSecret, {\r\n-    expiresIn: config.refreshTokenExpiration\r\n+    expiresIn: config.refreshTokenExpiration,\r\n   });\r\n };\r\n \r\n // 验证访问令牌\r\n@@ -43,6 +44,6 @@\n module.exports = {\r\n   generateAccessToken,\r\n   generateRefreshToken,\r\n   verifyAccessToken,\r\n-  verifyRefreshToken\r\n+  verifyRefreshToken,\r\n };\r\n"
                 }
             ],
             "date": 1745924019557,

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "models/category.model.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1745924843172,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1745924843172,
+            "name": "Commit-0",
+            "content": "const { DataTypes } = require(\"sequelize\");\r\n\r\nmodule.exports = (sequelize) => {\r\n  const Category = sequelize.define(\"Category\", {\r\n    name: {\r\n      type: DataTypes.STRING,\r\n      allowNull: false,\r\n      comment: \"分类名称\"\r\n    },\r\n    code: {\r\n      type: DataTypes.STRING,\r\n      allowNull: false,\r\n      comment: \"分类编码\"\r\n    },\r\n    parentId: {\r\n      type: DataTypes.INTEGER,\r\n      allowNull: true,\r\n      defaultValue: null,\r\n      comment: \"父级分类ID\"\r\n    },\r\n    typeId: {\r\n      type: DataTypes.INTEGER,\r\n      allowNull: false,\r\n      comment: \"分类类型ID\"\r\n    },\r\n    description: {\r\n      type: DataTypes.STRING,\r\n      allowNull: true,\r\n      comment: \"分类描述\"\r\n    },\r\n    sort: {\r\n      type: DataTypes.INTEGER,\r\n      allowNull: false,\r\n      defaultValue: 0,\r\n      comment: \"排序号\"\r\n    },\r\n    status: {\r\n      type: DataTypes.BOOLEAN,\r\n      allowNull: false,\r\n      defaultValue: true,\r\n      comment: \"状态：true-启用，false-禁用\"\r\n    }\r\n  }, {\r\n    indexes: [\r\n      {\r\n        unique: true,\r\n        fields: [\"code\", \"typeId\"],\r\n        name: \"uk_code_type\"\r\n      }\r\n    ]\r\n  });\r\n\r\n  Category.associate = (models) => {\r\n    // 自关联（父子关系）\r\n    Category.belongsTo(Category, {\r\n      foreignKey: \"parentId\",\r\n      as: \"parent\"\r\n    });\r\n    Category.hasMany(Category, {\r\n      foreignKey: \"parentId\",\r\n      as: \"children\"\r\n    });\r\n\r\n    // 与分类类型的关联\r\n    Category.belongsTo(models.CategoryType, {\r\n      foreignKey: \"typeId\",\r\n      as: \"type\"\r\n    });\r\n  };\r\n\r\n  return Category;\r\n};\r\n"
+        }
+    ]
+}

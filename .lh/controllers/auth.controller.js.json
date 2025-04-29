@@ -3,11 +3,15 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 1,
             "patches": [
                 {
                     "date": 1745923933211,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1745924153230,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,9 @@\n const bcrypt = require(\"bcryptjs\");\r\n const { User, Role, Permission, RefreshToken } = require(\"../models\");\r\n const jwt = require(\"../utils/jwt\");\r\n const ResponseUtil = require(\"../utils/response\");\r\n+const config = require(\"../config/auth\");\r\n \r\n // 用户登录\r\n exports.login = async (req, res, next) => {\r\n   try {\r\n@@ -33,12 +34,17 @@\n     // 生成令牌\r\n     const accessToken = jwt.generateAccessToken(user);\r\n     const refreshToken = jwt.generateRefreshToken(user);\r\n \r\n+    // 计算刷新令牌过期时间\r\n+    const expiresAt = new Date();\r\n+    expiresAt.setDate(expiresAt.getDate() + 7); // 7天后过期\r\n+\r\n     // 保存刷新令牌\r\n     await RefreshToken.create({\r\n       token: refreshToken,\r\n       userId: user.id,\r\n+      expiresAt: expiresAt\r\n     });\r\n \r\n     // 返回令牌和用户信息（不包含密码）\r\n     const userWithoutPassword = {\r\n"
                 }
             ],
             "date": 1745923933211,
