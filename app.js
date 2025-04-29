@@ -2,14 +2,20 @@ require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const routes = require("./routes");
-const { errorHandler } = require("./middlewares/errorHandler");
+const { errorHandler } = require("./middlewares");
 const { sequelize } = require("./models");
 const createInitialData = require("./seeders/init");
 
 const app = express();
+
+// 配置中间件
 app.use(express.json());
 app.use(morgan("dev"));
+
+// 配置路由
 app.use("/api", routes);
+
+// 错误处理中间件
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
