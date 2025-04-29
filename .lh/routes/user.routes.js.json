@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 3,
+            "activePatchIndex": 4,
             "patches": [
                 {
                     "date": 1745880383418,
@@ -20,6 +20,10 @@
                 {
                     "date": 1745926425939,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,22 +1,21 @@\n const express = require(\"express\");\r\n const router = express.Router();\r\n const userController = require(\"../controllers/user.controller\");\r\n-const auth = require(\"../middlewares/auth\");\r\n-const rbac = require(\"../middlewares/rbac\");\r\n+const { authJwt, rbac } = require(\"../middlewares\");\r\n \r\n-// 创建用户（需要admin权限）\r\n-router.post(\"/\", [auth, rbac(\"create_user\")], userController.create);\r\n+// 创建用户（需要create_user权限）\r\n+router.post(\"/\", [authJwt.verifyToken, rbac.checkPermission(\"create_user\")], userController.create);\r\n \r\n // 获取用户列表（需要view_users权限）\r\n-router.get(\"/\", [auth, rbac(\"view_users\")], userController.list);\r\n+router.get(\"/\", [authJwt.verifyToken, rbac.checkPermission(\"view_users\")], userController.list);\r\n \r\n // 获取单个用户（需要view_users权限）\r\n-router.get(\"/:id\", [auth, rbac(\"view_users\")], userController.getById);\r\n+router.get(\"/:id\", [authJwt.verifyToken, rbac.checkPermission(\"view_users\")], userController.getById);\r\n \r\n // 更新用户（需要update_user权限）\r\n-router.put(\"/:id\", [auth, rbac(\"update_user\")], userController.update);\r\n+router.put(\"/:id\", [authJwt.verifyToken, rbac.checkPermission(\"update_user\")], userController.update);\r\n \r\n // 删除用户（需要delete_user权限）\r\n-router.delete(\"/:id\", [auth, rbac(\"delete_user\")], userController.delete);\r\n+router.delete(\"/:id\", [authJwt.verifyToken, rbac.checkPermission(\"delete_user\")], userController.delete);\r\n \r\n module.exports = router;\r\n"
+                },
+                {
+                    "date": 1745926462114,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,19 +3,39 @@\n const userController = require(\"../controllers/user.controller\");\r\n const { authJwt, rbac } = require(\"../middlewares\");\r\n \r\n // 创建用户（需要create_user权限）\r\n-router.post(\"/\", [authJwt.verifyToken, rbac.checkPermission(\"create_user\")], userController.create);\r\n+router.post(\r\n+  \"/\",\r\n+  [authJwt.verifyToken, rbac.checkPermission(\"create_user\")],\r\n+  userController.create\r\n+);\r\n \r\n // 获取用户列表（需要view_users权限）\r\n-router.get(\"/\", [authJwt.verifyToken, rbac.checkPermission(\"view_users\")], userController.list);\r\n+router.get(\r\n+  \"/\",\r\n+  [authJwt.verifyToken, rbac.checkPermission(\"view_users\")],\r\n+  userController.list\r\n+);\r\n \r\n // 获取单个用户（需要view_users权限）\r\n-router.get(\"/:id\", [authJwt.verifyToken, rbac.checkPermission(\"view_users\")], userController.getById);\r\n+router.get(\r\n+  \"/:id\",\r\n+  [authJwt.verifyToken, rbac.checkPermission(\"view_users\")],\r\n+  userController.getById\r\n+);\r\n \r\n // 更新用户（需要update_user权限）\r\n-router.put(\"/:id\", [authJwt.verifyToken, rbac.checkPermission(\"update_user\")], userController.update);\r\n+router.put(\r\n+  \"/:id\",\r\n+  [authJwt.verifyToken, rbac.checkPermission(\"update_user\")],\r\n+  userController.update\r\n+);\r\n \r\n // 删除用户（需要delete_user权限）\r\n-router.delete(\"/:id\", [authJwt.verifyToken, rbac.checkPermission(\"delete_user\")], userController.delete);\r\n+router.delete(\r\n+  \"/:id\",\r\n+  [authJwt.verifyToken, rbac.checkPermission(\"delete_user\")],\r\n+  userController.delete\r\n+);\r\n \r\n module.exports = router;\r\n"
                 }
             ],
             "date": 1745880383418,

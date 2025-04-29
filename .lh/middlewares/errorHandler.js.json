@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 1,
+            "activePatchIndex": 2,
             "patches": [
                 {
                     "date": 1745851267064,
@@ -12,6 +12,10 @@
                 {
                     "date": 1745923803635,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,36 @@\n-function errorHandler(err, req, res, next) {\r\n-  console.error(err);\r\n-  res\r\n-    .status(err.status || 500)\r\n-    .json({ message: err.message || \"Internal Server Error\" });\r\n-}\r\n-module.exports = { errorHandler };\r\n+const ResponseUtil = require(\"../utils/response\");\r\n+\r\n+exports.errorHandler = (err, req, res, next) => {\r\n+  console.error(err.stack);\r\n+\r\n+  // 处理 Sequelize 错误\r\n+  if (err.name === \"SequelizeValidationError\") {\r\n+    return res.status(400).json(\r\n+      ResponseUtil.error(err.errors[0].message, 400)\r\n+    );\r\n+  }\r\n+\r\n+  if (err.name === \"SequelizeUniqueConstraintError\") {\r\n+    return res.status(400).json(\r\n+      ResponseUtil.error(\"Record already exists\", 400)\r\n+    );\r\n+  }\r\n+\r\n+  // 处理 JWT 错误\r\n+  if (err.name === \"JsonWebTokenError\") {\r\n+    return res.status(401).json(\r\n+      ResponseUtil.error(\"Invalid token\", 401)\r\n+    );\r\n+  }\r\n+\r\n+  if (err.name === \"TokenExpiredError\") {\r\n+    return res.status(401).json(\r\n+      ResponseUtil.error(\"Token expired\", 401)\r\n+    );\r\n+  }\r\n+\r\n+  // 默认错误处理\r\n+  res.status(500).json(\r\n+    ResponseUtil.error(\"Internal Server Error\", 500)\r\n+  );\r\n+};\r\n"
+                },
+                {
+                    "date": 1745926523125,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,28 +1,16 @@\n-const ResponseUtil = require(\"../utils/response\");\r\n+const errorHandler = (err, req, res, next) => {\r\n+  console.error('Error:', err);\r\n \r\n-exports.errorHandler = (err, req, res, next) => {\r\n-  console.error(err.stack);\r\n+  // 如果错误已经有状态码，使用它，否则使用500\r\n+  const statusCode = err.statusCode || 500;\r\n+  const message = err.message || 'Internal server error';\r\n \r\n-  // 处理 Sequelize 错误\r\n-  if (err.name === \"SequelizeValidationError\") {\r\n-    return res.status(400).json(ResponseUtil.error(err.errors[0].message, 400));\r\n-  }\r\n+  res.status(statusCode).json({\r\n+    code: statusCode,\r\n+    message: message,\r\n+    data: null,\r\n+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })\r\n+  });\r\n+};\r\n \r\n-  if (err.name === \"SequelizeUniqueConstraintError\") {\r\n-    return res\r\n-      .status(400)\r\n-      .json(ResponseUtil.error(\"Record already exists\", 400));\r\n-  }\r\n-\r\n-  // 处理 JWT 错误\r\n-  if (err.name === \"JsonWebTokenError\") {\r\n-    return res.status(401).json(ResponseUtil.error(\"Invalid token\", 401));\r\n-  }\r\n-\r\n-  if (err.name === \"TokenExpiredError\") {\r\n-    return res.status(401).json(ResponseUtil.error(\"Token expired\", 401));\r\n-  }\r\n-\r\n-  // 默认错误处理\r\n-  res.status(500).json(ResponseUtil.error(\"Internal Server Error\", 500));\r\n-};\r\n+module.exports = errorHandler;\r\n"
                 }
             ],
             "date": 1745851267064,
