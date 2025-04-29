@@ -1,20 +1,56 @@
+const { DataTypes } = require("sequelize");
 const bcrypt = require("bcryptjs");
-module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define(
-    "User",
-    {
-      username: { type: DataTypes.STRING, unique: true, allowNull: false },
-      password: { type: DataTypes.STRING, allowNull: false },
-      email: { type: DataTypes.STRING, unique: true, allowNull: false },
-      status: { type: DataTypes.BOOLEAN, defaultValue: true },
+
+module.exports = (sequelize) => {
+  const User = sequelize.define("User", {
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
     },
-    {
-      hooks: {
-        beforeCreate: async (user) => {
-          user.password = await bcrypt.hash(user.password, 10);
-        },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: true,
       },
+    },
+    status: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
+  });
+
+  // 密码加密钩子
+  User.beforeCreate(async (user) => {
+    if (user.password) {
+      user.password = await bcrypt.hash(user.password, 10);
     }
-  );
+  });
+
+  User.beforeUpdate(async (user) => {
+    if (user.changed("password")) {
+      user.password = await bcrypt.hash(user.password, 10);
+    }
+  });
+
+  User.associate = (models) => {
+    User.belongsToMany(models.Role, {
+      through: "UserRole",
+      as: "Roles",
+    });
+
+    User.hasMany(models.RefreshToken, {
+      foreignKey: "userId",
+      as: "refreshTokens",
+    });
+  };
+
   return User;
 };

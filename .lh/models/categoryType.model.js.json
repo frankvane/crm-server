@@ -3,11 +3,15 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 1,
             "patches": [
                 {
                     "date": 1745924824231,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1745924885353,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,45 +1,50 @@\n const { DataTypes } = require(\"sequelize\");\r\n \r\n module.exports = (sequelize) => {\r\n-  const CategoryType = sequelize.define(\"CategoryType\", {\r\n-    name: {\r\n-      type: DataTypes.STRING,\r\n-      allowNull: false,\r\n-      unique: true,\r\n-      comment: \"分类类型名称，如：menu（菜单）、product（产品）、article（文章）\"\r\n+  const CategoryType = sequelize.define(\r\n+    \"CategoryType\",\r\n+    {\r\n+      name: {\r\n+        type: DataTypes.STRING,\r\n+        allowNull: false,\r\n+        unique: true,\r\n+        comment:\r\n+          \"分类类型名称，如：menu（菜单）、product（产品）、article（文章）\",\r\n+      },\r\n+      code: {\r\n+        type: DataTypes.STRING,\r\n+        allowNull: false,\r\n+        unique: true,\r\n+        comment: \"分类类型编码，用于程序中标识不同类型\",\r\n+      },\r\n+      description: {\r\n+        type: DataTypes.STRING,\r\n+        allowNull: true,\r\n+        comment: \"分类类型描述\",\r\n+      },\r\n+      status: {\r\n+        type: DataTypes.BOOLEAN,\r\n+        allowNull: false,\r\n+        defaultValue: true,\r\n+        comment: \"状态：true-启用，false-禁用\",\r\n+      },\r\n     },\r\n-    code: {\r\n-      type: DataTypes.STRING,\r\n-      allowNull: false,\r\n-      unique: true,\r\n-      comment: \"分类类型编码，用于程序中标识不同类型\"\r\n-    },\r\n-    description: {\r\n-      type: DataTypes.STRING,\r\n\\ No newline at end of file\n-      allowNull: true,\r\n-      comment: \"分类类型描述\"\r\n-    },\r\n-    status: {\r\n-      type: DataTypes.BOOLEAN,\r\n-      allowNull: false,\r\n-      defaultValue: true,\r\n-      comment: \"状态：true-启用，false-禁用\"\r\n+    {\r\n+      indexes: [\r\n+        {\r\n+          unique: true,\r\n+          fields: [\"code\"],\r\n+        },\r\n+      ],\r\n     }\r\n-  }, {\r\n-    indexes: [\r\n-      {\r\n-        unique: true,\r\n-        fields: [\"code\"]\r\n-      }\r\n-    ]\r\n-  });\r\n+  );\r\n \r\n   CategoryType.associate = (models) => {\r\n     CategoryType.hasMany(models.Category, {\r\n       foreignKey: \"typeId\",\r\n-      as: \"categories\"\r\n+      as: \"categories\",\r\n     });\r\n   };\r\n \r\n   return CategoryType;\r\n-};\n+};\r\n"
                 }
             ],
             "date": 1745924824231,

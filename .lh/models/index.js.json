@@ -1,0 +1,22 @@
+{
+    "sourceFile": "models/index.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1745924938211,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1745925001835,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -25,6 +25,6 @@\n   Role,\r\n   Permission,\r\n   RefreshToken,\r\n   Category,\r\n-  CategoryType\r\n+  CategoryType,\r\n };\r\n"
+                }
+            ],
+            "date": 1745924938211,
+            "name": "Commit-0",
+            "content": "const { Sequelize } = require(\"sequelize\");\r\nconst config = require(\"../config/database\");\r\n\r\nconst sequelize = new Sequelize(config);\r\n\r\n// 导入模型定义\r\nconst User = require(\"./user.model\")(sequelize);\r\nconst Role = require(\"./role.model\")(sequelize);\r\nconst Permission = require(\"./permission.model\")(sequelize);\r\nconst RefreshToken = require(\"./refreshToken.model\")(sequelize);\r\nconst Category = require(\"./category.model\")(sequelize);\r\nconst CategoryType = require(\"./categoryType.model\")(sequelize);\r\n\r\n// 建立模型关联\r\nUser.associate({ Role, RefreshToken });\r\nRole.associate({ User, Permission });\r\nPermission.associate({ Role });\r\nRefreshToken.associate({ User });\r\nCategory.associate({ CategoryType });\r\nCategoryType.associate({ Category });\r\n\r\nmodule.exports = {\r\n  sequelize,\r\n  User,\r\n  Role,\r\n  Permission,\r\n  RefreshToken,\r\n  Category,\r\n  CategoryType\r\n};\r\n"
+        }
+    ]
+}

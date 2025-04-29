@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const { User, Role, Permission, CategoryType } = require("../models");
+const { User, Role, Permission, CategoryType, Category } = require("../models");
 
 async function createInitialData() {
   try {
@@ -74,24 +74,124 @@ async function createInitialData() {
     await adminUser.setRoles([adminRole.id]);
 
     // 6. 创建默认分类类型
-    await CategoryType.bulkCreate([
+    const [menuType, productType] = await CategoryType.bulkCreate([
       {
-        name: "菜单分类",
+        name: "系统菜单",
         code: "menu",
         description: "系统菜单分类",
         status: true,
       },
       {
-        name: "产品分类",
+        name: "产品管理",
         code: "product",
-        description: "产品管理分类",
+        description: "产品相关分类",
         status: true,
       },
+    ]);
+
+    // 7. 创建系统菜单分类
+    const systemManage = await Category.create({
+      name: "系统管理",
+      code: "system",
+      typeId: menuType.id,
+      sort: 1,
+      description: "系统管理相关功能",
+    });
+
+    await Category.bulkCreate([
       {
-        name: "资讯分类",
-        code: "article",
-        description: "资讯文章分类",
-        status: true,
+        name: "用户管理",
+        code: "user",
+        parentId: systemManage.id,
+        typeId: menuType.id,
+        sort: 1,
+      },
+      {
+        name: "角色管理",
+        code: "role",
+        parentId: systemManage.id,
+        typeId: menuType.id,
+        sort: 2,
+      },
+      {
+        name: "权限管理",
+        code: "permission",
+        parentId: systemManage.id,
+        typeId: menuType.id,
+        sort: 3,
+      },
+      {
+        name: "分类管理",
+        code: "category",
+        parentId: systemManage.id,
+        typeId: menuType.id,
+        sort: 4,
+      },
+    ]);
+
+    // 创建产品相关分类
+    const productManage = await Category.create({
+      name: "产品管理",
+      code: "product",
+      typeId: menuType.id,
+      sort: 2,
+      description: "产品管理相关功能",
+    });
+
+    await Category.bulkCreate([
+      {
+        name: "产品列表",
+        code: "product-list",
+        parentId: productManage.id,
+        typeId: menuType.id,
+        sort: 1,
+      },
+      {
+        name: "品牌管理",
+        code: "brand",
+        parentId: productManage.id,
+        typeId: menuType.id,
+        sort: 2,
+      },
+      {
+        name: "分类管理",
+        code: "category",
+        parentId: productManage.id,
+        typeId: menuType.id,
+        sort: 3,
+      },
+    ]);
+
+    // 创建产品分类数据
+    const productCategory = await Category.create({
+      name: "所有产品",
+      code: "all-products",
+      typeId: productType.id,
+      sort: 1,
+      description: "产品分类",
+    });
+
+    await Category.bulkCreate([
+      {
+        name: "电子产品",
+        code: "electronics",
+        parentId: productCategory.id,
+        typeId: productType.id,
+        sort: 1,
+      },
+      {
+        name: "家具用品",
+        code: "furniture",
+        parentId: productCategory.id,
+        typeId: productType.id,
+        sort: 2,
+      },
+      {
+        name: "办公用品",
+        code: "office",
+        parentId: productCategory.id,
+        typeId: productType.id,
+        sort: 3,
       },
     ]);
 

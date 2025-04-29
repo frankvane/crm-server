@@ -1,0 +1,22 @@
+{
+    "sourceFile": "models/user.model.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1745924951145,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1745925001838,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -5,27 +5,27 @@\n   const User = sequelize.define(\"User\", {\r\n     username: {\r\n       type: DataTypes.STRING,\r\n       allowNull: false,\r\n-      unique: true\r\n+      unique: true,\r\n     },\r\n     password: {\r\n       type: DataTypes.STRING,\r\n-      allowNull: false\r\n+      allowNull: false,\r\n     },\r\n     email: {\r\n       type: DataTypes.STRING,\r\n       allowNull: false,\r\n       unique: true,\r\n       validate: {\r\n-        isEmail: true\r\n-      }\r\n+        isEmail: true,\r\n+      },\r\n     },\r\n     status: {\r\n       type: DataTypes.BOOLEAN,\r\n       allowNull: false,\r\n-      defaultValue: true\r\n-    }\r\n+      defaultValue: true,\r\n+    },\r\n   });\r\n \r\n   // 密码加密钩子\r\n   User.beforeCreate(async (user) => {\r\n@@ -42,14 +42,14 @@\n \r\n   User.associate = (models) => {\r\n     User.belongsToMany(models.Role, {\r\n       through: \"UserRole\",\r\n-      as: \"Roles\"\r\n+      as: \"Roles\",\r\n     });\r\n \r\n     User.hasMany(models.RefreshToken, {\r\n       foreignKey: \"userId\",\r\n-      as: \"refreshTokens\"\r\n+      as: \"refreshTokens\",\r\n     });\r\n   };\r\n \r\n   return User;\r\n"
+                }
+            ],
+            "date": 1745924951145,
+            "name": "Commit-0",
+            "content": "const { DataTypes } = require(\"sequelize\");\r\nconst bcrypt = require(\"bcryptjs\");\r\n\r\nmodule.exports = (sequelize) => {\r\n  const User = sequelize.define(\"User\", {\r\n    username: {\r\n      type: DataTypes.STRING,\r\n      allowNull: false,\r\n      unique: true\r\n    },\r\n    password: {\r\n      type: DataTypes.STRING,\r\n      allowNull: false\r\n    },\r\n    email: {\r\n      type: DataTypes.STRING,\r\n      allowNull: false,\r\n      unique: true,\r\n      validate: {\r\n        isEmail: true\r\n      }\r\n    },\r\n    status: {\r\n      type: DataTypes.BOOLEAN,\r\n      allowNull: false,\r\n      defaultValue: true\r\n    }\r\n  });\r\n\r\n  // 密码加密钩子\r\n  User.beforeCreate(async (user) => {\r\n    if (user.password) {\r\n      user.password = await bcrypt.hash(user.password, 10);\r\n    }\r\n  });\r\n\r\n  User.beforeUpdate(async (user) => {\r\n    if (user.changed(\"password\")) {\r\n      user.password = await bcrypt.hash(user.password, 10);\r\n    }\r\n  });\r\n\r\n  User.associate = (models) => {\r\n    User.belongsToMany(models.Role, {\r\n      through: \"UserRole\",\r\n      as: \"Roles\"\r\n    });\r\n\r\n    User.hasMany(models.RefreshToken, {\r\n      foreignKey: \"userId\",\r\n      as: \"refreshTokens\"\r\n    });\r\n  };\r\n\r\n  return User;\r\n};\r\n"
+        }
+    ]
+}

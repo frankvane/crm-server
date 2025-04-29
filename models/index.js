@@ -1,30 +1,30 @@
-const Sequelize = require("sequelize");
-const dbConfig = require("../config/database");
-const sequelize = new Sequelize(dbConfig);
+const { Sequelize } = require("sequelize");
+const config = require("../config/database");
 
-const db = {};
-db.Sequelize = Sequelize;
-db.sequelize = sequelize;
+const sequelize = new Sequelize(config);
 
-db.User = require("./user.model")(sequelize, Sequelize.DataTypes);
-db.Role = require("./role.model")(sequelize, Sequelize.DataTypes);
-db.Permission = require("./permission.model")(sequelize, Sequelize.DataTypes);
-db.Category = require("./category.model")(sequelize, Sequelize.DataTypes);
-db.RefreshToken = require("./refreshToken.model")(
+// 导入模型定义
+const User = require("./user.model")(sequelize);
+const Role = require("./role.model")(sequelize);
+const Permission = require("./permission.model")(sequelize);
+const RefreshToken = require("./refreshToken.model")(sequelize);
+const Category = require("./category.model")(sequelize);
+const CategoryType = require("./categoryType.model")(sequelize);
+
+// 建立模型关联
+User.associate({ Role, RefreshToken });
+Role.associate({ User, Permission });
+Permission.associate({ Role });
+RefreshToken.associate({ User });
+Category.associate({ CategoryType });
+CategoryType.associate({ Category });
+
+module.exports = {
   sequelize,
-  Sequelize.DataTypes
-);
-db.TokenBlacklist = require("./tokenBlacklist.model")(
-  sequelize,
-  Sequelize.DataTypes
-);
-
-db.User.belongsToMany(db.Role, { through: "UserRole" });
-db.Role.belongsToMany(db.User, { through: "UserRole" });
-db.Role.belongsToMany(db.Permission, { through: "RolePermission" });
-db.Permission.belongsToMany(db.Role, { through: "RolePermission" });
-
-db.Category.hasMany(db.Category, { as: "children", foreignKey: "parentId" });
-db.Category.belongsTo(db.Category, { as: "parent", foreignKey: "parentId" });
-
-module.exports = db;
+  User,
+  Role,
+  Permission,
+  RefreshToken,
+  Category,
+  CategoryType,
+};
