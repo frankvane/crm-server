@@ -1,46 +1,125 @@
-const authService = require("../services/auth.service");
-const { RefreshToken, TokenBlacklist } = require("../models");
+const bcrypt = require("bcryptjs");
+const { User, Role, Permission, RefreshToken } = require("../models");
 const jwt = require("../utils/jwt");
+const ResponseUtil = require("../utils/response");
 
+// 用户登录
 exports.login = async (req, res, next) => {
   try {
     const { username, password } = req.body;
-    const tokens = await authService.login(username, password);
-    res.json(tokens);
+
+    // 查找用户
+    const user = await User.findOne({
+      where: { username },
+      include: [
+        {
+          model: Role,
+          include: [{ model: Permission }],
+        },
+      ],
+    });
+
+    // 验证用户是否存在
+    if (!user) {
+      return res.status(401).json(ResponseUtil.error("User not found", 401));
+    }
+
+    // 验证密码
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      return res.status(401).json(ResponseUtil.error("Invalid password", 401));
+    }
+
+    // 生成令牌
+    const accessToken = jwt.generateAccessToken(user);
+    const refreshToken = jwt.generateRefreshToken(user);
+
+    // 保存刷新令牌
+    await RefreshToken.create({
+      token: refreshToken,
+      userId: user.id,
+    });
+
+    // 返回令牌和用户信息（不包含密码）
+    const userWithoutPassword = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      status: user.status,
+      roles: user.Roles,
+    };
+
+    res.json(
+      ResponseUtil.success(
+        {
+          user: userWithoutPassword,
+          accessToken,
+          refreshToken,
+        },
+        "Login successful"
+      )
+    );
   } catch (err) {
     next(err);
   }
 };
 
+// 刷新令牌
 exports.refresh = async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
-    if (!refreshToken) throw new Error("No refresh token");
-    const payload = jwt.verifyRefreshToken(refreshToken);
-    const tokenInDb = await RefreshToken.findOne({
+
+    if (!refreshToken) {
+      return res
+        .status(401)
+        .json(ResponseUtil.error("No refresh token provided", 401));
+    }
+
+    // 验证刷新令牌
+    const tokenDoc = await RefreshToken.findOne({
       where: { token: refreshToken },
+      include: [
+        {
+          model: User,
+          include: [{ model: Role }],
+        },
+      ],
     });
-    if (!tokenInDb) throw new Error("Invalid refresh token");
-    const accessToken = jwt.signAccessToken({
-      id: payload.id,
-      username: payload.username,
-    });
-    res.json({ accessToken });
+
+    if (!tokenDoc) {
+      return res
+        .status(401)
+        .json(ResponseUtil.error("Invalid refresh token", 401));
+    }
+
+    // 生成新的访问令牌
+    const accessToken = jwt.generateAccessToken(tokenDoc.User);
+
+    res.json(
+      ResponseUtil.success({ accessToken }, "Token refreshed successfully")
+    );
   } catch (err) {
     next(err);
   }
 };
 
+// 注销登录
 exports.logout = async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
-    if (!refreshToken) throw new Error("No refresh token");
-    await TokenBlacklist.create({
-      token: refreshToken,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+
+    if (!refreshToken) {
+      return res
+        .status(401)
+        .json(ResponseUtil.error("No refresh token provided", 401));
+    }
+
+    // 删除刷新令牌
+    await RefreshToken.destroy({
+      where: { token: refreshToken },
     });
-    await RefreshToken.destroy({ where: { token: refreshToken } });
-    res.json({ message: "Logged out" });
+
+    res.json(ResponseUtil.success(null, "Logged out successfully"));
   } catch (err) {
     next(err);
   }

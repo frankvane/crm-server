@@ -1,0 +1,18 @@
+{
+    "sourceFile": "controllers/auth.controller.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1745923933211,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1745923933211,
+            "name": "Commit-0",
+            "content": "const bcrypt = require(\"bcryptjs\");\r\nconst { User, Role, Permission, RefreshToken } = require(\"../models\");\r\nconst jwt = require(\"../utils/jwt\");\r\nconst ResponseUtil = require(\"../utils/response\");\r\n\r\n// 用户登录\r\nexports.login = async (req, res, next) => {\r\n  try {\r\n    const { username, password } = req.body;\r\n\r\n    // 查找用户\r\n    const user = await User.findOne({\r\n      where: { username },\r\n      include: [{\r\n        model: Role,\r\n        include: [{ model: Permission }]\r\n      }]\r\n    });\r\n\r\n    // 验证用户是否存在\r\n    if (!user) {\r\n      return res.status(401).json(\r\n        ResponseUtil.error(\"User not found\", 401)\r\n      );\r\n    }\r\n\r\n    // 验证密码\r\n    const isValidPassword = await bcrypt.compare(password, user.password);\r\n    if (!isValidPassword) {\r\n      return res.status(401).json(\r\n        ResponseUtil.error(\"Invalid password\", 401)\r\n      );\r\n    }\r\n\r\n    // 生成令牌\r\n    const accessToken = jwt.generateAccessToken(user);\r\n    const refreshToken = jwt.generateRefreshToken(user);\r\n\r\n    // 保存刷新令牌\r\n    await RefreshToken.create({\r\n      token: refreshToken,\r\n      userId: user.id\r\n    });\r\n\r\n    // 返回令牌和用户信息（不包含密码）\r\n    const userWithoutPassword = {\r\n      id: user.id,\r\n      username: user.username,\r\n      email: user.email,\r\n      status: user.status,\r\n      roles: user.Roles\r\n    };\r\n\r\n    res.json(ResponseUtil.success({\r\n      user: userWithoutPassword,\r\n      accessToken,\r\n      refreshToken\r\n    }, \"Login successful\"));\r\n\r\n  } catch (err) {\r\n    next(err);\r\n  }\r\n};\r\n\r\n// 刷新令牌\r\nexports.refresh = async (req, res, next) => {\r\n  try {\r\n    const { refreshToken } = req.body;\r\n\r\n    if (!refreshToken) {\r\n      return res.status(401).json(\r\n        ResponseUtil.error(\"No refresh token provided\", 401)\r\n      );\r\n    }\r\n\r\n    // 验证刷新令牌\r\n    const tokenDoc = await RefreshToken.findOne({\r\n      where: { token: refreshToken },\r\n      include: [{\r\n        model: User,\r\n        include: [{ model: Role }]\r\n      }]\r\n    });\r\n\r\n    if (!tokenDoc) {\r\n      return res.status(401).json(\r\n        ResponseUtil.error(\"Invalid refresh token\", 401)\r\n      );\r\n    }\r\n\r\n    // 生成新的访问令牌\r\n    const accessToken = jwt.generateAccessToken(tokenDoc.User);\r\n\r\n    res.json(ResponseUtil.success({ accessToken }, \"Token refreshed successfully\"));\r\n\r\n  } catch (err) {\r\n    next(err);\r\n  }\r\n};\r\n\r\n// 注销登录\r\nexports.logout = async (req, res, next) => {\r\n  try {\r\n    const { refreshToken } = req.body;\r\n\r\n    if (!refreshToken) {\r\n      return res.status(401).json(\r\n        ResponseUtil.error(\"No refresh token provided\", 401)\r\n      );\r\n    }\r\n\r\n    // 删除刷新令牌\r\n    await RefreshToken.destroy({\r\n      where: { token: refreshToken }\r\n    });\r\n\r\n    res.json(ResponseUtil.success(null, \"Logged out successfully\"));\r\n\r\n  } catch (err) {\r\n    next(err);\r\n  }\r\n};\r\n"
+        }
+    ]
+}

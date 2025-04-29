@@ -88,13 +88,43 @@ npm start
 - **响应**：
   ```json
   {
-    "accessToken": "string",
-    "refreshToken": "string"
+    "code": 200,
+    "message": "Login successful",
+    "data": {
+      "user": {
+        "id": "number",
+        "username": "string",
+        "email": "string",
+        "status": "boolean",
+        "roles": [
+          {
+            "id": "number",
+            "name": "string",
+            "description": "string",
+            "Permissions": [
+              {
+                "id": "number",
+                "name": "string",
+                "action": "string",
+                "resource": "string"
+              }
+            ]
+          }
+        ]
+      },
+      "accessToken": "string",
+      "refreshToken": "string"
+    }
   }
   ```
-- **错误**：
-  - 401: "User not found" / "Invalid password"
-  - 500: "Internal Server Error"
+- **错误响应**：
+  ```json
+  {
+    "code": 401,
+    "message": "User not found" | "Invalid password",
+    "data": null
+  }
+  ```
 
 #### 2. 刷新令牌
 
@@ -109,12 +139,21 @@ npm start
 - **响应**：
   ```json
   {
-    "accessToken": "string"
+    "code": 200,
+    "message": "Token refreshed successfully",
+    "data": {
+      "accessToken": "string"
+    }
   }
   ```
-- **错误**：
-  - 401: "No refresh token" / "Invalid refresh token"
-  - 500: "Internal Server Error"
+- **错误响应**：
+  ```json
+  {
+    "code": 401,
+    "message": "No refresh token provided" | "Invalid refresh token",
+    "data": null
+  }
+  ```
 
 #### 3. 注销登录
 
@@ -129,12 +168,19 @@ npm start
 - **响应**：
   ```json
   {
-    "message": "Logged out"
+    "code": 200,
+    "message": "Logged out successfully",
+    "data": null
   }
   ```
-- **错误**：
-  - 401: "No refresh token"
-  - 500: "Internal Server Error"
+- **错误响应**：
+  ```json
+  {
+    "code": 401,
+    "message": "No refresh token provided",
+    "data": null
+  }
+  ```
 
 ### 用户管理接口
 
