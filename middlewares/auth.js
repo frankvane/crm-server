@@ -1,11 +1,31 @@
 const jwt = require("../utils/jwt");
-module.exports = (req, res, next) => {
-  const token = req.headers["authorization"]?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "No token provided" });
+const ResponseUtil = require("../utils/response");
+
+module.exports = async (req, res, next) => {
   try {
-    req.user = jwt.verifyAccessToken(token);
-    next();
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json(ResponseUtil.error("No token provided", 401));
+    }
+
+    const token = authHeader.split(" ")[1];
+    if (!token) {
+      return res
+        .status(401)
+        .json(ResponseUtil.error("Invalid token format", 401));
+    }
+
+    try {
+      const decoded = jwt.verifyAccessToken(token);
+      req.user = decoded;
+      next();
+    } catch (err) {
+      if (err.name === "TokenExpiredError") {
+        return res.status(401).json(ResponseUtil.error("Token expired", 401));
+      }
+      return res.status(401).json(ResponseUtil.error("Invalid token", 401));
+    }
   } catch (err) {
-    return res.status(401).json({ message: "Invalid or expired token" });
+    next(err);
   }
 };

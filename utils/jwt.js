@@ -1,17 +1,49 @@
 const jwt = require("jsonwebtoken");
-const ACCESS_SECRET = process.env.JWT_SECRET;
-const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
+const config = require("../config/auth");
 
-exports.signAccessToken = (payload) =>
-  jwt.sign(payload, ACCESS_SECRET, {
-    expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN,
+// 生成访问令牌
+const generateAccessToken = (user) => {
+  const payload = {
+    id: user.id,
+    username: user.username,
+    roles:
+      user.Roles?.map((role) => ({
+        id: role.id,
+        name: role.name,
+        permissions: role.Permissions?.map((p) => p.name) || [],
+      })) || [],
+  };
+
+  return jwt.sign(payload, config.jwtSecret, {
+    expiresIn: config.jwtExpiration,
   });
+};
 
-exports.signRefreshToken = (payload) =>
-  jwt.sign(payload, REFRESH_SECRET, {
-    expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN,
+// 生成刷新令牌
+const generateRefreshToken = (user) => {
+  const payload = {
+    id: user.id,
+    username: user.username,
+  };
+
+  return jwt.sign(payload, config.refreshTokenSecret, {
+    expiresIn: config.refreshTokenExpiration,
   });
+};
 
-exports.verifyAccessToken = (token) => jwt.verify(token, ACCESS_SECRET);
+// 验证访问令牌
+const verifyAccessToken = (token) => {
+  return jwt.verify(token, config.jwtSecret);
+};
 
-exports.verifyRefreshToken = (token) => jwt.verify(token, REFRESH_SECRET);
+// 验证刷新令牌
+const verifyRefreshToken = (token) => {
+  return jwt.verify(token, config.refreshTokenSecret);
+};
+
+module.exports = {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyAccessToken,
+  verifyRefreshToken,
+};
