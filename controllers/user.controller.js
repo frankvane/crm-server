@@ -1,6 +1,7 @@
 const { User, Role } = require("../models");
 const bcrypt = require("bcryptjs");
 const { Op } = require("sequelize");
+const ResponseUtil = require("../utils/response");
 
 // 创建用户
 exports.create = async (req, res, next) => {
@@ -10,13 +11,15 @@ exports.create = async (req, res, next) => {
     // 检查用户名是否已存在
     const existingUser = await User.findOne({ where: { username } });
     if (existingUser) {
-      return res.status(400).json({ message: "Username already exists" });
+      return res
+        .status(400)
+        .json(ResponseUtil.error("Username already exists", 400));
     }
 
     // 创建用户
     const user = await User.create({
       username,
-      password, // 密码会在model的beforeCreate钩子中自动加密
+      password,
       email,
       status: true,
     });
@@ -32,7 +35,9 @@ exports.create = async (req, res, next) => {
       attributes: { exclude: ["password"] },
     });
 
-    res.status(201).json(userWithRoles);
+    res
+      .status(201)
+      .json(ResponseUtil.success(userWithRoles, "User created successfully"));
   } catch (err) {
     next(err);
   }
@@ -41,8 +46,8 @@ exports.create = async (req, res, next) => {
 // 获取用户列表（支持分页和搜索）
 exports.list = async (req, res, next) => {
   try {
-    const { page = 1, limit = 10, search } = req.query;
-    const offset = (page - 1) * limit;
+    const { page = 1, pageSize = 10, search } = req.query;
+    const offset = (page - 1) * pageSize;
 
     const where = {};
     if (search) {
@@ -57,16 +62,13 @@ exports.list = async (req, res, next) => {
       include: [{ model: Role, through: { attributes: [] } }],
       attributes: { exclude: ["password"] },
       offset,
-      limit: parseInt(limit),
+      limit: parseInt(pageSize),
       distinct: true,
     });
 
-    res.json({
-      total: count,
-      pages: Math.ceil(count / limit),
-      currentPage: parseInt(page),
-      data: rows,
-    });
+    res.json(
+      ResponseUtil.page(rows, count, parseInt(page), parseInt(pageSize))
+    );
   } catch (err) {
     next(err);
   }
@@ -81,10 +83,10 @@ exports.getById = async (req, res, next) => {
     });
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json(ResponseUtil.error("User not found", 404));
     }
 
-    res.json(user);
+    res.json(ResponseUtil.success(user));
   } catch (err) {
     next(err);
   }
@@ -97,14 +99,16 @@ exports.update = async (req, res, next) => {
     const user = await User.findByPk(req.params.id);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json(ResponseUtil.error("User not found", 404));
     }
 
     // 如果要更新用户名，检查是否与其他用户冲突
     if (username && username !== user.username) {
       const existingUser = await User.findOne({ where: { username } });
       if (existingUser) {
-        return res.status(400).json({ message: "Username already exists" });
+        return res
+          .status(400)
+          .json(ResponseUtil.error("Username already exists", 400));
       }
       user.username = username;
     }
@@ -127,7 +131,7 @@ exports.update = async (req, res, next) => {
       attributes: { exclude: ["password"] },
     });
 
-    res.json(updatedUser);
+    res.json(ResponseUtil.success(updatedUser, "User updated successfully"));
   } catch (err) {
     next(err);
   }
@@ -139,11 +143,11 @@ exports.delete = async (req, res, next) => {
     const user = await User.findByPk(req.params.id);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json(ResponseUtil.error("User not found", 404));
     }
 
     await user.destroy();
-    res.json({ message: "User deleted successfully" });
+    res.json(ResponseUtil.success(null, "User deleted successfully"));
   } catch (err) {
     next(err);
   }

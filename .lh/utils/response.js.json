@@ -1,0 +1,22 @@
+{
+    "sourceFile": "utils/response.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1745923739943,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1745923812249,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,17 +2,17 @@\n   static success(data = null, message = \"Success\") {\r\n     return {\r\n       code: 200,\r\n       message,\r\n-      data\r\n+      data,\r\n     };\r\n   }\r\n \r\n   static error(message = \"Error\", code = 500) {\r\n     return {\r\n       code,\r\n       message,\r\n-      data: null\r\n+      data: null,\r\n     };\r\n   }\r\n \r\n   static page(data, total, currentPage, pageSize) {\r\n@@ -24,11 +24,11 @@\n         pagination: {\r\n           total,\r\n           current: currentPage,\r\n           pageSize,\r\n-          totalPages: Math.ceil(total / pageSize)\r\n-        }\r\n-      }\r\n+          totalPages: Math.ceil(total / pageSize),\r\n+        },\r\n+      },\r\n     };\r\n   }\r\n }\r\n \r\n"
+                }
+            ],
+            "date": 1745923739943,
+            "name": "Commit-0",
+            "content": "class ResponseUtil {\r\n  static success(data = null, message = \"Success\") {\r\n    return {\r\n      code: 200,\r\n      message,\r\n      data\r\n    };\r\n  }\r\n\r\n  static error(message = \"Error\", code = 500) {\r\n    return {\r\n      code,\r\n      message,\r\n      data: null\r\n    };\r\n  }\r\n\r\n  static page(data, total, currentPage, pageSize) {\r\n    return {\r\n      code: 200,\r\n      message: \"Success\",\r\n      data: {\r\n        list: data,\r\n        pagination: {\r\n          total,\r\n          current: currentPage,\r\n          pageSize,\r\n          totalPages: Math.ceil(total / pageSize)\r\n        }\r\n      }\r\n    };\r\n  }\r\n}\r\n\r\nmodule.exports = ResponseUtil;\r\n"
+        }
+    ]
+}

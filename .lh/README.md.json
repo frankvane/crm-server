@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 6,
+            "activePatchIndex": 8,
             "patches": [
                 {
                     "date": 1745848057856,
@@ -32,6 +32,14 @@
                 {
                     "date": 1745881604778,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -370,8 +370,41 @@\n - **错误**：\r\n   - 401: \"No token provided\" / \"Invalid or expired token\"\r\n   - 500: \"Internal Server Error\"\r\n \r\n+## RBAC 权限管理\r\n+\r\n+### 权限检查流程\r\n+\r\n+1. 用户登录后获取访问令牌（Access Token）\r\n+2. 访问需要权限的接口时，需要在请求头中携带访问令牌\r\n+3. 系统会自动检查用户是否具有所需权限：\r\n+   - 通过 Token 解析用户身份\r\n+   - 查询用户关联的角色\r\n+   - 检查角色是否具有所需权限\r\n+   - 如果没有权限，返回 403 错误\r\n+\r\n+### 默认权限列表\r\n+\r\n+| 权限名称 | 描述 | 所属角色 |\r\n+|---------|------|---------|\r\n+| create_user | 创建用户 | admin |\r\n+| view_users | 查看用户 | admin, user |\r\n+| update_user | 更新用户 | admin |\r\n+| delete_user | 删除用户 | admin |\r\n+| manage_roles | 管理角色 | admin |\r\n+| manage_categories | 管理分类 | admin |\r\n+\r\n+### 默认角色\r\n+\r\n+1. **管理员(admin)**\r\n+   - 拥有所有权限\r\n+   - 可以管理用户、角色、权限和分类\r\n+\r\n+2. **普通用户(user)**\r\n+   - 仅拥有查看权限\r\n+   - 可以查看用户列表和用户详情\r\n+\r\n ## 更新日志（Changelog）\r\n \r\n ### v1.0.1 (2024-03-19)\r\n \r\n@@ -379,8 +412,15 @@\n - 实现数据库初始化脚本\r\n - 添加默认管理员账户\r\n - 完善接口文档\r\n \r\n+### v1.0.2 (2024-03-19)\r\n+\r\n+- 优化 RBAC 权限管理模块\r\n+- 修复数据库同步问题\r\n+- 完善权限检查机制\r\n+- 更新文档，添加 RBAC 权限管理说明\r\n+\r\n ### v1.0.0\r\n \r\n - 项目初始化，完成 RBAC 权限管理、JWT 双 Token 认证、无限级分类基础模块\r\n - 支持用户、角色、权限、分类、Token 等基础模型\r\n"
+                },
+                {
+                    "date": 1745923811916,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -384,20 +384,21 @@\n    - 如果没有权限，返回 403 错误\r\n \r\n ### 默认权限列表\r\n \r\n-| 权限名称 | 描述 | 所属角色 |\r\n-|---------|------|---------|\r\n-| create_user | 创建用户 | admin |\r\n-| view_users | 查看用户 | admin, user |\r\n-| update_user | 更新用户 | admin |\r\n-| delete_user | 删除用户 | admin |\r\n-| manage_roles | 管理角色 | admin |\r\n-| manage_categories | 管理分类 | admin |\r\n+| 权限名称          | 描述     | 所属角色    |\r\n+| ----------------- | -------- | ----------- |\r\n+| create_user       | 创建用户 | admin       |\r\n+| view_users        | 查看用户 | admin, user |\r\n+| update_user       | 更新用户 | admin       |\r\n+| delete_user       | 删除用户 | admin       |\r\n+| manage_roles      | 管理角色 | admin       |\r\n+| manage_categories | 管理分类 | admin       |\r\n \r\n ### 默认角色\r\n \r\n 1. **管理员(admin)**\r\n+\r\n    - 拥有所有权限\r\n    - 可以管理用户、角色、权限和分类\r\n \r\n 2. **普通用户(user)**\r\n"
+                },
+                {
+                    "date": 1745923823639,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -404,8 +404,61 @@\n 2. **普通用户(user)**\r\n    - 仅拥有查看权限\r\n    - 可以查看用户列表和用户详情\r\n \r\n+## 接口响应格式\r\n+\r\n+### 成功响应\r\n+\r\n+```json\r\n+{\r\n+  \"code\": 200,\r\n+  \"message\": \"Success\",\r\n+  \"data\": {\r\n+    // 响应数据\r\n+  }\r\n+}\r\n+```\r\n+\r\n+### 分页响应\r\n+\r\n+```json\r\n+{\r\n+  \"code\": 200,\r\n+  \"message\": \"Success\",\r\n+  \"data\": {\r\n+    \"list\": [\r\n+      // 数据列表\r\n+    ],\r\n+    \"pagination\": {\r\n+      \"total\": 100,      // 总记录数\r\n+      \"current\": 1,      // 当前页码\r\n+      \"pageSize\": 10,    // 每页大小\r\n+      \"totalPages\": 10   // 总页数\r\n+    }\r\n+  }\r\n+}\r\n+```\r\n+\r\n+### 错误响应\r\n+\r\n+```json\r\n+{\r\n+  \"code\": 400,          // 错误码\r\n+  \"message\": \"错误信息\",  // 错误描述\r\n+  \"data\": null\r\n+}\r\n+```\r\n+\r\n+### 常见错误码\r\n+\r\n+- 200: 成功\r\n+- 400: 请求参数错误\r\n+- 401: 未认证或认证失败\r\n+- 403: 权限不足\r\n+- 404: 资源不存在\r\n+- 500: 服务器内部错误\r\n+\r\n ## 更新日志（Changelog）\r\n \r\n ### v1.0.1 (2024-03-19)\r\n \r\n@@ -420,8 +473,15 @@\n - 修复数据库同步问题\r\n - 完善权限检查机制\r\n - 更新文档，添加 RBAC 权限管理说明\r\n \r\n+### v1.0.3 (2024-03-19)\r\n+\r\n+- 统一接口响应格式\r\n+- 添加分页响应格式\r\n+- 完善错误处理机制\r\n+- 更新接口文档\r\n+\r\n ### v1.0.0\r\n \r\n - 项目初始化，完成 RBAC 权限管理、JWT 双 Token 认证、无限级分类基础模块\r\n - 支持用户、角色、权限、分类、Token 等基础模型\r\n"
                 }
             ],
             "date": 1745848057855,
