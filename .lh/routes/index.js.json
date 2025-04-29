@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 1,
+            "activePatchIndex": 2,
             "patches": [
                 {
                     "date": 1745880394978,
@@ -12,6 +12,10 @@
                 {
                     "date": 1745926103968,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,7 +2,8 @@\n const router = express.Router();\r\n \r\n router.use(\"/auth\", require(\"./auth.routes\"));\r\n router.use(\"/users\", require(\"./user.routes\"));\r\n-router.use(\"/category\", require(\"./category.routes\"));\r\n+router.use(\"/categories\", require(\"./category.routes\"));\r\n+router.use(\"/category-types\", require(\"./categoryType.routes\"));\r\n \r\n module.exports = router;\r\n"
+                },
+                {
+                    "date": 1745936752325,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,6 +4,7 @@\n router.use(\"/auth\", require(\"./auth.routes\"));\r\n router.use(\"/users\", require(\"./user.routes\"));\r\n router.use(\"/categories\", require(\"./category.routes\"));\r\n router.use(\"/category-types\", require(\"./categoryType.routes\"));\r\n+router.use(\"/roles\", require(\"./role.routes\"));\r\n \r\n module.exports = router;\r\n"
                 }
             ],
             "date": 1745880394978,

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "routes/role.routes.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1745936740995,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1745936740995,
+            "name": "Commit-0",
+            "content": "const express = require(\"express\");\r\nconst router = express.Router();\r\nconst roleController = require(\"../controllers/role.controller\");\r\nconst { authenticateToken, checkPermission } = require(\"../middlewares/auth\");\r\n\r\n// 创建角色\r\nrouter.post(\r\n  \"/\",\r\n  authenticateToken,\r\n  checkPermission(\"manage_roles\"),\r\n  roleController.createRole\r\n);\r\n\r\n// 获取角色列表\r\nrouter.get(\r\n  \"/\",\r\n  authenticateToken,\r\n  checkPermission(\"view_roles\"),\r\n  roleController.getRoles\r\n);\r\n\r\n// 获取单个角色\r\nrouter.get(\r\n  \"/:id\",\r\n  authenticateToken,\r\n  checkPermission(\"view_roles\"),\r\n  roleController.getRole\r\n);\r\n\r\n// 更新角色\r\nrouter.put(\r\n  \"/:id\",\r\n  authenticateToken,\r\n  checkPermission(\"manage_roles\"),\r\n  roleController.updateRole\r\n);\r\n\r\n// 删除角色\r\nrouter.delete(\r\n  \"/:id\",\r\n  authenticateToken,\r\n  checkPermission(\"manage_roles\"),\r\n  roleController.deleteRole\r\n);\r\n\r\nmodule.exports = router;"
+        }
+    ]
+}
