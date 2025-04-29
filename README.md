@@ -352,10 +352,10 @@ npm start
 
 ### 分类接口
 
-#### 1. 创建分类
+#### 1. 创建分类类型
 
-- **接口**：`POST /api/category`
-- **描述**：创建新的分类（支持无限级嵌套）
+- **接口**：`POST /api/category-types`
+- **描述**：创建新的分类类型（需要 manage_categories 权限）
 - **认证**：需要有效的访问令牌（Bearer Token）
 - **请求头**：
   ```
@@ -365,57 +365,220 @@ npm start
   ```json
   {
     "name": "string",
-    "parentId": "number | null",
-    "description": "string | null"
+    "code": "string",
+    "description": "string",
+    "status": "boolean"
   }
   ```
-- **响应**：返回创建的分类对象
+- **响应**：
   ```json
   {
-    "id": "number",
-    "name": "string",
-    "parentId": "number | null",
-    "description": "string | null",
-    "createdAt": "string",
-    "updatedAt": "string"
+    "code": 200,
+    "message": "Category type created successfully",
+    "data": {
+      "id": "number",
+      "name": "string",
+      "code": "string",
+      "description": "string",
+      "status": "boolean",
+      "createdAt": "string",
+      "updatedAt": "string"
+    }
   }
   ```
-- **错误**：
-  - 401: "No token provided" / "Invalid or expired token"
-  - 500: "Internal Server Error"
+- **错误响应**：
+  ```json
+  {
+    "code": 400,
+    "message": "Category type code already exists",
+    "data": null
+  }
+  ```
 
-#### 2. 获取分类树
+#### 2. 获取分类类型列表
 
-- **接口**：`GET /api/category`
-- **描述**：获取完整的分类树结构
+- **接口**：`GET /api/category-types`
+- **描述**：获取所有分类类型
 - **认证**：需要有效的访问令牌（Bearer Token）
 - **请求头**：
   ```
   Authorization: Bearer <accessToken>
   ```
-- **响应**：返回树形结构的分类列表
+- **查询参数**：
+  - `page`: 页码（默认：1）
+  - `pageSize`: 每页数量（默认：10）
+  - `status`: 状态过滤（可选）
+- **响应**：
   ```json
-  [
-    {
-      "id": "number",
-      "name": "string",
-      "parentId": null,
-      "description": "string",
-      "children": [
+  {
+    "code": 200,
+    "message": "Success",
+    "data": {
+      "total": "number",
+      "items": [
         {
           "id": "number",
           "name": "string",
-          "parentId": "number",
+          "code": "string",
           "description": "string",
-          "children": []
+          "status": "boolean",
+          "createdAt": "string",
+          "updatedAt": "string"
         }
       ]
     }
-  ]
+  }
   ```
-- **错误**：
-  - 401: "No token provided" / "Invalid or expired token"
-  - 500: "Internal Server Error"
+
+#### 3. 创建分类
+
+- **接口**：`POST /api/categories`
+- **描述**：创建新的分类（需要 manage_categories 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **请求头**：
+  ```
+  Authorization: Bearer <accessToken>
+  ```
+- **请求体**：
+  ```json
+  {
+    "name": "string",
+    "code": "string",
+    "typeId": "number",
+    "parentId": "number",
+    "sort": "number",
+    "description": "string"
+  }
+  ```
+- **响应**：
+  ```json
+  {
+    "code": 200,
+    "message": "Category created successfully",
+    "data": {
+      "id": "number",
+      "name": "string",
+      "code": "string",
+      "typeId": "number",
+      "parentId": "number",
+      "sort": "number",
+      "description": "string",
+      "createdAt": "string",
+      "updatedAt": "string"
+    }
+  }
+  ```
+- **错误响应**：
+  ```json
+  {
+    "code": 400,
+    "message": "Category code already exists under the same type",
+    "data": null
+  }
+  ```
+
+#### 4. 获取分类树
+
+- **接口**：`GET /api/categories/tree`
+- **描述**：获取指定类型的分类树结构
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **请求头**：
+  ```
+  Authorization: Bearer <accessToken>
+  ```
+- **查询参数**：
+  - `typeId`: 分类类型 ID（必填）
+- **响应**：
+  ```json
+  {
+    "code": 200,
+    "message": "Success",
+    "data": [
+      {
+        "id": "number",
+        "name": "string",
+        "code": "string",
+        "typeId": "number",
+        "sort": "number",
+        "description": "string",
+        "children": [
+          {
+            "id": "number",
+            "name": "string",
+            "code": "string",
+            "typeId": "number",
+            "parentId": "number",
+            "sort": "number",
+            "description": "string"
+          }
+        ]
+      }
+    ]
+  }
+  ```
+
+#### 5. 更新分类
+
+- **接口**：`PUT /api/categories/:id`
+- **描述**：更新指定分类（需要 manage_categories 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **请求头**：
+  ```
+  Authorization: Bearer <accessToken>
+  ```
+- **请求体**：
+  ```json
+  {
+    "name": "string",
+    "code": "string",
+    "parentId": "number",
+    "sort": "number",
+    "description": "string"
+  }
+  ```
+- **响应**：
+  ```json
+  {
+    "code": 200,
+    "message": "Category updated successfully",
+    "data": {
+      "id": "number",
+      "name": "string",
+      "code": "string",
+      "typeId": "number",
+      "parentId": "number",
+      "sort": "number",
+      "description": "string",
+      "updatedAt": "string"
+    }
+  }
+  ```
+
+#### 6. 删除分类
+
+- **接口**：`DELETE /api/categories/:id`
+- **描述**：删除指定分类（需要 manage_categories 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **请求头**：
+  ```
+  Authorization: Bearer <accessToken>
+  ```
+- **响应**：
+  ```json
+  {
+    "code": 200,
+    "message": "Category deleted successfully",
+    "data": null
+  }
+  ```
+- **错误响应**：
+  ```json
+  {
+    "code": 400,
+    "message": "Cannot delete category with children",
+    "data": null
+  }
+  ```
 
 ## RBAC 权限管理
 
@@ -533,3 +696,22 @@ npm start
 - 支持用户、角色、权限、分类、Token 等基础模型
 - 实现基础认证、分类接口
 - 添加详细的 API 接口文档
+
+### v0.2.0 (2024-03-xx)
+
+- 新增分类管理功能
+  - 支持分类类型管理
+  - 支持无限级分类
+  - 分类代码唯一性校验
+  - 分类树形结构查询
+- 完善 API 文档
+  - 新增分类管理接口文档
+  - 更新用户管理接口文档
+
+### v0.1.0 (2024-03-xx)
+
+- 初始版本
+  - 基础 RBAC 权限模型
+  - JWT 双 Token 认证
+  - 用户管理功能
+  - 角色权限管理
