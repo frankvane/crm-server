@@ -92,7 +92,7 @@ async function createInitialData() {
     // 7. 创建系统菜单分类
     const systemManage = await Category.create({
       name: "系统管理",
-      code: "system",
+      code: "system-manage",
       typeId: menuType.id,
       sort: 1,
       description: "系统管理相关功能",
@@ -101,38 +101,38 @@ async function createInitialData() {
     await Category.bulkCreate([
       {
         name: "用户管理",
-        code: "user",
+        code: "system-user",
         parentId: systemManage.id,
         typeId: menuType.id,
         sort: 1,
       },
       {
         name: "角色管理",
-        code: "role",
+        code: "system-role",
         parentId: systemManage.id,
         typeId: menuType.id,
         sort: 2,
       },
       {
         name: "权限管理",
-        code: "permission",
+        code: "system-permission",
         parentId: systemManage.id,
         typeId: menuType.id,
         sort: 3,
       },
       {
         name: "分类管理",
-        code: "category",
+        code: "system-category",
         parentId: systemManage.id,
         typeId: menuType.id,
         sort: 4,
       },
     ]);
 
-    // 创建产品相关分类
+    // 创建产品相关菜单分类
     const productManage = await Category.create({
       name: "产品管理",
-      code: "product",
+      code: "product-manage",
       typeId: menuType.id,
       sort: 2,
       description: "产品管理相关功能",
@@ -141,21 +141,21 @@ async function createInitialData() {
     await Category.bulkCreate([
       {
         name: "产品列表",
-        code: "product-list",
+        code: "product-manage-list",
         parentId: productManage.id,
         typeId: menuType.id,
         sort: 1,
       },
       {
         name: "品牌管理",
-        code: "brand",
+        code: "product-manage-brand",
         parentId: productManage.id,
         typeId: menuType.id,
         sort: 2,
       },
       {
         name: "分类管理",
-        code: "category",
+        code: "product-manage-category",
         parentId: productManage.id,
         typeId: menuType.id,
         sort: 3,
@@ -165,7 +165,7 @@ async function createInitialData() {
     // 创建产品分类数据
     const productCategory = await Category.create({
       name: "所有产品",
-      code: "all-products",
+      code: "product-all",
       typeId: productType.id,
       sort: 1,
       description: "产品分类",
@@ -174,21 +174,21 @@ async function createInitialData() {
     await Category.bulkCreate([
       {
         name: "电子产品",
-        code: "electronics",
+        code: "product-electronics",
         parentId: productCategory.id,
         typeId: productType.id,
         sort: 1,
       },
       {
         name: "家具用品",
-        code: "furniture",
+        code: "product-furniture",
         parentId: productCategory.id,
         typeId: productType.id,
         sort: 2,
       },
       {
         name: "办公用品",
-        code: "office",
+        code: "product-office",
         parentId: productCategory.id,
         typeId: productType.id,
         sort: 3,
