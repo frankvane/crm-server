@@ -1,13 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const roleController = require("../controllers/role.controller");
-const { authenticateToken, checkPermission } = require("../middlewares/auth");
+const { authenticateToken, hasPermission } = require("../middlewares/auth");
 
 // 创建角色
 router.post(
   "/",
   authenticateToken,
-  checkPermission("manage_roles"),
+  hasPermission("manage_roles"),
   roleController.createRole
 );
 
@@ -15,7 +15,7 @@ router.post(
 router.get(
   "/",
   authenticateToken,
-  checkPermission("view_roles"),
+  hasPermission("view_roles"),
   roleController.getRoles
 );
 
@@ -23,7 +23,7 @@ router.get(
 router.get(
   "/:id",
   authenticateToken,
-  checkPermission("view_roles"),
+  hasPermission("view_roles"),
   roleController.getRole
 );
 
@@ -31,7 +31,7 @@ router.get(
 router.put(
   "/:id",
   authenticateToken,
-  checkPermission("manage_roles"),
+  hasPermission("manage_roles"),
   roleController.updateRole
 );
 
@@ -39,7 +39,7 @@ router.put(
 router.delete(
   "/:id",
   authenticateToken,
-  checkPermission("manage_roles"),
+  hasPermission("manage_roles"),
   roleController.deleteRole
 );
 
