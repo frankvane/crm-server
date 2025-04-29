@@ -1,0 +1,22 @@
+{
+    "sourceFile": "config/database.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1745938826657,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1745939479328,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -14,15 +14,15 @@\n       validateBulkLoadParameters: true,\r\n       rowCollectionOnDone: true,\r\n       useUTC: false,\r\n       connectTimeout: 30000,\r\n-      requestTimeout: 30000\r\n+      requestTimeout: 30000,\r\n     },\r\n   },\r\n   pool: {\r\n     max: 5,\r\n     min: 0,\r\n     acquire: 30000,\r\n-    idle: 10000\r\n+    idle: 10000,\r\n   },\r\n-  logging: false\r\n+  logging: false,\r\n };\r\n"
+                }
+            ],
+            "date": 1745938826656,
+            "name": "Commit-0",
+            "content": "require(\"dotenv\").config();\r\nmodule.exports = {\r\n  username: process.env.DB_USER,\r\n  password: process.env.DB_PASS,\r\n  database: process.env.DB_NAME,\r\n  host: process.env.DB_HOST,\r\n  port: process.env.DB_PORT,\r\n  dialect: \"mssql\",\r\n  dialectOptions: {\r\n    options: {\r\n      encrypt: false,\r\n      trustServerCertificate: true,\r\n      enableArithAbort: true,\r\n      validateBulkLoadParameters: true,\r\n      rowCollectionOnDone: true,\r\n      useUTC: false,\r\n      connectTimeout: 30000,\r\n      requestTimeout: 30000\r\n    },\r\n  },\r\n  pool: {\r\n    max: 5,\r\n    min: 0,\r\n    acquire: 30000,\r\n    idle: 10000\r\n  },\r\n  logging: false\r\n};\r\n"
+        }
+    ]
+}

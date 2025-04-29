@@ -1,0 +1,22 @@
+{
+    "sourceFile": "scripts/test-login.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1745938105428,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1745938568847,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,16 +1,19 @@\n-const axios = require('axios');\r\n+const axios = require(\"axios\");\r\n \r\n async function testLogin() {\r\n   try {\r\n-    const response = await axios.post('http://localhost:3000/api/auth/login', {\r\n-      username: 'admin',\r\n-      password: 'admin123'\r\n+    const response = await axios.post(\"http://localhost:3000/api/auth/login\", {\r\n+      username: \"admin\",\r\n+      password: \"admin123\",\r\n     });\r\n \r\n-    console.log('Login Response:', response.data);\r\n+    console.log(\"Login Response:\", response.data);\r\n   } catch (error) {\r\n\\ No newline at end of file\n-    console.error('Error:', error.response ? error.response.data : error.message);\r\n+    console.error(\r\n+      \"Error:\",\r\n+      error.response ? error.response.data : error.message\r\n+    );\r\n   }\r\n }\r\n \r\n-testLogin(); \n+testLogin();\r\n"
+                }
+            ],
+            "date": 1745938105428,
+            "name": "Commit-0",
+            "content": "const axios = require('axios');\r\n\r\nasync function testLogin() {\r\n  try {\r\n    const response = await axios.post('http://localhost:3000/api/auth/login', {\r\n      username: 'admin',\r\n      password: 'admin123'\r\n    });\r\n\r\n    console.log('Login Response:', response.data);\r\n  } catch (error) {\r\n    console.error('Error:', error.response ? error.response.data : error.message);\r\n  }\r\n}\r\n\r\ntestLogin(); "
+        }
+    ]
+}

@@ -1,0 +1,38 @@
+
+> crm-server@1.0.0 start
+> node app.js
+
+Error starting server: AccessDeniedError [SequelizeAccessDeniedError]: Login failed for user 'sa'.
+    at ConnectionManager.connect (E:\crm-server\node_modules\sequelize\lib\dialects\mssql\connection-manager.js:115:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async ConnectionManager._connect (E:\crm-server\node_modules\sequelize\lib\dialects\abstract\connection-manager.js:222:24)
+    at async E:\crm-server\node_modules\sequelize\lib\dialects\abstract\connection-manager.js:174:32
+    at async ConnectionManager.getConnection (E:\crm-server\node_modules\sequelize\lib\dialects\abstract\connection-manager.js:197:7)
+    at async E:\crm-server\node_modules\sequelize\lib\sequelize.js:305:26
+    at async MSSqlQueryInterface.dropTable (E:\crm-server\node_modules\sequelize\lib\dialects\abstract\query-interface.js:111:5)
+    at async RolePermission.drop (E:\crm-server\node_modules\sequelize\lib\model.js:1007:12)
+    at async Sequelize.drop (E:\crm-server\node_modules\sequelize\lib\sequelize.js:429:9)
+    at async Sequelize.sync (E:\crm-server\node_modules\sequelize\lib\sequelize.js:366:7) {
+  parent: ConnectionError: Login failed for user 'sa'.
+      at Login7TokenHandler.onErrorMessage (E:\crm-server\node_modules\tedious\lib\token\handler.js:187:19)
+      at Readable.<anonymous> (E:\crm-server\node_modules\tedious\lib\token\token-stream-parser.js:18:33)
+      at Readable.emit (node:events:524:28)
+      at addChunk (node:internal/streams/readable:561:12)
+      at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+      at Readable.push (node:internal/streams/readable:393:5)
+      at nextAsync (node:internal/streams/from:194:22)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+    code: 'ELOGIN'
+  },
+  original: ConnectionError: Login failed for user 'sa'.
+      at Login7TokenHandler.onErrorMessage (E:\crm-server\node_modules\tedious\lib\token\handler.js:187:19)
+      at Readable.<anonymous> (E:\crm-server\node_modules\tedious\lib\token\token-stream-parser.js:18:33)
+      at Readable.emit (node:events:524:28)
+      at addChunk (node:internal/streams/readable:561:12)
+      at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+      at Readable.push (node:internal/streams/readable:393:5)
+      at nextAsync (node:internal/streams/from:194:22)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+    code: 'ELOGIN'
+  }
+}

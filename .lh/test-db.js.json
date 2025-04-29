@@ -1,0 +1,22 @@
+{
+    "sourceFile": "test-db.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1745939270923,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1745939479497,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,10 +1,10 @@\n-const { Sequelize } = require('sequelize');\r\n+const { Sequelize } = require(\"sequelize\");\r\n \r\n-const sequelize = new Sequelize('crm', 'sa', 'chinavane', {\r\n-  host: 'localhost',\r\n+const sequelize = new Sequelize(\"crm\", \"sa\", \"chinavane\", {\r\n+  host: \"localhost\",\r\n   port: 1433,\r\n-  dialect: 'mssql',\r\n+  dialect: \"mssql\",\r\n   dialectOptions: {\r\n     options: {\r\n       encrypt: false,\r\n       trustServerCertificate: true,\r\n@@ -12,19 +12,19 @@\n       validateBulkLoadParameters: true,\r\n       rowCollectionOnDone: true,\r\n       useUTC: false,\r\n       connectTimeout: 30000,\r\n-      requestTimeout: 30000\r\n-    }\r\n-  }\r\n+      requestTimeout: 30000,\r\n+    },\r\n+  },\r\n });\r\n \r\n async function testConnection() {\r\n   try {\r\n     await sequelize.authenticate();\r\n-    console.log('Connection has been established successfully.');\r\n+    console.log(\"Connection has been established successfully.\");\r\n   } catch (error) {\r\n-    console.error('Unable to connect to the database:', error);\r\n\\ No newline at end of file\n+    console.error(\"Unable to connect to the database:\", error);\r\n   }\r\n }\r\n \r\n-testConnection(); \n+testConnection();\r\n"
+                }
+            ],
+            "date": 1745939270923,
+            "name": "Commit-0",
+            "content": "const { Sequelize } = require('sequelize');\r\n\r\nconst sequelize = new Sequelize('crm', 'sa', 'chinavane', {\r\n  host: 'localhost',\r\n  port: 1433,\r\n  dialect: 'mssql',\r\n  dialectOptions: {\r\n    options: {\r\n      encrypt: false,\r\n      trustServerCertificate: true,\r\n      enableArithAbort: true,\r\n      validateBulkLoadParameters: true,\r\n      rowCollectionOnDone: true,\r\n      useUTC: false,\r\n      connectTimeout: 30000,\r\n      requestTimeout: 30000\r\n    }\r\n  }\r\n});\r\n\r\nasync function testConnection() {\r\n  try {\r\n    await sequelize.authenticate();\r\n    console.log('Connection has been established successfully.');\r\n  } catch (error) {\r\n    console.error('Unable to connect to the database:', error);\r\n  }\r\n}\r\n\r\ntestConnection(); "
+        }
+    ]
+}
