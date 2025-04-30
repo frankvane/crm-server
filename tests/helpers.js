@@ -1,83 +1,67 @@
-const { sequelize, User, Role, Permission } = require("../models");
-const bcrypt = require("bcryptjs");
 const jwt = require("../utils/jwt");
 
-async function clearDatabase() {
-  try {
-    // 禁用所有表的外键约束
-    await sequelize.query(
-      "EXEC sp_MSforeachtable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'"
-    );
-
-    // 先删除关联表
-    await sequelize.models.UserRoles.destroy({ truncate: true, force: true });
-    await sequelize.models.RoleResources.destroy({
-      truncate: true,
-      force: true,
-    });
-    await sequelize.models.RolePermissions.destroy({
-      truncate: true,
-      force: true,
-    });
-
-    // 再删除基础表
-    await User.destroy({ truncate: true, force: true });
-    await Role.destroy({ truncate: true, force: true });
-    await sequelize.models.Resource.destroy({ truncate: true, force: true });
-    await Permission.destroy({ truncate: true, force: true });
-
-    // 重新启用所有表的外键约束
-    await sequelize.query(
-      "EXEC sp_MSforeachtable 'ALTER TABLE ? CHECK CONSTRAINT ALL'"
-    );
-  } catch (error) {
-    console.error("清理数据库失败:", error);
-    throw error;
-  }
+/**
+ * 生成测试用的请求头
+ * @param {number} userId - 用户ID
+ * @returns {Object} - 包含Authorization的请求头
+ */
+function getTestHeaders(userId = 1) {
+  const token = jwt.generateAccessToken(userId);
+  return {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
 }
 
-async function createTestUser(userData = {}) {
-  const defaultData = {
+/**
+ * 生成测试用的用户数据
+ * @param {Object} overrides - 需要覆盖的字段
+ * @returns {Object} - 用户数据
+ */
+function generateUserData(overrides = {}) {
+  return {
     username: "testuser",
-    password: await bcrypt.hash("password123", 10),
+    password: "password123",
     email: "test@example.com",
     status: 1,
+    ...overrides,
   };
-
-  const user = await User.create({ ...defaultData, ...userData });
-  return user;
 }
 
-async function createTestRole(roleData = {}) {
-  const defaultData = {
-    name: "testrole",
-    description: "Test role description",
+/**
+ * 生成测试用的角色数据
+ * @param {Object} overrides - 需要覆盖的字段
+ * @returns {Object} - 角色数据
+ */
+function generateRoleData(overrides = {}) {
+  return {
+    name: "测试角色",
+    code: "test_role",
+    description: "用于测试的角色",
+    ...overrides,
   };
-
-  const role = await Role.create({ ...defaultData, ...roleData });
-  return role;
 }
 
-async function createTestPermission(permData = {}) {
-  const defaultData = {
-    name: "testpermission",
-    action: "read",
-    resource: "test",
-    description: "Test permission description",
+/**
+ * 生成测试用的资源数据
+ * @param {Object} overrides - 需要覆盖的字段
+ * @returns {Object} - 资源数据
+ */
+function generateResourceData(overrides = {}) {
+  return {
+    name: "测试资源",
+    code: "test_resource",
+    type: "menu",
+    path: "/test",
+    component: "Test",
+    description: "用于测试的资源",
+    ...overrides,
   };
-
-  const permission = await Permission.create({ ...defaultData, ...permData });
-  return permission;
-}
-
-async function getAuthToken(user) {
-  return jwt.generateAccessToken(user.id);
 }
 
 module.exports = {
-  clearDatabase,
-  createTestUser,
-  createTestRole,
-  createTestPermission,
-  getAuthToken,
+  getTestHeaders,
+  generateUserData,
+  generateRoleData,
+  generateResourceData,
 };
