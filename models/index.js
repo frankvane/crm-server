@@ -15,7 +15,7 @@ const RefreshToken = require("./refreshToken.model")(sequelize);
 // 建立模型关联
 // 1. User 相关关联
 User.belongsToMany(Role, {
-  through: "UserRole",
+  through: "UserRoles",
   foreignKey: "userId",
   otherKey: "roleId",
   as: "roles",
@@ -23,21 +23,21 @@ User.belongsToMany(Role, {
 
 // 2. Role 相关关联
 Role.belongsToMany(User, {
-  through: "UserRole",
+  through: "UserRoles",
   foreignKey: "roleId",
   otherKey: "userId",
   as: "users",
 });
 
 Role.belongsToMany(Permission, {
-  through: "RolePermission",
+  through: "RolePermissions",
   foreignKey: "roleId",
   otherKey: "permissionId",
   as: "permissions",
 });
 
 Role.belongsToMany(Resource, {
-  through: "RoleResource",
+  through: "RoleResources",
   foreignKey: "roleId",
   otherKey: "resourceId",
   as: "resources",
@@ -45,7 +45,7 @@ Role.belongsToMany(Resource, {
 
 // 3. Permission 相关关联
 Permission.belongsToMany(Role, {
-  through: "RolePermission",
+  through: "RolePermissions",
   foreignKey: "permissionId",
   otherKey: "roleId",
   as: "roles",
@@ -53,7 +53,7 @@ Permission.belongsToMany(Role, {
 
 // 4. Resource 相关关联
 Resource.belongsToMany(Role, {
-  through: "RoleResource",
+  through: "RoleResources",
   foreignKey: "resourceId",
   otherKey: "roleId",
   as: "roles",
