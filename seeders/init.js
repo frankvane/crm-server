@@ -8,6 +8,7 @@ const {
   ResourceAction,
 } = require("../models");
 const { clearDatabase } = require("../utils/database");
+const bcrypt = require("bcryptjs");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -341,9 +342,10 @@ module.exports = {
 
       // 5. 创建管理员用户
       console.log("创建管理员用户...");
+      const hashedPassword = await bcrypt.hash("admin123", 10);
       const adminUser = await User.create({
         username: "admin",
-        password: "admin123",
+        password: hashedPassword,
         email: "admin@example.com",
         status: 1,
       });
