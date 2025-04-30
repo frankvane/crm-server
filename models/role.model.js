@@ -33,6 +33,16 @@ module.exports = (sequelize) => {
       otherKey: "permissionId",
       as: "Permissions",
     });
+
+    Role.belongsToMany(models.Resource, {
+      through: {
+        model: "RoleResource",
+        tableName: "RoleResource",
+      },
+      foreignKey: "roleId",
+      otherKey: "resourceId",
+      as: "Resources",
+    });
   };
 
   return Role;
