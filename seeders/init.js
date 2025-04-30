@@ -217,7 +217,7 @@ module.exports = {
       );
       await userRole.setPermissions(userPerms);
 
-      // 5. 创建管理员用户
+      // 5. 创建用户并分配角色
       const adminUser = await User.create({
         username: "admin",
         password: "admin123",
@@ -225,6 +225,22 @@ module.exports = {
         status: 1,
       });
       await adminUser.addRole(adminRole);
+
+      const managerUser = await User.create({
+        username: "manager",
+        password: "manager123",
+        email: "manager@example.com",
+        status: 1,
+      });
+      await managerUser.addRole(managerRole);
+
+      const normalUser = await User.create({
+        username: "user",
+        password: "user123",
+        email: "user@example.com",
+        status: 1,
+      });
+      await normalUser.addRole(userRole);
 
       console.log("核心初始数据创建完成！");
     } catch (error) {
