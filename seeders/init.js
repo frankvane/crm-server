@@ -109,6 +109,19 @@ module.exports = {
           resource: "ticket",
           description: "查询我的罚款单",
         },
+        // 角色管理权限
+        {
+          name: "view_roles",
+          action: "read",
+          resource: "role",
+          description: "查看角色列表",
+        },
+        {
+          name: "manage_roles",
+          action: "manage",
+          resource: "role",
+          description: "管理角色",
+        },
       ]);
 
       // 2. 创建资源菜单

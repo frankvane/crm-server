@@ -21,7 +21,7 @@ exports.create = async (req, res, next) => {
       username,
       password,
       email,
-      status: true,
+      status: 1,
     });
 
     // 如果提供了角色ID，则关联角色
@@ -71,7 +71,7 @@ exports.list = async (req, res, next) => {
       id: user.id,
       username: user.username,
       email: user.email,
-      status: user.status ? 1 : 0, // 将布尔值转换为数字
+      status: user.status,
       roles: user.roles.map((role) => ({
         id: role.id,
         name: role.name,
@@ -231,10 +231,10 @@ exports.toggleStatus = async (req, res, next) => {
     }
 
     // 切换状态
-    user.status = !user.status;
+    user.status = user.status === 1 ? 0 : 1;
     await user.save();
 
-    const statusMessage = user.status ? "enabled" : "disabled";
+    const statusMessage = user.status === 1 ? "enabled" : "disabled";
     res.json(
       ResponseUtil.success(
         { id: user.id, status: user.status },
