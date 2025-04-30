@@ -1175,3 +1175,132 @@ npm start
 [v1.0.0]: https://github.com/your-username/crm-server/compare/v0.2.0...v1.0.0
 [v0.2.0]: https://github.com/your-username/crm-server/compare/v0.1.0...v0.2.0
 [v0.1.0]: https://github.com/your-username/crm-server/releases/tag/v0.1.0
+
+## 资源管理接口
+
+#### 1. 创建资源
+
+- **接口**：`POST /api/resources`
+- **描述**：创建新资源（需要 manage_resources 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **请求体**：
+  ```json
+  {
+    "name": "string",
+    "type": "string", // menu/page/button
+    "code": "string",
+    "path": "string",
+    "parentId": "number",
+    "component": "string",
+    "icon": "string",
+    "sort": "number",
+    "hidden": "boolean",
+    "redirect": "string",
+    "alwaysShow": "boolean",
+    "meta": {
+      "title": "string",
+      "icon": "string",
+      "noCache": false,
+      "link": null
+    },
+    "description": "string"
+  }
+  ```
+- **响应**：资源对象
+
+#### 2. 获取资源列表
+
+- **接口**：`GET /api/resources`
+- **描述**：获取所有资源（需要 view_resources 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **响应**：资源数组
+
+#### 3. 获取单个资源
+
+- **接口**：`GET /api/resources/:id`
+- **描述**：获取指定资源详情（需要 view_resources 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **响应**：资源对象
+
+#### 4. 更新资源
+
+- **接口**：`PUT /api/resources/:id`
+- **描述**：更新指定资源（需要 manage_resources 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **请求体**：同创建资源
+- **响应**：资源对象
+
+#### 5. 删除资源
+
+- **接口**：`DELETE /api/resources/:id`
+- **描述**：删除指定资源（需要 manage_resources 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **响应**：删除结果
+
+## 资源操作管理接口
+
+#### 1. 创建资源操作
+
+- **接口**：`POST /api/resource-actions`
+- **描述**：创建新资源操作（需要 manage_resource_actions 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **请求体**：
+  ```json
+  {
+    "name": "string",
+    "code": "string",
+    "description": "string",
+    "icon": "string",
+    "sort": "number",
+    "needConfirm": "boolean",
+    "confirmMessage": "string"
+  }
+  ```
+- **响应**：资源操作对象
+
+#### 2. 获取资源操作列表
+
+- **接口**：`GET /api/resource-actions`
+- **描述**：获取所有资源操作（需要 view_resource_actions 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **响应**：资源操作数组
+
+#### 3. 获取单个资源操作
+
+- **接口**：`GET /api/resource-actions/:id`
+- **描述**：获取指定资源操作详情（需要 view_resource_actions 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **响应**：资源操作对象
+
+#### 4. 更新资源操作
+
+- **接口**：`PUT /api/resource-actions/:id`
+- **描述**：更新指定资源操作（需要 manage_resource_actions 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **请求体**：同创建资源操作
+- **响应**：资源操作对象
+
+#### 5. 删除资源操作
+
+- **接口**：`DELETE /api/resource-actions/:id`
+- **描述**：删除指定资源操作（需要 manage_resource_actions 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **响应**：删除结果
+
+## 权限列表（按实际接口操作补全）
+
+| 权限名称                | 描述          |
+| ----------------------- | ------------- |
+| create_user             | 创建用户      |
+| view_users              | 查看用户      |
+| update_user             | 更新用户      |
+| delete_user             | 删除用户      |
+| manage_roles            | 管理角色      |
+| view_roles              | 查看角色      |
+| manage_categories       | 管理分类      |
+| view_categories         | 查看分类      |
+| manage_resources        | 管理资源      |
+| view_resources          | 查看资源      |
+| manage_resource_actions | 管理资源操作  |
+| view_resource_actions   | 查看资源操作  |
+| ...                     | ...（可扩展） |
