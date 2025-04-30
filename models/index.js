@@ -7,24 +7,92 @@ const sequelize = new Sequelize(config);
 const User = require("./user.model")(sequelize);
 const Role = require("./role.model")(sequelize);
 const Permission = require("./permission.model")(sequelize);
+const Resource = require("./resource.model")(sequelize);
+const ResourceAction = require("./resourceAction.model")(sequelize);
+const RoleResource = require("./roleResource.model")(sequelize);
 const RefreshToken = require("./refreshToken.model")(sequelize);
-const Category = require("./category.model")(sequelize);
-const CategoryType = require("./categoryType.model")(sequelize);
 
 // 建立模型关联
-User.associate({ Role, RefreshToken });
-Role.associate({ User, Permission });
-Permission.associate({ Role });
-RefreshToken.associate({ User });
-Category.associate({ CategoryType });
-CategoryType.associate({ Category });
+// 1. User 相关关联
+User.belongsToMany(Role, {
+  through: "UserRole",
+  foreignKey: "userId",
+  otherKey: "roleId",
+  as: "roles",
+});
+
+// 2. Role 相关关联
+Role.belongsToMany(User, {
+  through: "UserRole",
+  foreignKey: "roleId",
+  otherKey: "userId",
+  as: "users",
+});
+
+Role.belongsToMany(Permission, {
+  through: "RolePermission",
+  foreignKey: "roleId",
+  otherKey: "permissionId",
+  as: "permissions",
+});
+
+Role.belongsToMany(Resource, {
+  through: "RoleResource",
+  foreignKey: "roleId",
+  otherKey: "resourceId",
+  as: "resources",
+});
+
+// 3. Permission 相关关联
+Permission.belongsToMany(Role, {
+  through: "RolePermission",
+  foreignKey: "permissionId",
+  otherKey: "roleId",
+  as: "roles",
+});
+
+// 4. Resource 相关关联
+Resource.belongsToMany(Role, {
+  through: "RoleResource",
+  foreignKey: "resourceId",
+  otherKey: "roleId",
+  as: "roles",
+});
+
+Resource.belongsTo(Resource, {
+  foreignKey: "parentId",
+  as: "parent",
+});
+
+Resource.hasMany(Resource, {
+  foreignKey: "parentId",
+  as: "children",
+});
+
+Resource.hasMany(ResourceAction, {
+  foreignKey: "resourceId",
+  as: "actions",
+});
+
+// 5. ResourceAction 相关关联
+ResourceAction.belongsTo(Resource, {
+  foreignKey: "resourceId",
+  as: "resource",
+});
+
+// 6. RefreshToken 相关关联
+RefreshToken.belongsTo(User, {
+  foreignKey: "userId",
+  as: "user",
+});
 
 module.exports = {
   sequelize,
   User,
   Role,
   Permission,
+  Resource,
+  ResourceAction,
+  RoleResource,
   RefreshToken,
-  Category,
-  CategoryType,
 };
