@@ -45,7 +45,7 @@ const hasPermission = (permission) => {
             include: [
               {
                 model: Permission,
-                as: "permissions",
+                as: "Permissions",
                 through: { attributes: [] },
               },
             ],
@@ -59,7 +59,7 @@ const hasPermission = (permission) => {
 
       // 检查用户的所有角色中是否有所需权限
       const hasRequiredPermission = user.roles.some((role) =>
-        role.permissions.some((p) => p.name === permission)
+        role.Permissions.some((p) => p.name === permission)
       );
 
       if (!hasRequiredPermission) {

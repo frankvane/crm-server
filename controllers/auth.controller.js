@@ -19,7 +19,7 @@ exports.login = async (req, res, next) => {
           include: [
             {
               model: Permission,
-              as: "permissions",
+              as: "Permissions",
               through: { attributes: [] },
             },
           ],
@@ -109,7 +109,7 @@ exports.refresh = async (req, res, next) => {
             include: [
               {
                 model: Permission,
-                as: "permissions",
+                as: "Permissions",
                 through: { attributes: [] },
               },
             ],
