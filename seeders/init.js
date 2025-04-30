@@ -345,7 +345,7 @@ module.exports = {
         username: "admin",
         password: "admin123",
         email: "admin@example.com",
-        status: true,
+        status: 1,
       });
 
       // 6. 分配角色给管理员用户
