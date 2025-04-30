@@ -40,17 +40,5 @@ module.exports = (sequelize) => {
     }
   });
 
-  User.associate = (models) => {
-    User.belongsToMany(models.Role, {
-      through: "UserRole",
-      as: "Roles",
-    });
-
-    User.hasMany(models.RefreshToken, {
-      foreignKey: "userId",
-      as: "refreshTokens",
-    });
-  };
-
   return User;
 };

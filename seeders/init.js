@@ -1,6 +1,5 @@
 "use strict";
 
-const bcrypt = require("bcryptjs");
 const { User, Role, Permission } = require("../models");
 
 async function createInitialData() {
@@ -59,14 +58,16 @@ async function createInitialData() {
     // 为管理员角色分配所有权限
     await adminRole.setPermissions(permissions);
 
-    // 为普通用户角色分配查看权限
-    const viewPermissions = permissions.filter((p) => p.action === "read");
-    await userRole.setPermissions(viewPermissions);
+    // 为普通用户角色分配查看用户列表权限
+    const viewUsersPermission = permissions.find(
+      (p) => p.name === "view_users"
+    );
+    await userRole.setPermissions([viewUsersPermission]);
 
     // 创建管理员用户
     const adminUser = await User.create({
       username: "admin",
-      password: await bcrypt.hash("admin123", 10),
+      password: "admin123", // 密码会被模型的钩子自动加密
       email: "admin@example.com",
     });
 
