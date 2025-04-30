@@ -59,7 +59,7 @@ module.exports = {
         defaultValue: false,
       },
       meta: {
-        type: Sequelize.JSON,
+        type: Sequelize.TEXT,
         allowNull: true,
       },
       description: {
