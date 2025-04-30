@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 5,
+            "activePatchIndex": 6,
             "patches": [
                 {
                     "date": 1745924964063,
@@ -28,6 +28,10 @@
                 {
                     "date": 1746018434475,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -14,16 +14,22 @@\n   });\r\n \r\n   Role.associate = (models) => {\r\n     Role.belongsToMany(models.User, {\r\n-      through: \"UserRoles\",\r\n+      through: {\r\n+        model: \"UserRoles\",\r\n+        tableName: \"UserRoles\",\r\n+      },\r\n       foreignKey: \"roleId\",\r\n       otherKey: \"userId\",\r\n       as: \"Users\",\r\n     });\r\n \r\n     Role.belongsToMany(models.Permission, {\r\n-      through: \"RolePermissions\",\r\n+      through: {\r\n+        model: \"RolePermissions\",\r\n+        tableName: \"RolePermissions\",\r\n+      },\r\n       foreignKey: \"roleId\",\r\n       otherKey: \"permissionId\",\r\n       as: \"Permissions\",\r\n     });\r\n"
+                },
+                {
+                    "date": 1746028426946,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -32,8 +32,18 @@\n       foreignKey: \"roleId\",\r\n       otherKey: \"permissionId\",\r\n       as: \"Permissions\",\r\n     });\r\n+\r\n+    Role.belongsToMany(models.Resource, {\r\n+      through: {\r\n+        model: \"RoleResource\",\r\n+        tableName: \"RoleResource\",\r\n+      },\r\n+      foreignKey: \"roleId\",\r\n+      otherKey: \"resourceId\",\r\n+      as: \"Resources\",\r\n+    });\r\n   };\r\n \r\n   return Role;\r\n };\r\n"
                 }
             ],
             "date": 1745924964063,
