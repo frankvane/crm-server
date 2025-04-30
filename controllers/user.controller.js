@@ -66,9 +66,31 @@ exports.list = async (req, res, next) => {
       distinct: true,
     });
 
-    res.json(
-      ResponseUtil.page(rows, count, parseInt(page), parseInt(pageSize))
-    );
+    // 格式化用户数据
+    const formattedUsers = rows.map((user) => ({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      status: user.status ? 1 : 0, // 将布尔值转换为数字
+      roles: user.Roles.map((role) => ({
+        id: role.id,
+        name: role.name,
+      })),
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    }));
+
+    // 构建分页响应
+    const response = {
+      list: formattedUsers,
+      pagination: {
+        current: parseInt(page),
+        pageSize: parseInt(pageSize),
+        total: count,
+      },
+    };
+
+    res.json(ResponseUtil.success(response));
   } catch (err) {
     next(err);
   }
