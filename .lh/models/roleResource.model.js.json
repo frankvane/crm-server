@@ -1,0 +1,22 @@
+{
+    "sourceFile": "models/roleResource.model.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1746007665939,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1746008109170,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,26 +1,30 @@\n-const { DataTypes } = require('sequelize');\r\n+const { DataTypes } = require(\"sequelize\");\r\n \r\n module.exports = (sequelize) => {\r\n-  const RoleResource = sequelize.define('RoleResource', {\r\n-    roleId: {\r\n-      type: DataTypes.INTEGER,\r\n-      allowNull: false,\r\n-      references: {\r\n-        model: 'Roles',\r\n-        key: 'id',\r\n+  const RoleResource = sequelize.define(\r\n+    \"RoleResource\",\r\n+    {\r\n+      roleId: {\r\n+        type: DataTypes.INTEGER,\r\n+        allowNull: false,\r\n+        references: {\r\n+          model: \"Roles\",\r\n+          key: \"id\",\r\n+        },\r\n       },\r\n-    },\r\n-    resourceId: {\r\n-      type: DataTypes.INTEGER,\r\n-      allowNull: false,\r\n\\ No newline at end of file\n-      references: {\r\n-        model: 'Resources',\r\n-        key: 'id',\r\n+      resourceId: {\r\n+        type: DataTypes.INTEGER,\r\n+        allowNull: false,\r\n+        references: {\r\n+          model: \"Resources\",\r\n+          key: \"id\",\r\n+        },\r\n       },\r\n     },\r\n-  }, {\r\n-    timestamps: true,\r\n-  });\r\n+    {\r\n+      timestamps: true,\r\n+    }\r\n+  );\r\n \r\n   return RoleResource;\r\n-};\n+};\r\n"
+                }
+            ],
+            "date": 1746007665939,
+            "name": "Commit-0",
+            "content": "const { DataTypes } = require('sequelize');\r\n\r\nmodule.exports = (sequelize) => {\r\n  const RoleResource = sequelize.define('RoleResource', {\r\n    roleId: {\r\n      type: DataTypes.INTEGER,\r\n      allowNull: false,\r\n      references: {\r\n        model: 'Roles',\r\n        key: 'id',\r\n      },\r\n    },\r\n    resourceId: {\r\n      type: DataTypes.INTEGER,\r\n      allowNull: false,\r\n      references: {\r\n        model: 'Resources',\r\n        key: 'id',\r\n      },\r\n    },\r\n  }, {\r\n    timestamps: true,\r\n  });\r\n\r\n  return RoleResource;\r\n};"
+        }
+    ]
+}

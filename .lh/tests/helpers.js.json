@@ -1,0 +1,26 @@
+{
+    "sourceFile": "tests/helpers.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1746011547462,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1746011995709,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,15 +2,27 @@\n const bcrypt = require(\"bcryptjs\");\r\n const jwt = require(\"../utils/jwt\");\r\n \r\n async function clearDatabase() {\r\n-  await sequelize.query(\"SET FOREIGN_KEY_CHECKS = 0\");\r\n-  await Promise.all(\r\n-    Object.values(sequelize.models).map((model) =>\r\n-      model.destroy({ truncate: true, force: true })\r\n-    )\r\n-  );\r\n-  await sequelize.query(\"SET FOREIGN_KEY_CHECKS = 1\");\r\n+  try {\r\n+    await sequelize.query(\"SET FOREIGN_KEY_CHECKS = 0\");\r\n+    \r\n+    // 先删除关联表\r\n+    await sequelize.models.UserRoles.destroy({ truncate: true, force: true });\r\n+    await sequelize.models.RoleResources.destroy({ truncate: true, force: true });\r\n+    await sequelize.models.RolePermissions.destroy({ truncate: true, force: true });\r\n+    \r\n+    // 再删除基础表\r\n+    await User.destroy({ truncate: true, force: true });\r\n+    await Role.destroy({ truncate: true, force: true });\r\n+    await sequelize.models.Resource.destroy({ truncate: true, force: true });\r\n+    await Permission.destroy({ truncate: true, force: true });\r\n+    \r\n+    await sequelize.query(\"SET FOREIGN_KEY_CHECKS = 1\");\r\n+  } catch (error) {\r\n+    console.error(\"清理数据库失败:\", error);\r\n+    throw error;\r\n+  }\r\n }\r\n \r\n async function createTestUser(userData = {}) {\r\n   const defaultData = {\r\n"
+                },
+                {
+                    "date": 1746012047200,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,9 +3,10 @@\n const jwt = require(\"../utils/jwt\");\r\n \r\n async function clearDatabase() {\r\n   try {\r\n-    await sequelize.query(\"SET FOREIGN_KEY_CHECKS = 0\");\r\n+    // 禁用所有表的外键约束\r\n+    await sequelize.query(\"EXEC sp_MSforeachtable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'\");\r\n \r\n     // 先删除关联表\r\n     await sequelize.models.UserRoles.destroy({ truncate: true, force: true });\r\n     await sequelize.models.RoleResources.destroy({\r\n@@ -22,9 +23,10 @@\n     await Role.destroy({ truncate: true, force: true });\r\n     await sequelize.models.Resource.destroy({ truncate: true, force: true });\r\n     await Permission.destroy({ truncate: true, force: true });\r\n \r\n-    await sequelize.query(\"SET FOREIGN_KEY_CHECKS = 1\");\r\n+    // 重新启用所有表的外键约束\r\n+    await sequelize.query(\"EXEC sp_MSforeachtable 'ALTER TABLE ? CHECK CONSTRAINT ALL'\");\r\n   } catch (error) {\r\n     console.error(\"清理数据库失败:\", error);\r\n     throw error;\r\n   }\r\n"
+                }
+            ],
+            "date": 1746011547462,
+            "name": "Commit-0",
+            "content": "const { sequelize, User, Role, Permission } = require('../models');\r\nconst bcrypt = require('bcryptjs');\r\nconst jwt = require('../utils/jwt');\r\n\r\nasync function clearDatabase() {\r\n  await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');\r\n  await Promise.all(\r\n    Object.values(sequelize.models).map(model => model.destroy({ truncate: true, force: true }))\r\n  );\r\n  await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');\r\n}\r\n\r\nasync function createTestUser(userData = {}) {\r\n  const defaultData = {\r\n    username: 'testuser',\r\n    password: await bcrypt.hash('password123', 10),\r\n    email: 'test@example.com',\r\n    status: 1\r\n  };\r\n\r\n  const user = await User.create({ ...defaultData, ...userData });\r\n  return user;\r\n}\r\n\r\nasync function createTestRole(roleData = {}) {\r\n  const defaultData = {\r\n    name: 'testrole',\r\n    description: 'Test role description'\r\n  };\r\n\r\n  const role = await Role.create({ ...defaultData, ...roleData });\r\n  return role;\r\n}\r\n\r\nasync function createTestPermission(permData = {}) {\r\n  const defaultData = {\r\n    name: 'testpermission',\r\n    action: 'read',\r\n    resource: 'test',\r\n    description: 'Test permission description'\r\n  };\r\n\r\n  const permission = await Permission.create({ ...defaultData, ...permData });\r\n  return permission;\r\n}\r\n\r\nasync function getAuthToken(user) {\r\n  return jwt.generateAccessToken(user.id);\r\n}\r\n\r\nmodule.exports = {\r\n  clearDatabase,\r\n  createTestUser,\r\n  createTestRole,\r\n  createTestPermission,\r\n  getAuthToken\r\n}; "
+        }
+    ]
+}

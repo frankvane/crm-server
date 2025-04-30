@@ -31,7 +31,7 @@ exports.create = async (req, res, next) => {
 
     // 获取包含角色的完整用户信息
     const userWithRoles = await User.findByPk(user.id, {
-      include: [{ model: Role, as: "Roles", through: { attributes: [] } }],
+      include: [{ model: Role, as: "roles", through: { attributes: [] } }],
       attributes: { exclude: ["password"] },
     });
 
@@ -59,7 +59,7 @@ exports.list = async (req, res, next) => {
 
     const { count, rows } = await User.findAndCountAll({
       where,
-      include: [{ model: Role, as: "Roles", through: { attributes: [] } }],
+      include: [{ model: Role, as: "roles", through: { attributes: [] } }],
       attributes: { exclude: ["password"] },
       offset,
       limit: parseInt(pageSize),
@@ -72,7 +72,7 @@ exports.list = async (req, res, next) => {
       username: user.username,
       email: user.email,
       status: user.status ? 1 : 0, // 将布尔值转换为数字
-      roles: user.Roles.map((role) => ({
+      roles: user.roles.map((role) => ({
         id: role.id,
         name: role.name,
       })),
@@ -100,7 +100,7 @@ exports.list = async (req, res, next) => {
 exports.getById = async (req, res, next) => {
   try {
     const user = await User.findByPk(req.params.id, {
-      include: [{ model: Role, as: "Roles", through: { attributes: [] } }],
+      include: [{ model: Role, as: "roles", through: { attributes: [] } }],
       attributes: { exclude: ["password"] },
     });
 
@@ -149,7 +149,7 @@ exports.update = async (req, res, next) => {
 
     // 获取更新后的用户信息（包含角色）
     const updatedUser = await User.findByPk(user.id, {
-      include: [{ model: Role, as: "Roles", through: { attributes: [] } }],
+      include: [{ model: Role, as: "roles", through: { attributes: [] } }],
       attributes: { exclude: ["password"] },
     });
 

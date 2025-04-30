@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 1,
+            "activePatchIndex": 3,
             "patches": [
                 {
                     "date": 1745924938211,
@@ -12,6 +12,14 @@
                 {
                     "date": 1745925001835,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -25,6 +25,6 @@\n   Role,\r\n   Permission,\r\n   RefreshToken,\r\n   Category,\r\n-  CategoryType\r\n+  CategoryType,\r\n };\r\n"
+                },
+                {
+                    "date": 1746008083682,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -6,25 +6,81 @@\n // 导入模型定义\r\n const User = require(\"./user.model\")(sequelize);\r\n const Role = require(\"./role.model\")(sequelize);\r\n const Permission = require(\"./permission.model\")(sequelize);\r\n+const Resource = require(\"./resource.model\")(sequelize);\r\n+const ResourceAction = require(\"./resourceAction.model\")(sequelize);\r\n+const RoleResource = require(\"./roleResource.model\")(sequelize);\r\n const RefreshToken = require(\"./refreshToken.model\")(sequelize);\r\n-const Category = require(\"./category.model\")(sequelize);\r\n-const CategoryType = require(\"./categoryType.model\")(sequelize);\r\n \r\n // 建立模型关联\r\n-User.associate({ Role, RefreshToken });\r\n-Role.associate({ User, Permission });\r\n-Permission.associate({ Role });\r\n-RefreshToken.associate({ User });\r\n-Category.associate({ CategoryType });\r\n-CategoryType.associate({ Category });\r\n+// 1. User 相关关联\r\n+User.belongsToMany(Role, {\r\n+  through: \"UserRole\",\r\n+  as: \"roles\",\r\n+});\r\n \r\n+// 2. Role 相关关联\r\n+Role.belongsToMany(User, {\r\n+  through: \"UserRole\",\r\n+  as: \"users\",\r\n+});\r\n+\r\n+Role.belongsToMany(Permission, {\r\n+  through: \"RolePermission\",\r\n+  as: \"permissions\",\r\n+});\r\n+\r\n+Role.belongsToMany(Resource, {\r\n+  through: \"RoleResource\",\r\n+  as: \"resources\",\r\n+});\r\n+\r\n+// 3. Permission 相关关联\r\n+Permission.belongsToMany(Role, {\r\n+  through: \"RolePermission\",\r\n+  as: \"roles\",\r\n+});\r\n+\r\n+// 4. Resource 相关关联\r\n+Resource.belongsToMany(Role, {\r\n+  through: \"RoleResource\",\r\n+  as: \"roles\",\r\n+});\r\n+\r\n+Resource.belongsTo(Resource, {\r\n+  foreignKey: \"parentId\",\r\n+  as: \"parent\",\r\n+});\r\n+\r\n+Resource.hasMany(Resource, {\r\n+  foreignKey: \"parentId\",\r\n+  as: \"children\",\r\n+});\r\n+\r\n+Resource.hasMany(ResourceAction, {\r\n+  foreignKey: \"resourceId\",\r\n+  as: \"actions\",\r\n+});\r\n+\r\n+// 5. ResourceAction 相关关联\r\n+ResourceAction.belongsTo(Resource, {\r\n+  foreignKey: \"resourceId\",\r\n+  as: \"resource\",\r\n+});\r\n+\r\n+// 6. RefreshToken 相关关联\r\n+RefreshToken.belongsTo(User, {\r\n+  foreignKey: \"userId\",\r\n+  as: \"user\",\r\n+});\r\n+\r\n module.exports = {\r\n   sequelize,\r\n   User,\r\n   Role,\r\n   Permission,\r\n+  Resource,\r\n+  ResourceAction,\r\n+  RoleResource,\r\n   RefreshToken,\r\n-  Category,\r\n-  CategoryType,\r\n };\r\n"
+                },
+                {
+                    "date": 1746008357007,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -15,36 +15,48 @@\n // 建立模型关联\r\n // 1. User 相关关联\r\n User.belongsToMany(Role, {\r\n   through: \"UserRole\",\r\n+  foreignKey: \"userId\",\r\n+  otherKey: \"roleId\",\r\n   as: \"roles\",\r\n });\r\n \r\n // 2. Role 相关关联\r\n Role.belongsToMany(User, {\r\n   through: \"UserRole\",\r\n+  foreignKey: \"roleId\",\r\n+  otherKey: \"userId\",\r\n   as: \"users\",\r\n });\r\n \r\n Role.belongsToMany(Permission, {\r\n   through: \"RolePermission\",\r\n+  foreignKey: \"roleId\",\r\n+  otherKey: \"permissionId\",\r\n   as: \"permissions\",\r\n });\r\n \r\n Role.belongsToMany(Resource, {\r\n   through: \"RoleResource\",\r\n+  foreignKey: \"roleId\",\r\n+  otherKey: \"resourceId\",\r\n   as: \"resources\",\r\n });\r\n \r\n // 3. Permission 相关关联\r\n Permission.belongsToMany(Role, {\r\n   through: \"RolePermission\",\r\n+  foreignKey: \"permissionId\",\r\n+  otherKey: \"roleId\",\r\n   as: \"roles\",\r\n });\r\n \r\n // 4. Resource 相关关联\r\n Resource.belongsToMany(Role, {\r\n   through: \"RoleResource\",\r\n+  foreignKey: \"resourceId\",\r\n+  otherKey: \"roleId\",\r\n   as: \"roles\",\r\n });\r\n \r\n Resource.belongsTo(Resource, {\r\n"
                 }
             ],
             "date": 1745924938211,

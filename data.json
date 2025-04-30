@@ -1,0 +1,516 @@
+{
+  "data": {
+    "departmentName": "人工智能教学",
+    "headImg": null,
+    "departMap": {
+      "32": "人工智能教学"
+    },
+    "routes": [
+      {
+        "name": "Train",
+        "path": "train",
+        "hidden": false,
+        "component": "Layout",
+        "meta": {
+          "title": "培训管理",
+          "icon": "个人办公",
+          "noCache": false,
+          "link": null
+        }
+      },
+      {
+        "name": "Approval",
+        "path": "approval",
+        "hidden": false,
+        "redirect": "noRedirect",
+        "component": "Layout",
+        "alwaysShow": true,
+        "meta": {
+          "title": "审批管理",
+          "icon": "审批",
+          "noCache": false,
+          "link": null
+        },
+        "children": [
+          {
+            "name": "Myapply",
+            "path": "myapply",
+            "hidden": false,
+            "component": "approval/myapply/index",
+            "meta": {
+              "title": "我的申请列表",
+              "icon": "",
+              "noCache": false,
+              "link": null
+            }
+          },
+          {
+            "name": "Myapproval",
+            "path": "myapproval",
+            "hidden": false,
+            "component": "approval/myapproval/index",
+            "meta": {
+              "title": "我的审核列表",
+              "icon": "",
+              "noCache": false,
+              "link": null
+            }
+          },
+          {
+            "name": "Copylist",
+            "path": "copylist",
+            "hidden": false,
+            "component": "approval/copylist/index",
+            "meta": {
+              "title": "我的抄送列表",
+              "icon": "#",
+              "noCache": false,
+              "link": null
+            }
+          }
+        ]
+      },
+      {
+        "name": "Finance",
+        "path": "finance",
+        "hidden": false,
+        "redirect": "noRedirect",
+        "component": "Layout",
+        "alwaysShow": true,
+        "meta": {
+          "title": "财务管理",
+          "icon": "社区财务",
+          "noCache": false,
+          "link": null
+        },
+        "children": [
+          {
+            "name": "Ticket",
+            "path": "ticket",
+            "hidden": false,
+            "redirect": "noRedirect",
+            "component": "ParentView",
+            "alwaysShow": true,
+            "meta": {
+              "title": "罚款单",
+              "icon": "#",
+              "noCache": false,
+              "link": null
+            },
+            "children": [
+              {
+                "name": "Mylist",
+                "path": "mylist",
+                "hidden": false,
+                "component": "finance/ticket/mylist/index",
+                "meta": {
+                  "title": "我的罚款单",
+                  "icon": "#",
+                  "noCache": false,
+                  "link": null
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Teachadmin",
+        "path": "teachadmin",
+        "hidden": false,
+        "redirect": "noRedirect",
+        "component": "Layout",
+        "alwaysShow": true,
+        "meta": {
+          "title": "教学管理",
+          "icon": "通知公告",
+          "noCache": false,
+          "link": null
+        },
+        "children": [
+          {
+            "name": "Allstudents",
+            "path": "allstudents",
+            "hidden": false,
+            "component": "teachadmin/allstudents/index",
+            "meta": {
+              "title": "全部学生列表",
+              "icon": "#",
+              "noCache": false,
+              "link": null
+            }
+          },
+          {
+            "name": "Mystudents",
+            "path": "mystudents",
+            "hidden": false,
+            "component": "teachadmin/mystudents/index",
+            "meta": {
+              "title": "我的班级学生列表",
+              "icon": "#",
+              "noCache": false,
+              "link": null
+            }
+          },
+          {
+            "name": "Receive",
+            "path": "receive",
+            "hidden": false,
+            "component": "teachadmin/receive/index",
+            "meta": {
+              "title": "待接收学生列表",
+              "icon": "#",
+              "noCache": false,
+              "link": null
+            }
+          },
+          {
+            "name": "Timetable",
+            "path": "timetable",
+            "hidden": false,
+            "component": "teachadmin/timetable/index",
+            "meta": {
+              "title": "排课管理",
+              "icon": "#",
+              "noCache": false,
+              "link": null
+            }
+          },
+          {
+            "name": "Classrollcall",
+            "path": "classrollcall",
+            "hidden": false,
+            "redirect": "noRedirect",
+            "component": "ParentView",
+            "alwaysShow": true,
+            "meta": {
+              "title": "上课点名管理",
+              "icon": "#",
+              "noCache": false,
+              "link": null
+            },
+            "children": [
+              {
+                "name": "Myteachschedule",
+                "path": "myteachschedule",
+                "hidden": false,
+                "component": "teachadmin/myteachschedule/index",
+                "meta": {
+                  "title": "我的排课表",
+                  "icon": "#",
+                  "noCache": false,
+                  "link": null
+                }
+              },
+              {
+                "name": "Mycourses",
+                "path": "mycourses",
+                "hidden": false,
+                "component": "teachadmin/mycourses/index",
+                "meta": {
+                  "title": "我的课程列表",
+                  "icon": "#",
+                  "noCache": false,
+                  "link": null
+                }
+              },
+              {
+                "name": "Refinecallroll",
+                "path": "refinecallroll",
+                "hidden": false,
+                "component": "teachadmin/refinecallroll/index",
+                "meta": {
+                  "title": "我的点名记录",
+                  "icon": "#",
+                  "noCache": false,
+                  "link": null
+                }
+              },
+              {
+                "name": "Allcallroll",
+                "path": "allcallroll",
+                "hidden": false,
+                "component": "teachadmin/allcallroll/index",
+                "meta": {
+                  "title": "所有点名列表",
+                  "icon": "#",
+                  "noCache": false,
+                  "link": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "Studentscore",
+            "path": "studentscore",
+            "hidden": false,
+            "redirect": "noRedirect",
+            "component": "ParentView",
+            "alwaysShow": true,
+            "meta": {
+              "title": "学生成绩管理",
+              "icon": "#",
+              "noCache": false,
+              "link": null
+            },
+            "children": [
+              {
+                "name": "Classscore",
+                "path": "classscore",
+                "hidden": false,
+                "component": "teachadmin/studentscore/classscore/index",
+                "meta": {
+                  "title": "班级成绩列表",
+                  "icon": "#",
+                  "noCache": false,
+                  "link": null
+                }
+              },
+              {
+                "name": "Schoolscore",
+                "path": "schoolscore",
+                "hidden": false,
+                "component": "teachadmin/studentscore/schoolscore/index",
+                "meta": {
+                  "title": "学院成绩列表",
+                  "icon": "#",
+                  "noCache": false,
+                  "link": null
+                }
+              },
+              {
+                "name": "Summaryscore",
+                "path": "summaryscore",
+                "hidden": false,
+                "component": "teachadmin/studentscore/summaryscore/index",
+                "meta": {
+                  "title": "成绩汇总列表",
+                  "icon": "#",
+                  "noCache": false,
+                  "link": null
+                }
+              },
+              {
+                "name": "Scorelist",
+                "path": "scorelist",
+                "hidden": false,
+                "component": "teachadmin/studentscore/scorelist/index",
+                "meta": {
+                  "title": "学生成绩列表",
+                  "icon": "#",
+                  "noCache": false,
+                  "link": null
+                }
+              },
+              {
+                "name": "Studentbonuslist",
+                "path": "studentbonuslist",
+                "hidden": false,
+                "component": "teachadmin/studentscore/studentbonuslist/index",
+                "meta": {
+                  "title": "学生加分项列表",
+                  "icon": "#",
+                  "noCache": false,
+                  "link": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "Stuviolation",
+            "path": "stuviolation",
+            "hidden": false,
+            "redirect": "noRedirect",
+            "component": "ParentView",
+            "alwaysShow": true,
+            "meta": {
+              "title": "学生违纪管理",
+              "icon": "#",
+              "noCache": false,
+              "link": null
+            },
+            "children": [
+              {
+                "name": "Stumistake",
+                "path": "stumistake",
+                "hidden": false,
+                "component": "teachadmin/mistake/index",
+                "meta": {
+                  "title": "违纪确认列表",
+                  "icon": "#",
+                  "noCache": false,
+                  "link": null
+                }
+              },
+              {
+                "name": "Stupunish",
+                "path": "stupunish",
+                "hidden": false,
+                "component": "teachadmin/stupunish/index",
+                "meta": {
+                  "title": "处分确认列表",
+                  "icon": "#",
+                  "noCache": false,
+                  "link": null
+                }
+              },
+              {
+                "name": "Allmistakes",
+                "path": "allmistakes",
+                "hidden": false,
+                "component": "teachadmin/mistake/all",
+                "meta": {
+                  "title": "全部违纪信息列表",
+                  "icon": "#",
+                  "noCache": false,
+                  "link": null
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Integration",
+        "path": "integration",
+        "hidden": false,
+        "redirect": "noRedirect",
+        "component": "Layout",
+        "alwaysShow": true,
+        "meta": {
+          "title": "综合积分",
+          "icon": "积分",
+          "noCache": false,
+          "link": null
+        },
+        "children": [
+          {
+            "name": "CreditAsk",
+            "path": "creditAsk",
+            "hidden": false,
+            "component": "integration/creditAsk/index",
+            "meta": {
+              "title": "加分申请",
+              "icon": "#",
+              "noCache": false,
+              "link": null
+            }
+          }
+        ]
+      }
+    ],
+    "roles": ["30", "20"],
+    "rolesName": ["学院讲师", "通用"],
+    "departList": [
+      {
+        "departId": 32,
+        "departName": "人工智能教学",
+        "parentId": null,
+        "dingDepartId": null,
+        "departIdChain": null,
+        "departNameChain": null,
+        "departType": null,
+        "leaderId": null,
+        "isFirstNode": null,
+        "agentLeaderId": null,
+        "agentLevel": null,
+        "manageArea": null,
+        "createId": null,
+        "createName": null,
+        "createTime": null,
+        "operateId": null,
+        "operateName": null,
+        "operateTime": null,
+        "isValid": null
+      }
+    ],
+    "pwdReset": 2,
+    "createTime": 120220809008,
+    "phone": "13819971001",
+    "permissions": [
+      "teachadmin:allstudents:get",
+      "teachadmin:studentscore:schoolscore:query",
+      "approval:myapply:query",
+      "teachadmin:allcallroll:get",
+      "train:meetingroom:applys:get",
+      "teachadmin:mystudents:graImgUpload",
+      "teachadmin:studentscore:studentbonuslist:query",
+      "teachadmin:studentscore:summaryscore:query",
+      "teachadmin:studentscore:scorelist:query",
+      "teachadmin:refinecallroll:edit",
+      "teachadmin:allmistakes:query",
+      "approval:myapply:edit",
+      "teachadmin:receive:receive",
+      "teachadmin:studentscore:scorelist:get",
+      "teachadmin:allcallroll:query",
+      "teachadmin:mycourses:query",
+      "approval:myapply:cancel",
+      "teachadmin:refinecallroll:query",
+      "teachadmin:studentscore:classscore:edit",
+      "integration:creditAsk:revoke",
+      "train:meetingroom:applys:query",
+      "teachadmin:receive:reject",
+      "teachadmin:studentscore:summaryscore:get",
+      "train:meetingroom:applys:apply",
+      "teachadmin:myteachschedule:query",
+      "teachadmin:mistake:confirm",
+      "teachadmin:allstudents:query",
+      "teachadmin:mystudents:export",
+      "integration:creditAsk:detail",
+      "teachadmin:mistake:query",
+      "teachadmin:allmistakes:get",
+      "teachadmin:studentscore:studentbonuslist:remove",
+      "approval:myapply:add",
+      "integration:creditAsk:add",
+      "teachadmin:refinecallroll:get",
+      "teachadmin:studentscore:schoolscore:export",
+      "teachadmin:studentscore:classscore:template",
+      "teachadmin:mistake:export",
+      "teachadmin:stupunish:query",
+      "teachadmin:allcallroll:export",
+      "teachadmin:studentscore:classscore:get",
+      "teachadmin:refinecallroll:remove",
+      "integration:creditAsk:export",
+      "teachadmin:studentscore:classscore:add",
+      "teachadmin:studentscore:scorelist:export",
+      "train:meetingroom:applys:cancel",
+      "teachadmin:allstudents:graImgUpload",
+      "teachadmin:mistake:detail",
+      "approval:copylist:get",
+      "teachadmin:timetable:query",
+      "teachadmin:studentscore:studentbonuslist:edit",
+      "teachadmin:mystudents:get",
+      "approval:myapproval:get",
+      "approval:myapply:append",
+      "finance:ticket:mylist:query",
+      "teachadmin:studentscore:schoolscore:get",
+      "teachadmin:allmistakes:export",
+      "teachadmin:receive:track",
+      "teachadmin:mystudents:update",
+      "approval:copylist:query",
+      "integration:creditAsk:query",
+      "teachadmin:studentscore:classscore:remove",
+      "teachadmin:timetable:get",
+      "teachadmin:allstudents:update",
+      "teachadmin:mystudents:query",
+      "approval:myapproval:query",
+      "teachadmin:stupunish:export",
+      "teachadmin:receive:query",
+      "teachadmin:receive:get",
+      "teachadmin:stupunish:get",
+      "teachadmin:stupunish:determine",
+      "approval:myapproval:check",
+      "teachadmin:studentscore:studentbonuslist:upload",
+      "teachadmin:studentscore:classscore:query",
+      "approval:myapply:get",
+      "teachadmin:allstudents:export"
+    ],
+    "staffName": "方晓恩",
+    "firstDepartmentName": "人工智能教学",
+    "staffId": 120230807007
+  },
+  "code": 1,
+  "msg": "操作成功！",
+  "args": "",
+  "totalCount": 0
+}

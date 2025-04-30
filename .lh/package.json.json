@@ -1,0 +1,42 @@
+{
+    "sourceFile": "package.json",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 6,
+            "patches": [
+                {
+                    "date": 1746010123713,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1746010153234,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -31,10 +31,14 @@\n     \"nodemon\": \"^3.1.0\"\r\n   },\r\n   \"jest\": {\r\n     \"testEnvironment\": \"node\",\r\n-    \"setupFilesAfterEnv\": [\"./tests/setup.js\"],\r\n-    \"testMatch\": [\"**/tests/**/*.test.js\"],\r\n+    \"setupFilesAfterEnv\": [\r\n+      \"./tests/setup.js\"\r\n+    ],\r\n+    \"testMatch\": [\r\n+      \"**/tests/**/*.test.js\"\r\n+    ],\r\n     \"collectCoverageFrom\": [\r\n       \"controllers/**/*.js\",\r\n       \"services/**/*.js\",\r\n       \"models/**/*.js\",\r\n"
+                },
+                {
+                    "date": 1746011615507,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -5,9 +5,9 @@\n   \"main\": \"app.js\",\r\n   \"scripts\": {\r\n     \"start\": \"node app.js\",\r\n     \"dev\": \"nodemon app.js\",\r\n-    \"test\": \"jest --detectOpenHandles\",\r\n+    \"test\": \"jest\",\r\n     \"test:watch\": \"jest --watch\",\r\n     \"test:coverage\": \"jest --coverage\"\r\n   },\r\n   \"keywords\": [],\r\n"
+                },
+                {
+                    "date": 1746011759000,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -5,11 +5,11 @@\n   \"main\": \"app.js\",\r\n   \"scripts\": {\r\n     \"start\": \"node app.js\",\r\n     \"dev\": \"nodemon app.js\",\r\n-    \"test\": \"jest\",\r\n-    \"test:watch\": \"jest --watch\",\r\n-    \"test:coverage\": \"jest --coverage\"\r\n+    \"test\": \"dotenv -e .env.test jest\",\r\n+    \"test:watch\": \"dotenv -e .env.test jest --watch\",\r\n+    \"test:coverage\": \"dotenv -e .env.test jest --coverage\"\r\n   },\r\n   \"keywords\": [],\r\n   \"author\": \"\",\r\n   \"license\": \"ISC\",\r\n@@ -18,18 +18,19 @@\n     \"bcryptjs\": \"^2.4.3\",\r\n     \"cors\": \"^2.8.5\",\r\n     \"dotenv\": \"^16.4.5\",\r\n     \"express\": \"^4.18.3\",\r\n-    \"jest\": \"^29.7.0\",\r\n     \"jsonwebtoken\": \"^9.0.2\",\r\n     \"morgan\": \"^1.10.0\",\r\n     \"mssql\": \"^10.0.2\",\r\n     \"sequelize\": \"^6.37.1\",\r\n-    \"supertest\": \"^6.3.4\",\r\n     \"tedious\": \"^16.0.1\"\r\n   },\r\n   \"devDependencies\": {\r\n-    \"nodemon\": \"^3.1.0\"\r\n+    \"dotenv-cli\": \"^7.4.1\",\r\n+    \"jest\": \"^29.7.0\",\r\n+    \"nodemon\": \"^3.1.0\",\r\n+    \"supertest\": \"^6.3.4\"\r\n   },\r\n   \"jest\": {\r\n     \"testEnvironment\": \"node\",\r\n     \"setupFilesAfterEnv\": [\r\n@@ -42,7 +43,8 @@\n       \"controllers/**/*.js\",\r\n       \"services/**/*.js\",\r\n       \"models/**/*.js\",\r\n       \"!**/node_modules/**\"\r\n-    ]\r\n+    ],\r\n+    \"verbose\": true\r\n   }\r\n }\r\n"
+                },
+                {
+                    "date": 1746012106546,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -25,9 +25,9 @@\n     \"sequelize\": \"^6.37.1\",\r\n     \"tedious\": \"^16.0.1\"\r\n   },\r\n   \"devDependencies\": {\r\n-    \"dotenv-cli\": \"^7.4.1\",\r\n+    \"dotenv-cli\": \"^7.4.4\",\r\n     \"jest\": \"^29.7.0\",\r\n     \"nodemon\": \"^3.1.0\",\r\n     \"supertest\": \"^6.3.4\"\r\n   },\r\n"
+                },
+                {
+                    "date": 1746012335857,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -7,9 +7,10 @@\n     \"start\": \"node app.js\",\r\n     \"dev\": \"nodemon app.js\",\r\n     \"test\": \"dotenv -e .env.test jest\",\r\n     \"test:watch\": \"dotenv -e .env.test jest --watch\",\r\n-    \"test:coverage\": \"dotenv -e .env.test jest --coverage\"\r\n+    \"test:coverage\": \"dotenv -e .env.test jest --coverage\",\r\n+    \"test:controllers\": \"jest tests/controllers --detectOpenHandles --forceExit\"\r\n   },\r\n   \"keywords\": [],\r\n   \"author\": \"\",\r\n   \"license\": \"ISC\",\r\n"
+                },
+                {
+                    "date": 1746012491562,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -5,12 +5,12 @@\n   \"main\": \"app.js\",\r\n   \"scripts\": {\r\n     \"start\": \"node app.js\",\r\n     \"dev\": \"nodemon app.js\",\r\n-    \"test\": \"dotenv -e .env.test jest\",\r\n-    \"test:watch\": \"dotenv -e .env.test jest --watch\",\r\n-    \"test:coverage\": \"dotenv -e .env.test jest --coverage\",\r\n-    \"test:controllers\": \"jest tests/controllers --detectOpenHandles --forceExit\"\r\n+    \"test\": \"jest\",\r\n+    \"test:watch\": \"jest --watch\",\r\n+    \"test:coverage\": \"jest --coverage\",\r\n+    \"test:controllers\": \"jest tests/controllers --detectOpenHandles --forceExit --runInBand\"\r\n   },\r\n   \"keywords\": [],\r\n   \"author\": \"\",\r\n   \"license\": \"ISC\",\r\n@@ -26,9 +26,8 @@\n     \"sequelize\": \"^6.37.1\",\r\n     \"tedious\": \"^16.0.1\"\r\n   },\r\n   \"devDependencies\": {\r\n-    \"dotenv-cli\": \"^7.4.4\",\r\n     \"jest\": \"^29.7.0\",\r\n     \"nodemon\": \"^3.1.0\",\r\n     \"supertest\": \"^6.3.4\"\r\n   },\r\n@@ -45,7 +44,8 @@\n       \"services/**/*.js\",\r\n       \"models/**/*.js\",\r\n       \"!**/node_modules/**\"\r\n     ],\r\n-    \"verbose\": true\r\n+    \"verbose\": true,\r\n+    \"testTimeout\": 30000\r\n   }\r\n }\r\n"
+                }
+            ],
+            "date": 1746010123713,
+            "name": "Commit-0",
+            "content": "{\r\n  \"name\": \"crm-server\",\r\n  \"version\": \"1.0.0\",\r\n  \"description\": \"\",\r\n  \"main\": \"app.js\",\r\n  \"scripts\": {\r\n    \"start\": \"node app.js\",\r\n    \"dev\": \"nodemon app.js\",\r\n    \"test\": \"jest --detectOpenHandles\",\r\n    \"test:watch\": \"jest --watch\",\r\n    \"test:coverage\": \"jest --coverage\"\r\n  },\r\n  \"keywords\": [],\r\n  \"author\": \"\",\r\n  \"license\": \"ISC\",\r\n  \"dependencies\": {\r\n    \"axios\": \"^1.9.0\",\r\n    \"bcryptjs\": \"^2.4.3\",\r\n    \"cors\": \"^2.8.5\",\r\n    \"dotenv\": \"^16.4.5\",\r\n    \"express\": \"^4.18.3\",\r\n    \"jest\": \"^29.7.0\",\r\n    \"jsonwebtoken\": \"^9.0.2\",\r\n    \"morgan\": \"^1.10.0\",\r\n    \"mssql\": \"^10.0.2\",\r\n    \"sequelize\": \"^6.37.1\",\r\n    \"supertest\": \"^6.3.4\",\r\n    \"tedious\": \"^16.0.1\"\r\n  },\r\n  \"devDependencies\": {\r\n    \"nodemon\": \"^3.1.0\"\r\n  },\r\n  \"jest\": {\r\n    \"testEnvironment\": \"node\",\r\n    \"setupFilesAfterEnv\": [\"./tests/setup.js\"],\r\n    \"testMatch\": [\"**/tests/**/*.test.js\"],\r\n    \"collectCoverageFrom\": [\r\n      \"controllers/**/*.js\",\r\n      \"services/**/*.js\",\r\n      \"models/**/*.js\",\r\n      \"!**/node_modules/**\"\r\n    ]\r\n  }\r\n}\r\n"
+        }
+    ]
+}

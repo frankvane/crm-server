@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 1,
+            "activePatchIndex": 3,
             "patches": [
                 {
                     "date": 1745924964063,
@@ -12,6 +12,14 @@
                 {
                     "date": 1745925001840,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,25 +4,25 @@\n   const Role = sequelize.define(\"Role\", {\r\n     name: {\r\n       type: DataTypes.STRING,\r\n       allowNull: false,\r\n-      unique: true\r\n+      unique: true,\r\n     },\r\n     description: {\r\n       type: DataTypes.STRING,\r\n-      allowNull: true\r\n-    }\r\n+      allowNull: true,\r\n+    },\r\n   });\r\n \r\n   Role.associate = (models) => {\r\n     Role.belongsToMany(models.User, {\r\n       through: \"UserRole\",\r\n-      as: \"Users\"\r\n+      as: \"Users\",\r\n     });\r\n \r\n     Role.belongsToMany(models.Permission, {\r\n       through: \"RolePermission\",\r\n-      as: \"Permissions\"\r\n+      as: \"Permissions\",\r\n     });\r\n   };\r\n \r\n   return Role;\r\n"
+                },
+                {
+                    "date": 1746007683727,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,8 +22,13 @@\n     Role.belongsToMany(models.Permission, {\r\n       through: \"RolePermission\",\r\n       as: \"Permissions\",\r\n     });\r\n+\r\n+    Role.belongsToMany(models.Resource, {\r\n+      through: \"RoleResource\",\r\n+      as: \"Resources\",\r\n+    });\r\n   };\r\n \r\n   return Role;\r\n };\r\n"
+                },
+                {
+                    "date": 1746007963982,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,13 +22,8 @@\n     Role.belongsToMany(models.Permission, {\r\n       through: \"RolePermission\",\r\n       as: \"Permissions\",\r\n     });\r\n-\r\n-    Role.belongsToMany(models.Resource, {\r\n-      through: \"RoleResource\",\r\n-      as: \"Resources\",\r\n-    });\r\n   };\r\n \r\n   return Role;\r\n };\r\n"
                 }
             ],
             "date": 1745924964063,

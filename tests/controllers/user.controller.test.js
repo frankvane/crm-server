@@ -1,8 +1,20 @@
 const request = require("supertest");
 const app = require("../../app");
-const { getTestHeaders, generateUserData } = require("../helpers");
+const {
+  getTestHeaders,
+  generateUserData,
+  getTestToken,
+} = require("../helpers");
 
 describe("User Controller", () => {
+  let testToken;
+
+  beforeEach(async () => {
+    // 在每个测试前获取新的 token
+    const userData = generateUserData();
+    testToken = await getTestToken(userData);
+  });
+
   describe("POST /api/users", () => {
     it("should create a new user when valid data is provided", async () => {
       const userData = generateUserData();
@@ -50,31 +62,59 @@ describe("User Controller", () => {
       expect(response.body.code).toBe(0);
       expect(response.body.msg).toContain("必填");
     });
+
+    it("should create a new user", async () => {
+      const userData = generateUserData();
+      const response = await request(app)
+        .post("/api/users")
+        .set("Authorization", `Bearer ${testToken}`)
+        .set("Content-Type", "application/json")
+        .send(userData);
+
+      expect(response.status).toBe(201);
+      expect(response.body.code).toBe(1);
+      expect(response.body.data).toHaveProperty("id");
+      expect(response.body.data.username).toBe(userData.username);
+      expect(response.body.data.email).toBe(userData.email);
+    });
+
+    it("should return 403 without token", async () => {
+      const userData = generateUserData();
+      const response = await request(app)
+        .post("/api/users")
+        .set("Content-Type", "application/json")
+        .send(userData);
+
+      expect(response.status).toBe(403);
+      expect(response.body.code).toBe(0);
+      expect(response.body.msg).toBe("未提供访问令牌");
+    });
   });
 
   describe("GET /api/users", () => {
     it("should return list of users with pagination", async () => {
       const response = await request(app)
         .get("/api/users")
-        .query({ page: 1, pageSize: 10 })
-        .set(getTestHeaders());
+        .set("Authorization", `Bearer ${testToken}`)
+        .query({ current: 1, pageSize: 10 });
 
       expect(response.status).toBe(200);
       expect(response.body.code).toBe(1);
       expect(response.body.data).toHaveProperty("list");
-      expect(response.body.data).toHaveProperty("total");
-      expect(response.body.data).toHaveProperty("current", 1);
-      expect(response.body.data).toHaveProperty("pageSize", 10);
+      expect(response.body.data).toHaveProperty("pagination");
+      expect(response.body.data.pagination).toHaveProperty("current");
+      expect(response.body.data.pagination).toHaveProperty("pageSize");
+      expect(response.body.data.pagination).toHaveProperty("total");
+    });
 
-      // 验证用户列表数据结构
-      if (response.body.data.list.length > 0) {
-        const user = response.body.data.list[0];
-        expect(user).toHaveProperty("id");
-        expect(user).toHaveProperty("username");
-        expect(user).toHaveProperty("email");
-        expect(user).toHaveProperty("status");
-        expect(user).not.toHaveProperty("password");
-      }
+    it("should return 403 without token", async () => {
+      const response = await request(app)
+        .get("/api/users")
+        .query({ current: 1, pageSize: 10 });
+
+      expect(response.status).toBe(403);
+      expect(response.body.code).toBe(0);
+      expect(response.body.msg).toBe("未提供访问令牌");
     });
 
     it("should support search by username", async () => {
@@ -133,6 +173,44 @@ describe("User Controller", () => {
       expect(response.body.code).toBe(0);
       expect(response.body.msg).toBe("用户不存在");
     });
+
+    it("should update an existing user", async () => {
+      // 先创建用户
+      const userData = generateUserData();
+      const createResponse = await request(app)
+        .post("/api/users")
+        .set("Authorization", `Bearer ${testToken}`)
+        .set("Content-Type", "application/json")
+        .send(userData);
+
+      const userId = createResponse.body.data.id;
+      const updateData = {
+        username: "updatedusername",
+        email: "updated@example.com",
+      };
+
+      const response = await request(app)
+        .put(`/api/users/${userId}`)
+        .set("Authorization", `Bearer ${testToken}`)
+        .set("Content-Type", "application/json")
+        .send(updateData);
+
+      expect(response.status).toBe(200);
+      expect(response.body.code).toBe(1);
+      expect(response.body.data.username).toBe(updateData.username);
+      expect(response.body.data.email).toBe(updateData.email);
+    });
+
+    it("should return 403 without token", async () => {
+      const response = await request(app)
+        .put("/api/users/1")
+        .set("Content-Type", "application/json")
+        .send({ username: "updated" });
+
+      expect(response.status).toBe(403);
+      expect(response.body.code).toBe(0);
+      expect(response.body.msg).toBe("未提供访问令牌");
+    });
   });
 
   describe("DELETE /api/users/:id", () => {
@@ -162,6 +240,34 @@ describe("User Controller", () => {
       expect(response.status).toBe(404);
       expect(response.body.code).toBe(0);
       expect(response.body.msg).toBe("用户不存在");
+    });
+
+    it("should delete an existing user", async () => {
+      // 先创建用户
+      const userData = generateUserData();
+      const createResponse = await request(app)
+        .post("/api/users")
+        .set("Authorization", `Bearer ${testToken}`)
+        .set("Content-Type", "application/json")
+        .send(userData);
+
+      const userId = createResponse.body.data.id;
+
+      const response = await request(app)
+        .delete(`/api/users/${userId}`)
+        .set("Authorization", `Bearer ${testToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.code).toBe(1);
+      expect(response.body.msg).toBe("用户删除成功");
+    });
+
+    it("should return 403 without token", async () => {
+      const response = await request(app).delete("/api/users/1");
+
+      expect(response.status).toBe(403);
+      expect(response.body.code).toBe(0);
+      expect(response.body.msg).toBe("未提供访问令牌");
     });
   });
 

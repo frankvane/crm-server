@@ -1,4 +1,7 @@
 const jwt = require("../utils/jwt");
+const request = require("supertest");
+const app = require("../app");
+const { sequelize } = require("../models");
 
 /**
  * 生成测试用的请求头
@@ -59,9 +62,34 @@ function generateResourceData(overrides = {}) {
   };
 }
 
+/**
+ * 获取测试用户的 token
+ * @param {Object} userData - 用户数据
+ * @returns {Promise<string>} - 返回 token
+ */
+async function getTestToken(userData) {
+  // 先创建用户
+  await request(app)
+    .post("/api/users")
+    .set("Content-Type", "application/json")
+    .send(userData);
+
+  // 登录获取 token
+  const response = await request(app)
+    .post("/api/auth/login")
+    .set("Content-Type", "application/json")
+    .send({
+      username: userData.username,
+      password: userData.password,
+    });
+
+  return response.body.data.token;
+}
+
 module.exports = {
   getTestHeaders,
   generateUserData,
   generateRoleData,
   generateResourceData,
+  getTestToken,
 };

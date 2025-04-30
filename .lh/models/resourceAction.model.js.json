@@ -1,0 +1,26 @@
+{
+    "sourceFile": "models/resourceAction.model.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1746008161432,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1746008190074,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,45 @@\n+const { DataTypes } = require(\"sequelize\");\r\n+\r\n+module.exports = (sequelize) => {\r\n+  const ResourceAction = sequelize.define(\"ResourceAction\", {\r\n+    name: {\r\n+      type: DataTypes.STRING,\r\n+      allowNull: false,\r\n+      comment: \"操作名称，如'添加'、'编辑'\",\r\n+    },\r\n+    code: {\r\n+      type: DataTypes.STRING,\r\n+      allowNull: false,\r\n+      comment: \"操作代码，如'add'、'edit'、'get'\",\r\n+    },\r\n+    description: {\r\n+      type: DataTypes.STRING,\r\n+      allowNull: true,\r\n+      comment: \"操作描述\",\r\n+    },\r\n+    icon: {\r\n+      type: DataTypes.STRING,\r\n+      allowNull: true,\r\n+      comment: \"操作图标\",\r\n+    },\r\n+    sort: {\r\n+      type: DataTypes.INTEGER,\r\n+      allowNull: false,\r\n+      defaultValue: 0,\r\n+      comment: \"排序\",\r\n+    },\r\n+    needConfirm: {\r\n+      type: DataTypes.BOOLEAN,\r\n+      allowNull: false,\r\n+      defaultValue: false,\r\n+      comment: \"是否需要二次确认\",\r\n+    },\r\n+    confirmMessage: {\r\n+      type: DataTypes.STRING,\r\n+      allowNull: true,\r\n+      comment: \"确认提示信息\",\r\n+    },\r\n+  });\r\n+\r\n+  return ResourceAction;\r\n+};\r\n"
+                },
+                {
+                    "date": 1746008210810,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -42,5 +42,4 @@\n   });\r\n \r\n   return ResourceAction;\r\n };\r\n- \n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1746008161432,
+            "name": "Commit-0",
+            "content": " "
+        }
+    ]
+}
