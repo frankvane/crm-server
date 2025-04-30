@@ -7,14 +7,43 @@ const {
   Resource,
   ResourceAction,
 } = require("../models");
+const { clearDatabase } = require("../utils/database");
 
 async function createInitialData() {
   try {
+    console.log("开始清理数据库...");
+    await clearDatabase();
+
     console.log("开始创建初始数据...");
 
     // 1. 创建基础权限
     console.log("创建权限...");
     const permissions = await Permission.bulkCreate([
+      // 用户管理权限
+      {
+        name: "create_user",
+        action: "create",
+        resource: "user",
+        description: "创建用户",
+      },
+      {
+        name: "view_users",
+        action: "read",
+        resource: "user",
+        description: "查看用户列表",
+      },
+      {
+        name: "update_user",
+        action: "update",
+        resource: "user",
+        description: "更新用户",
+      },
+      {
+        name: "delete_user",
+        action: "delete",
+        resource: "user",
+        description: "删除用户",
+      },
       // 教学管理权限
       {
         name: "teachadmin:allstudents:get",
@@ -84,6 +113,25 @@ async function createInitialData() {
     console.log("创建资源菜单...");
 
     // 2.1 创建顶级菜单
+    const system = await Resource.create({
+      name: "系统管理",
+      code: "system",
+      type: "menu",
+      path: "system",
+      component: "Layout",
+      icon: "系统",
+      hidden: false,
+      redirect: "noRedirect",
+      alwaysShow: true,
+      meta: {
+        title: "系统管理",
+        icon: "系统",
+        noCache: false,
+        link: null,
+      },
+      description: "系统管理模块",
+    });
+
     const teachAdmin = await Resource.create({
       name: "教学管理",
       code: "teachadmin",
@@ -141,7 +189,26 @@ async function createInitialData() {
       description: "财务管理模块",
     });
 
-    // 2.2 创建教学管理子菜单
+    // 2.2 创建系统管理子菜单
+    await Resource.create({
+      name: "用户管理",
+      code: "system:user",
+      type: "menu",
+      path: "user",
+      parentId: system.id,
+      component: "system/user/index",
+      icon: "#",
+      hidden: false,
+      meta: {
+        title: "用户管理",
+        icon: "#",
+        noCache: false,
+        link: null,
+      },
+      description: "用户管理",
+    });
+
+    // 2.3 创建教学管理子菜单
     await Resource.create({
       name: "全部学生列表",
       code: "teachadmin:allstudents",
@@ -178,7 +245,7 @@ async function createInitialData() {
       description: "我的班级学生列表",
     });
 
-    // 2.3 创建审批管理子菜单
+    // 2.4 创建审批管理子菜单
     await Resource.create({
       name: "我的申请列表",
       code: "approval:myapply",
@@ -197,7 +264,7 @@ async function createInitialData() {
       description: "我的申请列表",
     });
 
-    // 2.4 创建财务管理子菜单
+    // 2.5 创建财务管理子菜单
     const ticket = await Resource.create({
       name: "罚款单",
       code: "finance:ticket",
@@ -256,7 +323,7 @@ async function createInitialData() {
       username: "admin",
       password: "admin123", // 密码会被模型的钩子自动加密
       email: "admin@example.com",
-      status: true,
+      status: 1, // 修改为整数 1 代表激活状态
       departmentName: "人工智能教学",
       firstDepartmentName: "人工智能教学",
       staffName: "方晓恩",
