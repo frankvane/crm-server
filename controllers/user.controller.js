@@ -2,6 +2,7 @@ const { User, Role } = require("../models");
 const bcrypt = require("bcryptjs");
 const { Op } = require("sequelize");
 const ResponseUtil = require("../utils/response");
+const { PERMISSION_RULES } = require("../config/permissions");
 
 // 创建用户
 exports.create = async (req, res, next) => {
@@ -267,6 +268,111 @@ exports.batchDelete = async (req, res, next) => {
         { deletedCount: result },
         `${result} users deleted successfully`
       )
+    );
+  } catch (err) {
+    next(err);
+  }
+};
+
+// 获取当前登录用户信息（含角色、菜单、按钮权限）
+exports.me = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    const {
+      User,
+      Role,
+      Permission,
+      Resource,
+      ResourceAction,
+    } = require("../models");
+
+    // 查询用户及角色
+    const user = await User.findByPk(userId, {
+      include: [
+        {
+          model: Role,
+          as: "roles",
+          include: [
+            {
+              model: Permission,
+              as: "Permissions",
+              through: { attributes: [] },
+            },
+            {
+              model: Resource,
+              as: "Resources",
+              through: { attributes: [] },
+            },
+          ],
+          through: { attributes: [] },
+        },
+      ],
+      attributes: { exclude: ["password"] },
+    });
+
+    if (!user) {
+      return res.status(404).json(ResponseUtil.error("User not found", 404));
+    }
+
+    // 角色清单（过滤掉null值）
+    const roles = user.roles
+      .filter((role) => role !== null)
+      .map((role) => ({
+        id: role.id,
+        name: role.name,
+        code: role.code,
+      }));
+
+    // 构建资源树
+    const buildResourceTree = (resources, parentId = null) => {
+      return resources
+        .filter((resource) => resource.parentId === parentId)
+        .map((resource) => ({
+          ...resource.toJSON(),
+          children: buildResourceTree(resources, resource.id),
+        }))
+        .filter((node) => node.children.length > 0 || !node.hidden);
+    };
+
+    // 获取所有资源并构建树形结构
+    const allResources = [];
+    user.roles.forEach((role) => {
+      if (role && role.Resources) {
+        role.Resources.forEach((resource) => {
+          if (!allResources.find((r) => r.id === resource.id)) {
+            allResources.push(resource);
+          }
+        });
+      }
+    });
+    const routes = buildResourceTree(allResources);
+
+    // 权限列表（使用配置的规则验证权限）
+    const permSet = new Set();
+    user.roles.forEach((role) => {
+      if (role && role.Permissions) {
+        role.Permissions.forEach((permission) => {
+          if (PERMISSION_RULES.isValidPermission(permission.name)) {
+            permSet.add(permission.name);
+          }
+        });
+      }
+    });
+    const permissions = Array.from(permSet);
+
+    res.json(
+      ResponseUtil.success({
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          status: user.status,
+        },
+        roles,
+        routes,
+        permissions,
+      })
     );
   } catch (err) {
     next(err);

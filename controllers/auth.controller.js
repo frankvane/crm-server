@@ -48,14 +48,9 @@ exports.login = async (req, res, next) => {
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
     });
 
-    // 准备用户数据（排除密码）
-    const userData = user.toJSON();
-    delete userData.password;
-
     res.json(
       ResponseUtil.success(
         {
-          user: userData,
           accessToken,
           refreshToken,
         },

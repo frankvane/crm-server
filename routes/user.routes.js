@@ -3,6 +3,9 @@ const router = express.Router();
 const userController = require("../controllers/user.controller");
 const { authJwt } = require("../middlewares");
 
+// 获取当前登录用户信息（含角色、菜单、按钮权限）
+router.get("/me", [authJwt.verifyToken], userController.me);
+
 // 创建用户（需要create_user权限）
 router.post(
   "/",
