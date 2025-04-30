@@ -148,6 +148,37 @@ module.exports = {
           resource: "resource_action",
           description: "查看资源操作（按钮/行为）",
         },
+        // 分类管理权限
+        {
+          name: "manage_categories",
+          action: "manage",
+          resource: "category",
+          description: "管理分类（含类型/树/节点）",
+        },
+        {
+          name: "view_categories",
+          action: "read",
+          resource: "category",
+          description: "查看分类（含类型/树/节点）",
+        },
+        {
+          name: "create_category",
+          action: "create",
+          resource: "category",
+          description: "创建分类",
+        },
+        {
+          name: "update_category",
+          action: "update",
+          resource: "category",
+          description: "更新分类",
+        },
+        {
+          name: "delete_category",
+          action: "delete",
+          resource: "category",
+          description: "删除分类",
+        },
       ]);
 
       // 2. 创建资源菜单
