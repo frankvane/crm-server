@@ -137,3 +137,132 @@
   - 403: "Forbidden"
   - 404: "User not found"
   - 500: "Internal Server Error"
+
+## 获取当前登录用户信息
+
+获取当前登录用户的详细信息，包括用户基本信息、角色、权限和菜单。
+
+- **URL**: `/api/users/me`
+- **Method**: `GET`
+- **Auth Required**: Yes
+- **Permissions Required**: None
+
+### 请求头
+
+```
+Authorization: Bearer <token>
+```
+
+### 响应
+
+#### 成功响应 (200 OK)
+
+```json
+{
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "user": {
+      "id": 1,
+      "username": "admin",
+      "email": "admin@example.com",
+      "status": 1
+    },
+    "roles": [
+      {
+        "id": 1,
+        "name": "管理员",
+        "code": "admin"
+      }
+    ],
+    "routes": [
+      {
+        "id": 1,
+        "name": "系统管理",
+        "path": "/system",
+        "component": "Layout",
+        "meta": {
+          "title": "系统管理",
+          "icon": "系统",
+          "noCache": false,
+          "link": null
+        },
+        "children": [
+          {
+            "id": 2,
+            "name": "用户管理",
+            "path": "user",
+            "component": "system/user/index",
+            "meta": {
+              "title": "用户管理",
+              "icon": "#",
+              "noCache": false,
+              "link": null
+            }
+          }
+        ]
+      }
+    ],
+    "permissions": [
+      "create_user",
+      "view_users",
+      "update_user",
+      "delete_user",
+      "manage_roles"
+    ]
+  }
+}
+```
+
+#### 错误响应
+
+##### 未授权 (401 Unauthorized)
+
+```json
+{
+  "code": 401,
+  "message": "No token provided",
+  "data": null
+}
+```
+
+##### 用户未找到 (404 Not Found)
+
+```json
+{
+  "code": 404,
+  "message": "User not found",
+  "data": null
+}
+```
+
+### 说明
+
+- `user`: 用户基本信息
+
+  - `id`: 用户 ID
+  - `username`: 用户名
+  - `email`: 邮箱
+  - `status`: 状态（1: 启用, 0: 禁用）
+
+- `roles`: 用户角色列表
+
+  - `id`: 角色 ID
+  - `name`: 角色名称
+  - `code`: 角色编码
+
+- `routes`: 菜单路由（树形结构）
+
+  - `id`: 路由 ID
+  - `name`: 路由名称
+  - `path`: 路由路径
+  - `component`: 组件路径
+  - `meta`: 路由元信息
+    - `title`: 菜单标题
+    - `icon`: 菜单图标
+    - `noCache`: 是否缓存
+    - `link`: 外部链接
+  - `children`: 子路由
+
+- `permissions`: 权限列表
+  - 包含所有以 `create_`、`view_`、`update_`、`delete_`、`manage_` 开头的权限
