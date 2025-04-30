@@ -1,0 +1,22 @@
+{
+    "sourceFile": "routes/resource.routes.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1746022475712,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1746024865566,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -37,5 +37,5 @@\n   [authJwt.verifyToken, authJwt.hasPermission(\"manage_resources\")],\r\n   resourceController.delete\r\n );\r\n \r\n-module.exports = router;\n\\ No newline at end of file\n+module.exports = router;\r\n"
+                }
+            ],
+            "date": 1746022475711,
+            "name": "Commit-0",
+            "content": "const express = require(\"express\");\r\nconst router = express.Router();\r\nconst resourceController = require(\"../controllers/resource.controller\");\r\nconst { authJwt } = require(\"../middlewares\");\r\n\r\n// 创建资源（需要manage_resources权限）\r\nrouter.post(\r\n  \"/\",\r\n  [authJwt.verifyToken, authJwt.hasPermission(\"manage_resources\")],\r\n  resourceController.create\r\n);\r\n\r\n// 获取资源列表（需要view_resources权限）\r\nrouter.get(\r\n  \"/\",\r\n  [authJwt.verifyToken, authJwt.hasPermission(\"view_resources\")],\r\n  resourceController.list\r\n);\r\n\r\n// 获取单个资源（需要view_resources权限）\r\nrouter.get(\r\n  \"/:id\",\r\n  [authJwt.verifyToken, authJwt.hasPermission(\"view_resources\")],\r\n  resourceController.getById\r\n);\r\n\r\n// 更新资源（需要manage_resources权限）\r\nrouter.put(\r\n  \"/:id\",\r\n  [authJwt.verifyToken, authJwt.hasPermission(\"manage_resources\")],\r\n  resourceController.update\r\n);\r\n\r\n// 删除资源（需要manage_resources权限）\r\nrouter.delete(\r\n  \"/:id\",\r\n  [authJwt.verifyToken, authJwt.hasPermission(\"manage_resources\")],\r\n  resourceController.delete\r\n);\r\n\r\nmodule.exports = router;"
+        }
+    ]
+}

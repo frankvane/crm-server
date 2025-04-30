@@ -1,0 +1,22 @@
+{
+    "sourceFile": "routes/resourceAction.routes.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1746022494454,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1746024865567,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -37,5 +37,5 @@\n   [authJwt.verifyToken, authJwt.hasPermission(\"manage_resource_actions\")],\r\n   resourceActionController.delete\r\n );\r\n \r\n-module.exports = router; \n\\ No newline at end of file\n+module.exports = router;\r\n"
+                }
+            ],
+            "date": 1746022494454,
+            "name": "Commit-0",
+            "content": "const express = require(\"express\");\r\nconst router = express.Router();\r\nconst resourceActionController = require(\"../controllers/resourceAction.controller\");\r\nconst { authJwt } = require(\"../middlewares\");\r\n\r\n// 创建资源操作（需要manage_resource_actions权限）\r\nrouter.post(\r\n  \"/\",\r\n  [authJwt.verifyToken, authJwt.hasPermission(\"manage_resource_actions\")],\r\n  resourceActionController.create\r\n);\r\n\r\n// 获取资源操作列表（需要view_resource_actions权限）\r\nrouter.get(\r\n  \"/\",\r\n  [authJwt.verifyToken, authJwt.hasPermission(\"view_resource_actions\")],\r\n  resourceActionController.list\r\n);\r\n\r\n// 获取单个资源操作（需要view_resource_actions权限）\r\nrouter.get(\r\n  \"/:id\",\r\n  [authJwt.verifyToken, authJwt.hasPermission(\"view_resource_actions\")],\r\n  resourceActionController.getById\r\n);\r\n\r\n// 更新资源操作（需要manage_resource_actions权限）\r\nrouter.put(\r\n  \"/:id\",\r\n  [authJwt.verifyToken, authJwt.hasPermission(\"manage_resource_actions\")],\r\n  resourceActionController.update\r\n);\r\n\r\n// 删除资源操作（需要manage_resource_actions权限）\r\nrouter.delete(\r\n  \"/:id\",\r\n  [authJwt.verifyToken, authJwt.hasPermission(\"manage_resource_actions\")],\r\n  resourceActionController.delete\r\n);\r\n\r\nmodule.exports = router; "
+        }
+    ]
+}

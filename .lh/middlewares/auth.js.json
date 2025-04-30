@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 2,
+            "activePatchIndex": 3,
             "patches": [
                 {
                     "date": 1745924047243,
@@ -16,6 +16,10 @@
                 {
                     "date": 1746016122701,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -40,13 +40,13 @@\n       const user = await User.findByPk(userId, {\r\n         include: [\r\n           {\r\n             model: Role,\r\n-            as: \"Roles\",\r\n+            as: \"roles\",\r\n             include: [\r\n               {\r\n                 model: Permission,\r\n-                as: \"Permissions\",\r\n+                as: \"permissions\",\r\n                 through: { attributes: [] },\r\n               },\r\n             ],\r\n           },\r\n@@ -57,10 +57,10 @@\n         return res.status(403).json(ResponseUtil.error(\"User not found\", 403));\r\n       }\r\n \r\n       // 检查用户的所有角色中是否有所需权限\r\n-      const hasRequiredPermission = user.Roles.some((role) =>\r\n-        role.Permissions.some((p) => p.name === permission)\r\n+      const hasRequiredPermission = user.roles.some((role) =>\r\n+        role.permissions.some((p) => p.name === permission)\r\n       );\r\n \r\n       if (!hasRequiredPermission) {\r\n         return res\r\n"
+                },
+                {
+                    "date": 1746021609688,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -44,9 +44,9 @@\n             as: \"roles\",\r\n             include: [\r\n               {\r\n                 model: Permission,\r\n-                as: \"permissions\",\r\n+                as: \"Permissions\",\r\n                 through: { attributes: [] },\r\n               },\r\n             ],\r\n           },\r\n@@ -58,9 +58,9 @@\n       }\r\n \r\n       // 检查用户的所有角色中是否有所需权限\r\n       const hasRequiredPermission = user.roles.some((role) =>\r\n-        role.permissions.some((p) => p.name === permission)\r\n+        role.Permissions.some((p) => p.name === permission)\r\n       );\r\n \r\n       if (!hasRequiredPermission) {\r\n         return res\r\n"
                 }
             ],
             "date": 1745924047243,
