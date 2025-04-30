@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 3,
+            "activePatchIndex": 4,
             "patches": [
                 {
                     "date": 1745924938211,
@@ -20,6 +20,10 @@
                 {
                     "date": 1746008357007,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -15,36 +15,48 @@\n // 建立模型关联\r\n // 1. User 相关关联\r\n User.belongsToMany(Role, {\r\n   through: \"UserRole\",\r\n+  foreignKey: \"userId\",\r\n+  otherKey: \"roleId\",\r\n   as: \"roles\",\r\n });\r\n \r\n // 2. Role 相关关联\r\n Role.belongsToMany(User, {\r\n   through: \"UserRole\",\r\n+  foreignKey: \"roleId\",\r\n+  otherKey: \"userId\",\r\n   as: \"users\",\r\n });\r\n \r\n Role.belongsToMany(Permission, {\r\n   through: \"RolePermission\",\r\n+  foreignKey: \"roleId\",\r\n+  otherKey: \"permissionId\",\r\n   as: \"permissions\",\r\n });\r\n \r\n Role.belongsToMany(Resource, {\r\n   through: \"RoleResource\",\r\n+  foreignKey: \"roleId\",\r\n+  otherKey: \"resourceId\",\r\n   as: \"resources\",\r\n });\r\n \r\n // 3. Permission 相关关联\r\n Permission.belongsToMany(Role, {\r\n   through: \"RolePermission\",\r\n+  foreignKey: \"permissionId\",\r\n+  otherKey: \"roleId\",\r\n   as: \"roles\",\r\n });\r\n \r\n // 4. Resource 相关关联\r\n Resource.belongsToMany(Role, {\r\n   through: \"RoleResource\",\r\n+  foreignKey: \"resourceId\",\r\n+  otherKey: \"roleId\",\r\n   as: \"roles\",\r\n });\r\n \r\n Resource.belongsTo(Resource, {\r\n"
+                },
+                {
+                    "date": 1746018592131,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -14,47 +14,47 @@\n \r\n // 建立模型关联\r\n // 1. User 相关关联\r\n User.belongsToMany(Role, {\r\n-  through: \"UserRole\",\r\n+  through: \"UserRoles\",\r\n   foreignKey: \"userId\",\r\n   otherKey: \"roleId\",\r\n   as: \"roles\",\r\n });\r\n \r\n // 2. Role 相关关联\r\n Role.belongsToMany(User, {\r\n-  through: \"UserRole\",\r\n+  through: \"UserRoles\",\r\n   foreignKey: \"roleId\",\r\n   otherKey: \"userId\",\r\n   as: \"users\",\r\n });\r\n \r\n Role.belongsToMany(Permission, {\r\n-  through: \"RolePermission\",\r\n+  through: \"RolePermissions\",\r\n   foreignKey: \"roleId\",\r\n   otherKey: \"permissionId\",\r\n   as: \"permissions\",\r\n });\r\n \r\n Role.belongsToMany(Resource, {\r\n-  through: \"RoleResource\",\r\n+  through: \"RoleResources\",\r\n   foreignKey: \"roleId\",\r\n   otherKey: \"resourceId\",\r\n   as: \"resources\",\r\n });\r\n \r\n // 3. Permission 相关关联\r\n Permission.belongsToMany(Role, {\r\n-  through: \"RolePermission\",\r\n+  through: \"RolePermissions\",\r\n   foreignKey: \"permissionId\",\r\n   otherKey: \"roleId\",\r\n   as: \"roles\",\r\n });\r\n \r\n // 4. Resource 相关关联\r\n Resource.belongsToMany(Role, {\r\n-  through: \"RoleResource\",\r\n+  through: \"RoleResources\",\r\n   foreignKey: \"resourceId\",\r\n   otherKey: \"roleId\",\r\n   as: \"roles\",\r\n });\r\n"
                 }
             ],
             "date": 1745924938211,

@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 2,
+            "activePatchIndex": 3,
             "patches": [
                 {
                     "date": 1746010572898,
@@ -16,6 +16,10 @@
                 {
                     "date": 1746010676824,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -39,5 +39,5 @@\n \r\n   down: async (queryInterface, Sequelize) => {\r\n     await queryInterface.dropTable(\"Users\");\r\n   },\r\n-};\n\\ No newline at end of file\n+};\r\n"
+                },
+                {
+                    "date": 1746018274970,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,10 +22,10 @@\n         type: Sequelize.STRING,\r\n         allowNull: true,\r\n       },\r\n       status: {\r\n-        type: Sequelize.ENUM(\"active\", \"inactive\"),\r\n-        defaultValue: \"active\",\r\n+        type: Sequelize.INTEGER,\r\n+        defaultValue: 1,\r\n       },\r\n       createdAt: {\r\n         allowNull: false,\r\n         type: Sequelize.DATE,\r\n"
                 }
             ],
             "date": 1746010572898,

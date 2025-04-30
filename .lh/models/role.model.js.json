@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 3,
+            "activePatchIndex": 5,
             "patches": [
                 {
                     "date": 1745924964063,
@@ -20,6 +20,14 @@
                 {
                     "date": 1746007963982,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,13 +22,8 @@\n     Role.belongsToMany(models.Permission, {\r\n       through: \"RolePermission\",\r\n       as: \"Permissions\",\r\n     });\r\n-\r\n-    Role.belongsToMany(models.Resource, {\r\n-      through: \"RoleResource\",\r\n-      as: \"Resources\",\r\n-    });\r\n   };\r\n \r\n   return Role;\r\n };\r\n"
+                },
+                {
+                    "date": 1746017061139,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -14,14 +14,18 @@\n   });\r\n \r\n   Role.associate = (models) => {\r\n     Role.belongsToMany(models.User, {\r\n-      through: \"UserRole\",\r\n+      through: \"UserRoles\",\r\n+      foreignKey: \"roleId\",\r\n+      otherKey: \"userId\",\r\n       as: \"Users\",\r\n     });\r\n \r\n     Role.belongsToMany(models.Permission, {\r\n-      through: \"RolePermission\",\r\n+      through: \"RolePermissions\",\r\n+      foreignKey: \"roleId\",\r\n+      otherKey: \"permissionId\",\r\n       as: \"Permissions\",\r\n     });\r\n   };\r\n \r\n"
+                },
+                {
+                    "date": 1746018434475,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -14,16 +14,22 @@\n   });\r\n \r\n   Role.associate = (models) => {\r\n     Role.belongsToMany(models.User, {\r\n-      through: \"UserRoles\",\r\n+      through: {\r\n+        model: \"UserRoles\",\r\n+        tableName: \"UserRoles\",\r\n+      },\r\n       foreignKey: \"roleId\",\r\n       otherKey: \"userId\",\r\n       as: \"Users\",\r\n     });\r\n \r\n     Role.belongsToMany(models.Permission, {\r\n-      through: \"RolePermissions\",\r\n+      through: {\r\n+        model: \"RolePermissions\",\r\n+        tableName: \"RolePermissions\",\r\n+      },\r\n       foreignKey: \"roleId\",\r\n       otherKey: \"permissionId\",\r\n       as: \"Permissions\",\r\n     });\r\n"
                 }
             ],
             "date": 1745924964063,
