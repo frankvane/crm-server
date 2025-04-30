@@ -1,0 +1,22 @@
+{
+    "sourceFile": "docs/auth.md",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1746028999216,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1746029195929,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,8 @@\n # 认证接口文档\r\n \r\n ## 1. 用户登录\r\n+\r\n - **接口**：`POST /api/auth/login`\r\n - **描述**：用户登录，返回访问令牌和刷新令牌\r\n - **请求体**：\r\n   ```json\r\n@@ -27,8 +28,9 @@\n   }\r\n   ```\r\n \r\n ## 2. 刷新令牌\r\n+\r\n - **接口**：`POST /api/auth/refresh`\r\n - **描述**：使用刷新令牌获取新的访问令牌\r\n - **请求体**：\r\n   ```json\r\n@@ -53,8 +55,9 @@\n   }\r\n   ```\r\n \r\n ## 3. 注销登录\r\n+\r\n - **接口**：`POST /api/auth/logout`\r\n - **描述**：注销用户并使刷新令牌失效\r\n - **请求体**：\r\n   ```json\r\n@@ -76,5 +79,5 @@\n     \"code\": 401,\r\n     \"message\": \"No refresh token provided\",\r\n     \"data\": null\r\n   }\r\n-  ``` \n\\ No newline at end of file\n+  ```\r\n"
+                }
+            ],
+            "date": 1746028999216,
+            "name": "Commit-0",
+            "content": "# 认证接口文档\r\n\r\n## 1. 用户登录\r\n- **接口**：`POST /api/auth/login`\r\n- **描述**：用户登录，返回访问令牌和刷新令牌\r\n- **请求体**：\r\n  ```json\r\n  {\r\n    \"username\": \"string\",\r\n    \"password\": \"string\"\r\n  }\r\n  ```\r\n- **响应**：\r\n  ```json\r\n  {\r\n    \"code\": 200,\r\n    \"message\": \"Login successful\",\r\n    \"data\": { ... }\r\n  }\r\n  ```\r\n- **错误响应**：\r\n  ```json\r\n  {\r\n    \"code\": 401,\r\n    \"message\": \"User not found\" | \"Invalid password\",\r\n    \"data\": null\r\n  }\r\n  ```\r\n\r\n## 2. 刷新令牌\r\n- **接口**：`POST /api/auth/refresh`\r\n- **描述**：使用刷新令牌获取新的访问令牌\r\n- **请求体**：\r\n  ```json\r\n  {\r\n    \"refreshToken\": \"string\"\r\n  }\r\n  ```\r\n- **响应**：\r\n  ```json\r\n  {\r\n    \"code\": 200,\r\n    \"message\": \"Token refreshed successfully\",\r\n    \"data\": { \"accessToken\": \"string\" }\r\n  }\r\n  ```\r\n- **错误响应**：\r\n  ```json\r\n  {\r\n    \"code\": 401,\r\n    \"message\": \"No refresh token provided\" | \"Invalid refresh token\",\r\n    \"data\": null\r\n  }\r\n  ```\r\n\r\n## 3. 注销登录\r\n- **接口**：`POST /api/auth/logout`\r\n- **描述**：注销用户并使刷新令牌失效\r\n- **请求体**：\r\n  ```json\r\n  {\r\n    \"refreshToken\": \"string\"\r\n  }\r\n  ```\r\n- **响应**：\r\n  ```json\r\n  {\r\n    \"code\": 200,\r\n    \"message\": \"Logged out successfully\",\r\n    \"data\": null\r\n  }\r\n  ```\r\n- **错误响应**：\r\n  ```json\r\n  {\r\n    \"code\": 401,\r\n    \"message\": \"No refresh token provided\",\r\n    \"data\": null\r\n  }\r\n  ``` "
+        }
+    ]
+}
