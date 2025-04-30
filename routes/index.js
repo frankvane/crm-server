@@ -6,5 +6,7 @@ router.use("/users", require("./user.routes"));
 router.use("/categories", require("./category.routes"));
 router.use("/category-types", require("./categoryType.routes"));
 router.use("/roles", require("./role.routes"));
+router.use("/resources", require("./resource.routes"));
+router.use("/resource-actions", require("./resourceAction.routes"));
 
 module.exports = router;
