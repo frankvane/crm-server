@@ -123,6 +123,31 @@ module.exports = {
           resource: "role",
           description: "管理角色",
         },
+        // 资源与资源操作管理权限
+        {
+          name: "manage_resources",
+          action: "manage",
+          resource: "resource",
+          description: "管理资源（菜单/页面）",
+        },
+        {
+          name: "view_resources",
+          action: "read",
+          resource: "resource",
+          description: "查看资源（菜单/页面）",
+        },
+        {
+          name: "manage_resource_actions",
+          action: "manage",
+          resource: "resource_action",
+          description: "管理资源操作（按钮/行为）",
+        },
+        {
+          name: "view_resource_actions",
+          action: "read",
+          resource: "resource_action",
+          description: "查看资源操作（按钮/行为）",
+        },
       ]);
 
       // 2. 创建资源菜单
