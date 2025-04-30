@@ -322,7 +322,7 @@ module.exports = {
       // 4. 分配权限给角色
       console.log("分配权限给角色...");
       // 超级管理员拥有所有权限
-      await adminRole.addPermissions(permissions);
+      await adminRole.setPermissions(permissions);
 
       // 教师拥有查看学生列表和导出的权限
       const teacherPermissions = permissions.filter(
@@ -330,7 +330,7 @@ module.exports = {
           p.name.startsWith("teachadmin:allstudents:") ||
           p.name.startsWith("teachadmin:mystudents:")
       );
-      await teacherRole.addPermissions(teacherPermissions);
+      await teacherRole.setPermissions(teacherPermissions);
 
       // 学生只有查看自己申请的权限
       const studentPermissions = permissions.filter(
@@ -338,7 +338,7 @@ module.exports = {
           p.name.startsWith("approval:myapply:") ||
           p.name === "finance:ticket:mylist:query"
       );
-      await studentRole.addPermissions(studentPermissions);
+      await studentRole.setPermissions(studentPermissions);
 
       // 5. 创建管理员用户
       console.log("创建管理员用户...");
