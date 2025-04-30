@@ -342,10 +342,9 @@ module.exports = {
 
       // 5. 创建管理员用户
       console.log("创建管理员用户...");
-      const hashedPassword = await bcrypt.hash("admin123", 10);
       const adminUser = await User.create({
         username: "admin",
-        password: hashedPassword,
+        password: "admin123",
         email: "admin@example.com",
         status: 1,
       });
