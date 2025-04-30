@@ -1,6 +1,12 @@
 "use strict";
 
-const { User, Role, Permission, Resource } = require("../models");
+const {
+  User,
+  Role,
+  Permission,
+  Resource,
+  ResourceAction,
+} = require("../models");
 const { clearDatabase } = require("../utils/database");
 const bcrypt = require("bcryptjs");
 
@@ -90,6 +96,76 @@ module.exports = {
           action: "read",
           resource: "category",
           description: "查看分类",
+        },
+      ]);
+
+      // 2.1 创建按钮级操作（ResourceActions）
+      const resourceActions = await ResourceAction.bulkCreate([
+        // 用户管理
+        {
+          name: "新增",
+          code: "add",
+          description: "新增用户",
+          icon: "plus",
+          sort: 1,
+        },
+        {
+          name: "编辑",
+          code: "edit",
+          description: "编辑用户",
+          icon: "edit",
+          sort: 2,
+        },
+        {
+          name: "删除",
+          code: "delete",
+          description: "删除用户",
+          icon: "delete",
+          sort: 3,
+        },
+        // 分类类型管理
+        {
+          name: "新增",
+          code: "add",
+          description: "新增分类类型",
+          icon: "plus",
+          sort: 1,
+        },
+        {
+          name: "编辑",
+          code: "edit",
+          description: "编辑分类类型",
+          icon: "edit",
+          sort: 2,
+        },
+        {
+          name: "删除",
+          code: "delete",
+          description: "删除分类类型",
+          icon: "delete",
+          sort: 3,
+        },
+        // 分类管理
+        {
+          name: "新增",
+          code: "add",
+          description: "新增分类",
+          icon: "plus",
+          sort: 1,
+        },
+        {
+          name: "编辑",
+          code: "edit",
+          description: "编辑分类",
+          icon: "edit",
+          sort: 2,
+        },
+        {
+          name: "删除",
+          code: "delete",
+          description: "删除分类",
+          icon: "delete",
+          sort: 3,
         },
       ]);
 
@@ -216,6 +292,22 @@ module.exports = {
         ["view_category"].includes(p.name)
       );
       await userRole.setPermissions(userPerms);
+
+      // 2.2 菜单可见性（RoleResources）
+      // 查询所有资源
+      const allResources = await Resource.findAll();
+      // admin 拥有所有菜单
+      await adminRole.setResources(allResources);
+      // manager 只可见分类管理相关菜单
+      const managerVisible = allResources.filter((r) =>
+        ["category", "category:type", "category:category"].includes(r.code)
+      );
+      await managerRole.setResources(managerVisible);
+      // user 只可见分类管理-查
+      const userVisible = allResources.filter((r) =>
+        ["category", "category:category"].includes(r.code)
+      );
+      await userRole.setResources(userVisible);
 
       // 5. 创建用户并分配角色
       const adminUser = await User.create({
