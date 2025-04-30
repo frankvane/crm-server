@@ -1,12 +1,6 @@
 "use strict";
 
-const {
-  User,
-  Role,
-  Permission,
-  Resource,
-  ResourceAction,
-} = require("../models");
+const { User, Role, Permission, Resource } = require("../models");
 const { clearDatabase } = require("../utils/database");
 const bcrypt = require("bcryptjs");
 
@@ -16,13 +10,11 @@ module.exports = {
     try {
       console.log("开始清理数据库...");
       await clearDatabase();
+      console.log("开始创建核心初始数据...");
 
-      console.log("开始创建初始数据...");
-
-      // 1. 创建基础权限
-      console.log("创建权限...");
+      // 1. 权限
       const permissions = await Permission.bulkCreate([
-        // 用户管理权限
+        // 用户管理
         {
           name: "create_user",
           action: "create",
@@ -33,7 +25,7 @@ module.exports = {
           name: "view_users",
           action: "read",
           resource: "user",
-          description: "查看用户列表",
+          description: "查看用户",
         },
         {
           name: "update_user",
@@ -47,165 +39,74 @@ module.exports = {
           resource: "user",
           description: "删除用户",
         },
-        // 审批管理权限
-        {
-          name: "approval:myapply:get",
-          action: "read",
-          resource: "myapply",
-          description: "查看我的申请",
-        },
-        {
-          name: "approval:myapply:query",
-          action: "read",
-          resource: "myapply",
-          description: "查询我的申请",
-        },
-        {
-          name: "approval:myapply:add",
-          action: "create",
-          resource: "myapply",
-          description: "新增申请",
-        },
-        // 财务管理权限
-        {
-          name: "finance:ticket:mylist:query",
-          action: "read",
-          resource: "ticket",
-          description: "查询我的罚款单",
-        },
-        // 角色管理权限
-        {
-          name: "view_roles",
-          action: "read",
-          resource: "role",
-          description: "查看角色列表",
-        },
+        // 角色管理
         {
           name: "manage_roles",
           action: "manage",
           resource: "role",
           description: "管理角色",
         },
-        // 资源与资源操作管理权限
+        {
+          name: "view_roles",
+          action: "read",
+          resource: "role",
+          description: "查看角色",
+        },
+        // 资源管理
         {
           name: "manage_resources",
           action: "manage",
           resource: "resource",
-          description: "管理资源（菜单/页面）",
+          description: "管理资源",
         },
         {
           name: "view_resources",
           action: "read",
           resource: "resource",
-          description: "查看资源（菜单/页面）",
+          description: "查看资源",
         },
-        {
-          name: "manage_resource_actions",
-          action: "manage",
-          resource: "resource_action",
-          description: "管理资源操作（按钮/行为）",
-        },
-        {
-          name: "view_resource_actions",
-          action: "read",
-          resource: "resource_action",
-          description: "查看资源操作（按钮/行为）",
-        },
-        // 分类管理权限
+        // 分类类型管理
         {
           name: "manage_categories",
           action: "manage",
-          resource: "category",
-          description: "管理分类（含类型/树/节点）",
+          resource: "categoryType",
+          description: "管理分类类型",
         },
         {
           name: "view_categories",
           action: "read",
+          resource: "categoryType",
+          description: "查看分类类型",
+        },
+        // 分类管理
+        {
+          name: "manage_category",
+          action: "manage",
           resource: "category",
-          description: "查看分类（含类型/树/节点）",
+          description: "管理分类",
         },
         {
-          name: "create_category",
-          action: "create",
+          name: "view_category",
+          action: "read",
           resource: "category",
-          description: "创建分类",
-        },
-        {
-          name: "update_category",
-          action: "update",
-          resource: "category",
-          description: "更新分类",
-        },
-        {
-          name: "delete_category",
-          action: "delete",
-          resource: "category",
-          description: "删除分类",
+          description: "查看分类",
         },
       ]);
 
-      // 2. 创建资源菜单
-      console.log("创建资源菜单...");
-
-      // 2.1 创建顶级菜单
+      // 2. 资源菜单
       const system = await Resource.create({
         name: "系统管理",
         code: "system",
         type: "menu",
-        path: "system",
+        path: "/system",
         component: "Layout",
         icon: "系统",
         hidden: false,
         redirect: "noRedirect",
         alwaysShow: true,
-        meta: {
-          title: "系统管理",
-          icon: "系统",
-          noCache: false,
-          link: null,
-        },
+        meta: { title: "系统管理", icon: "系统", noCache: false, link: null },
         description: "系统管理模块",
       });
-
-      const approval = await Resource.create({
-        name: "审批管理",
-        code: "approval",
-        type: "menu",
-        path: "approval",
-        component: "Layout",
-        icon: "审批",
-        hidden: false,
-        redirect: "noRedirect",
-        alwaysShow: true,
-        meta: {
-          title: "审批管理",
-          icon: "审批",
-          noCache: false,
-          link: null,
-        },
-        description: "审批管理模块",
-      });
-
-      const finance = await Resource.create({
-        name: "财务管理",
-        code: "finance",
-        type: "menu",
-        path: "finance",
-        component: "Layout",
-        icon: "社区财务",
-        hidden: false,
-        redirect: "noRedirect",
-        alwaysShow: true,
-        meta: {
-          title: "财务管理",
-          icon: "社区财务",
-          noCache: false,
-          link: null,
-        },
-        description: "财务管理模块",
-      });
-
-      // 2.2 创建系统管理子菜单
       await Resource.create({
         name: "用户管理",
         code: "system:user",
@@ -215,97 +116,117 @@ module.exports = {
         component: "system/user/index",
         icon: "#",
         hidden: false,
-        meta: {
-          title: "用户管理",
-          icon: "#",
-          noCache: false,
-          link: null,
-        },
+        meta: { title: "用户管理", icon: "#", noCache: false, link: null },
         description: "用户管理菜单",
       });
-
-      // 2.3 创建审批管理子菜单
       await Resource.create({
-        name: "我的申请",
-        code: "approval:myapply",
+        name: "角色管理",
+        code: "system:role",
         type: "menu",
-        path: "myapply",
-        parentId: approval.id,
-        component: "approval/myapply/index",
+        path: "role",
+        parentId: system.id,
+        component: "system/role/index",
         icon: "#",
         hidden: false,
-        meta: {
-          title: "我的申请",
-          icon: "#",
-          noCache: false,
-          link: null,
-        },
-        description: "我的申请菜单",
+        meta: { title: "角色管理", icon: "#", noCache: false, link: null },
+        description: "角色管理菜单",
       });
-
-      // 2.4 创建财务管理子菜单
       await Resource.create({
-        name: "我的罚款单",
-        code: "finance:ticket:mylist",
+        name: "资源管理",
+        code: "system:resource",
         type: "menu",
-        path: "ticket/mylist",
-        parentId: finance.id,
-        component: "finance/ticket/mylist/index",
+        path: "resource",
+        parentId: system.id,
+        component: "system/resource/index",
         icon: "#",
         hidden: false,
-        meta: {
-          title: "我的罚款单",
-          icon: "#",
-          noCache: false,
-          link: null,
-        },
-        description: "我的罚款单菜单",
+        meta: { title: "资源管理", icon: "#", noCache: false, link: null },
+        description: "资源管理菜单",
+      });
+      const category = await Resource.create({
+        name: "分类管理",
+        code: "category",
+        type: "menu",
+        path: "/category",
+        component: "Layout",
+        icon: "分类",
+        hidden: false,
+        redirect: "noRedirect",
+        alwaysShow: true,
+        meta: { title: "分类管理", icon: "分类", noCache: false, link: null },
+        description: "分类管理模块",
+      });
+      await Resource.create({
+        name: "分类类型管理",
+        code: "category:type",
+        type: "menu",
+        path: "type",
+        parentId: category.id,
+        component: "category/type/index",
+        icon: "#",
+        hidden: false,
+        meta: { title: "分类类型管理", icon: "#", noCache: false, link: null },
+        description: "分类类型管理菜单",
+      });
+      await Resource.create({
+        name: "分类管理",
+        code: "category:category",
+        type: "menu",
+        path: "category",
+        parentId: category.id,
+        component: "category/category/index",
+        icon: "#",
+        hidden: false,
+        meta: { title: "分类管理", icon: "#", noCache: false, link: null },
+        description: "分类管理菜单",
       });
 
-      // 3. 创建角色
-      console.log("创建角色...");
+      // 3. 角色
       const adminRole = await Role.create({
-        name: "超级管理员",
-        code: "admin",
-        description: "系统超级管理员",
-      });
-
-      const managerRole = await Role.create({
         name: "管理员",
+        code: "admin",
+        description: "系统管理员",
+      });
+      const managerRole = await Role.create({
+        name: "高级管理员",
         code: "manager",
+        description: "高级管理员",
+      });
+      const userRole = await Role.create({
+        name: "普通管理员",
+        code: "user",
         description: "普通管理员",
       });
 
-      // 4. 分配权限给角色
-      console.log("分配权限给角色...");
-      // 超级管理员拥有所有权限
+      // 4. 角色-权限分配
+      // admin 拥有所有权限
       await adminRole.setPermissions(permissions);
-      // 管理员拥有部分权限（仅分类相关和查看用户/角色/资源）
-      const managerPermissions = permissions.filter(
-        (p) =>
-          p.name.startsWith("view_") ||
-          p.name.startsWith("manage_categories") ||
-          p.name.startsWith("view_categories") ||
-          p.name.startsWith("create_category") ||
-          p.name.startsWith("update_category") ||
-          p.name.startsWith("delete_category")
+      // manager 只拥有分类类型和分类管理的增删改查
+      const managerPerms = permissions.filter((p) =>
+        [
+          "manage_categories",
+          "view_categories",
+          "manage_category",
+          "view_category",
+        ].includes(p.name)
       );
-      await managerRole.setPermissions(managerPermissions);
+      await managerRole.setPermissions(managerPerms);
+      // user 只拥有分类管理-查
+      const userPerms = permissions.filter((p) =>
+        ["view_category"].includes(p.name)
+      );
+      await userRole.setPermissions(userPerms);
 
       // 5. 创建管理员用户
-      console.log("创建管理员用户...");
       const adminUser = await User.create({
         username: "admin",
         password: "admin123",
         email: "admin@example.com",
         status: 1,
       });
-
-      // 6. 分配角色给管理员用户
-      console.log("分配角色给管理员用户...");
       await adminUser.addRole(adminRole);
 
-      console.log("初始数据创建完成！");
+      console.log("核心初始数据创建完成！");
     } catch (error) {
       console.error("初始数据创建失败：", error);
       throw error;
@@ -313,7 +234,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    // 清空所有表
     await clearDatabase();
   },
 };
