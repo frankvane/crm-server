@@ -181,3 +181,22 @@ exports.delete = async (req, res, next) => {
     next(err);
   }
 };
+
+// 获取单个分类
+async function getById(req, res) {
+  try {
+    const category = await Category.findByPk(req.params.id);
+    if (!category) {
+      return res
+        .status(404)
+        .json({ code: 404, message: "Category not found", data: null });
+    }
+    res.json({ code: 200, message: "Success", data: category });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ code: 500, message: "Internal server error", data: null });
+  }
+}
+
+module.exports.getById = getById;

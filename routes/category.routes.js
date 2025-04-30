@@ -16,6 +16,9 @@ router.get("/", [authJwt.verifyToken], categoryController.list);
 // 获取分类树
 router.get("/tree", [authJwt.verifyToken], categoryController.getTree);
 
+// 获取单个分类
+router.get("/:id", [authJwt.verifyToken], categoryController.getById);
+
 // 更新分类（需要manage_categories权限）
 router.put(
   "/:id",
