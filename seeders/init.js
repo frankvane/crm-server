@@ -232,7 +232,7 @@ module.exports = {
       ]);
 
       // 分类管理操作
-      await createResourceActions(categoryResource, [
+      const categoryActions = await createResourceActions(categoryResource, [
         { name: "新增", code: "add", description: "新增分类" },
         { name: "编辑", code: "edit", description: "编辑分类" },
         {
@@ -242,37 +242,84 @@ module.exports = {
           needConfirm: true,
           confirmMessage: "确定要删除该分类吗？",
         },
+        { name: "查看", code: "view", description: "查看分类" },
       ]);
 
       // 3. 创建角色
       const adminRole = await Role.create({
         name: "管理员",
         code: "admin",
-        description: "系统管理员",
+        description: "系统管理员，拥有所有权限",
       });
 
-      // 4. 创建管理员用户
+      const managerRole = await Role.create({
+        name: "高级管理员",
+        code: "manager",
+        description: "高级管理员，拥有分类管理的所有权限",
+      });
+
+      const userRole = await Role.create({
+        name: "普通管理员",
+        code: "user",
+        description: "普通管理员，只有分类管理的查看权限",
+      });
+
+      // 4. 分配权限
+      // 获取所有权限
+      const allPermissions = await Permission.findAll();
+
+      // 为管理员分配所有权限
+      await adminRole.addPermissions(allPermissions);
+
+      // 为高级管理员分配分类管理相关权限
+      const categoryPermissions = allPermissions.filter(
+        (permission) =>
+          permission.code.startsWith("category:type:") ||
+          permission.code.startsWith("category:category:")
+      );
+      await managerRole.addPermissions(categoryPermissions);
+
+      // 为普通管理员分配分类查看权限
+      const categoryViewPermissions = allPermissions.filter(
+        (permission) => permission.code === "category:category:view"
+      );
+      await userRole.addPermissions(categoryViewPermissions);
+
+      // 5. 创建默认用户
       const adminUser = await User.create({
         username: "admin",
-        password: bcrypt.hashSync("admin123", 10),
+        password: await bcrypt.hash("admin123", 10),
+        nickname: "系统管理员",
         email: "admin@example.com",
         status: 1,
       });
 
-      // 5. 为管理员用户分配角色
+      const managerUser = await User.create({
+        username: "manager",
+        password: await bcrypt.hash("manager123", 10),
+        nickname: "高级管理员",
+        email: "manager@example.com",
+        status: 1,
+      });
+
+      const normalUser = await User.create({
+        username: "user",
+        password: await bcrypt.hash("user123", 10),
+        nickname: "普通管理员",
+        email: "user@example.com",
+        status: 1,
+      });
+
+      // 6. 分配用户角色
       await adminUser.addRole(adminRole);
-
-      // 6. 为管理员角色分配所有资源和权限
-      const allResources = await Resource.findAll();
-      await adminRole.addResources(allResources);
-
-      const allPermissions = await Permission.findAll();
-      await adminRole.addPermissions(allPermissions);
+      await managerUser.addRole(managerRole);
+      await normalUser.addRole(userRole);
 
       console.log("初始数据创建成功");
+      return Promise.resolve();
     } catch (error) {
-      console.error("初始数据创建失败：", error);
-      throw error;
+      console.error("初始数据创建失败:", error);
+      return Promise.reject(error);
     }
   },
 
