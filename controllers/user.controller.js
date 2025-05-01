@@ -2,7 +2,6 @@ const { User, Role } = require("../models");
 const bcrypt = require("bcryptjs");
 const { Op } = require("sequelize");
 const ResponseUtil = require("../utils/response");
-const { PERMISSION_RULES } = require("../config/permissions");
 
 // 创建用户
 exports.create = async (req, res, next) => {
