@@ -7,35 +7,42 @@ const { authJwt } = require("../middlewares");
 router.post(
   "/",
   [authJwt.verifyToken, authJwt.hasPermission("system:role:add")],
-  roleController.createRole
+  roleController.create
+);
+
+// 获取所有角色（不分页）
+router.get(
+  "/all",
+  [authJwt.verifyToken, authJwt.hasPermission("system:role:edit")],
+  roleController.listAll
 );
 
 // 获取角色列表
 router.get(
   "/",
   [authJwt.verifyToken, authJwt.hasPermission("system:role:edit")],
-  roleController.getRoles
+  roleController.list
 );
 
 // 获取单个角色
 router.get(
   "/:id",
   [authJwt.verifyToken, authJwt.hasPermission("system:role:edit")],
-  roleController.getRole
+  roleController.detail
 );
 
 // 更新角色
 router.put(
   "/:id",
   [authJwt.verifyToken, authJwt.hasPermission("system:role:edit")],
-  roleController.updateRole
+  roleController.update
 );
 
 // 删除角色
 router.delete(
   "/:id",
   [authJwt.verifyToken, authJwt.hasPermission("system:role:delete")],
-  roleController.deleteRole
+  roleController.delete
 );
 
 // 切换角色状态
@@ -49,5 +56,19 @@ router
     [authJwt.verifyToken, authJwt.hasPermission("system:role:edit")],
     roleController.toggleStatus
   );
+
+// 分配资源
+router.post(
+  "/:roleId/resources",
+  [authJwt.verifyToken, authJwt.hasPermission("system:role:edit")],
+  roleController.assignResources
+);
+
+// 分配权限
+router.post(
+  "/:roleId/permissions",
+  [authJwt.verifyToken, authJwt.hasPermission("system:role:edit")],
+  roleController.assignPermissions
+);
 
 module.exports = router;

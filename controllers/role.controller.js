@@ -12,7 +12,7 @@ const { Op } = require("sequelize");
 
 const roleController = {
   // 创建角色
-  createRole: async (req, res) => {
+  create: async (req, res) => {
     try {
       const { name, code, description, permissionIds } = req.body;
 
@@ -57,19 +57,36 @@ const roleController = {
   },
 
   // 获取角色列表
-  getRoles: async (req, res) => {
+  list: async (req, res) => {
     try {
-      const { page = 1, limit = 10, search } = req.query;
-      const offset = (page - 1) * limit;
+      const { page = 1, pageSize = 10, search, name, code, status } = req.query;
+      const offset = (page - 1) * pageSize;
 
       const where = {};
+
+      // 构建查询条件
       if (search) {
-        where.name = { [Op.like]: `%${search}%` };
+        where[Op.or] = [
+          { name: { [Op.like]: `%${search}%` } },
+          { code: { [Op.like]: `%${search}%` } },
+          { description: { [Op.like]: `%${search}%` } },
+        ];
+      }
+
+      // 特定字段搜索
+      if (name) {
+        where.name = { [Op.like]: `%${name}%` };
+      }
+      if (code) {
+        where.code = { [Op.like]: `%${code}%` };
+      }
+      if (status !== undefined) {
+        where.status = status === "true" || status === "1" ? 1 : 0;
       }
 
       const { count, rows } = await Role.findAndCountAll({
         where,
-        limit: parseInt(limit),
+        limit: parseInt(pageSize),
         offset: parseInt(offset),
         include: [
           {
@@ -83,11 +100,14 @@ const roleController = {
             through: { attributes: [] },
           },
         ],
+        order: [["createdAt", "DESC"]],
       });
 
       return res
         .status(200)
-        .json(ResponseUtil.page(rows, count, parseInt(page), parseInt(limit)));
+        .json(
+          ResponseUtil.page(rows, count, parseInt(page), parseInt(pageSize))
+        );
     } catch (error) {
       console.error("获取角色列表失败:", error);
       return res.status(500).json(ResponseUtil.error("获取角色列表失败", 500));
@@ -95,7 +115,7 @@ const roleController = {
   },
 
   // 获取单个角色
-  getRole: async (req, res) => {
+  detail: async (req, res) => {
     try {
       const { id } = req.params;
 
@@ -126,7 +146,7 @@ const roleController = {
   },
 
   // 更新角色
-  updateRole: async (req, res) => {
+  update: async (req, res) => {
     try {
       const { id } = req.params;
       const { name, code, description, permissionIds } = req.body;
@@ -189,7 +209,7 @@ const roleController = {
   },
 
   // 删除角色
-  deleteRole: async (req, res) => {
+  delete: async (req, res) => {
     try {
       const { id } = req.params;
 
@@ -309,6 +329,35 @@ const roleController = {
     } catch (err) {
       await transaction.rollback();
       next(err);
+    }
+  },
+
+  // 获取所有角色（不分页）
+  listAll: async (req, res) => {
+    try {
+      const { status } = req.query;
+
+      const where = {};
+      if (status !== undefined) {
+        where.status = status === "true" || status === "1" ? 1 : 0;
+      }
+
+      const roles = await Role.findAll({
+        where,
+        include: [
+          {
+            model: Permission,
+            as: "permissions",
+            through: { attributes: [] },
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+
+      return res.status(200).json(ResponseUtil.success(roles));
+    } catch (error) {
+      console.error("获取所有角色失败:", error);
+      return res.status(500).json(ResponseUtil.error("获取所有角色失败", 500));
     }
   },
 };
