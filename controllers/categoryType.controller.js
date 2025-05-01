@@ -1,5 +1,6 @@
 const { CategoryType } = require("../models");
 const { Op } = require("sequelize");
+const ResponseUtil = require("../utils/response");
 
 // 创建分类类型
 exports.create = async (req, res) => {
@@ -7,13 +8,19 @@ exports.create = async (req, res) => {
     const { name, code, description, status } = req.body;
 
     // 检查code是否已存在
-    const existing = await CategoryType.findOne({ where: { code } });
-    if (existing) {
-      return res.status(400).json({
-        code: 400,
-        message: "Category type code already exists",
-        data: null,
-      });
+    const existingCode = await CategoryType.findOne({ where: { code } });
+    if (existingCode) {
+      return res
+        .status(400)
+        .json(ResponseUtil.error("Category type code already exists", 400));
+    }
+
+    // 检查name是否已存在
+    const existingName = await CategoryType.findOne({ where: { name } });
+    if (existingName) {
+      return res
+        .status(400)
+        .json(ResponseUtil.error("Category type name already exists", 400));
     }
 
     const categoryType = await CategoryType.create({
@@ -23,30 +30,62 @@ exports.create = async (req, res) => {
       status: status !== undefined ? status : true,
     });
 
-    res.json({
-      code: 200,
-      message: "Category type created successfully",
-      data: categoryType,
-    });
+    res
+      .status(201)
+      .json(
+        ResponseUtil.success(categoryType, "Category type created successfully")
+      );
   } catch (error) {
+    if (error.name === "SequelizeUniqueConstraintError") {
+      return res
+        .status(400)
+        .json(
+          ResponseUtil.error("Category type name or code must be unique", 400)
+        );
+    }
     console.error("Error creating category type:", error);
-    res.status(500).json({
-      code: 500,
-      message: "Internal server error",
-      data: null,
-    });
+    res.status(500).json(ResponseUtil.error("Internal server error", 500));
   }
 };
 
 // 获取分类类型列表
-exports.findAll = async (req, res) => {
+exports.list = async (req, res) => {
   try {
-    const { page = 1, pageSize = 10, status } = req.query;
+    const {
+      page = 1,
+      pageSize = 10,
+      status,
+      search,
+      name,
+      code,
+      description,
+    } = req.query;
     const offset = (page - 1) * pageSize;
     const where = {};
 
+    // 状态查询
     if (status !== undefined) {
       where.status = status === "true";
+    }
+
+    // 关键字搜索（支持名称、代码、描述模糊查询）
+    if (search) {
+      where[Op.or] = [
+        { name: { [Op.like]: `%${search}%` } },
+        { code: { [Op.like]: `%${search}%` } },
+        { description: { [Op.like]: `%${search}%` } },
+      ];
+    }
+
+    // 指定字段搜索
+    if (name) {
+      where.name = { [Op.like]: `%${name}%` };
+    }
+    if (code) {
+      where.code = { [Op.like]: `%${code}%` };
+    }
+    if (description) {
+      where.description = { [Op.like]: `%${description}%` };
     }
 
     const { count, rows } = await CategoryType.findAndCountAll({
@@ -56,24 +95,18 @@ exports.findAll = async (req, res) => {
       order: [["createdAt", "DESC"]],
     });
 
-    res.json({
-      code: 200,
-      message: "Success",
-      data: {
-        total: count,
-        items: rows,
-        currentPage: parseInt(page),
+    const response = {
+      list: rows,
+      pagination: {
+        current: parseInt(page),
         pageSize: parseInt(pageSize),
-        totalPages: Math.ceil(count / pageSize),
+        total: count,
       },
-    });
+    };
+    res.json(ResponseUtil.success(response));
   } catch (error) {
     console.error("Error getting category types:", error);
-    res.status(500).json({
-      code: 500,
-      message: "Internal server error",
-      data: null,
-    });
+    res.status(500).json(ResponseUtil.error("Internal server error", 500));
   }
 };
 
@@ -193,5 +226,24 @@ exports.delete = async (req, res) => {
       message: "Internal server error",
       data: null,
     });
+  }
+};
+
+// 获取所有分类类型（不分页）
+exports.listAll = async (req, res) => {
+  try {
+    const { status } = req.query;
+    const where = {};
+    if (status !== undefined) {
+      where.status = status === "true";
+    }
+    const categoryTypes = await CategoryType.findAll({
+      where,
+      order: [["createdAt", "DESC"]],
+    });
+    res.json(ResponseUtil.success(categoryTypes));
+  } catch (error) {
+    console.error("Error getting all category types:", error);
+    res.status(500).json(ResponseUtil.error("Internal server error", 500));
   }
 };
