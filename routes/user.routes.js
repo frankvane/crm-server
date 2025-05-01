@@ -49,11 +49,16 @@ router.put(
 );
 
 // 切换用户状态
-router.put(
-  "/:id/toggle-status",
-  [authJwt.verifyToken, authJwt.hasPermission("system:user:edit")],
-  userController.toggleStatus
-);
+router
+  .route("/:id/toggle-status")
+  .put(
+    [authJwt.verifyToken, authJwt.hasPermission("system:user:edit")],
+    userController.toggleStatus
+  )
+  .patch(
+    [authJwt.verifyToken, authJwt.hasPermission("system:user:edit")],
+    userController.toggleStatus
+  );
 
 // 批量删除用户
 router.delete(
