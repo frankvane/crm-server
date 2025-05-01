@@ -8,9 +8,11 @@ class RBACService {
         include: [
           {
             model: Role,
+            as: "roles", // 添加明确的别名
             include: [
               {
                 model: Permission,
+                as: "permissions", // 添加明确的别名
               },
             ],
           },
@@ -22,8 +24,8 @@ class RBACService {
       }
 
       // 检查用户的所有角色中是否有包含所需权限的
-      return user.Roles.some((role) =>
-        role.Permissions.some(
+      return user.roles.some((role) =>
+        role.permissions.some(
           (permission) => permission.name === requiredPermission
         )
       );

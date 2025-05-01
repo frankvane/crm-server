@@ -1,56 +1,59 @@
 # 命名规范
 
-## 数据库关联别名命名规范
+> **注意**: 本文档中的模型关联别名命名规范已迁移到更详细的文档中。请参阅 [模型关联别名命名规范](./standards/model-alias-conventions.md)。
 
-在模型关联和查询中，我们遵循以下命名规范：
+## 权限命名规范
 
-### 1. 多对多关联 (Many-to-Many)
+在整个系统中，权限命名应遵循以下规范：
 
-- 使用复数形式
-- 示例：`roles`, `permissions`, `resources`
+### 1. 权限代码格式
 
-### 2. 一对一关联 (One-to-One) 或多对一关联 (Many-to-One)
+- **资源操作权限**: `{resource-code}:{action-code}`
+  - 示例: `system:user:add`, `category:type:view`
 
-- 使用单数形式
-- 示例：`resource`, `action`, `parent`
+### 2. 资源代码规则
 
-### 3. 一对多关联 (One-to-Many)
+- 使用小写字母
+- 使用英文冒号(`:`)作为分隔符
+- 示例: `system`, `system:user`, `category:type`
 
-- 根据语义选择单数或复数形式
-- 示例：`children`, `actions`
+### 3. 操作代码规则
 
-### 4. 大小写规范
+- 标准操作: `add`, `edit`, `delete`, `view`
+- 其他特殊操作: `export`, `assign` 等
+- 示例: `system:user:add`, `system:role:assign`
 
-- 统一使用小写
-- 不要混用大小写（例如：不要使用 `Permissions`，应该使用 `permissions`）
+### 4. 权限与路由对应
 
-### 5. 当前使用的关联别名
+- API 路由中使用的权限名称必须与数据库中存储的权限名称完全一致
+- 登录返回的 JWT 令牌中包含的权限名称格式也应与此一致
 
-#### User 模型
+### 5. 当前使用的权限列表
 
-- User -> Role: `"roles"`
-- User -> RefreshToken: `"refreshTokens"`
+#### 系统管理
 
-#### Role 模型
+- `system:user:add` - 添加用户
+- `system:user:edit` - 编辑用户
+- `system:user:delete` - 删除用户
+- `system:user:export` - 导出用户
 
-- Role -> User: `"users"`
-- Role -> Permission: `"permissions"`
-- Role -> Resource: `"resources"`
+- `system:role:add` - 添加角色
+- `system:role:edit` - 编辑角色
+- `system:role:delete` - 删除角色
+- `system:role:assign` - 分配角色权限
 
-#### Permission 模型
+- `system:resource:add` - 添加资源
+- `system:resource:edit` - 编辑资源
+- `system:resource:delete` - 删除资源
 
-- Permission -> Resource: `"resource"`
-- Permission -> ResourceAction: `"action"`
-- Permission -> Role: `"roles"`
+#### 分类管理
 
-#### Resource 模型
+- `category:type:add` - 添加分类类型
+- `category:type:edit` - 编辑分类类型
+- `category:type:delete` - 删除分类类型
+- `category:type:view` - 查看分类类型
 
-- Resource -> Resource (self): `"parent"` 和 `"children"`
-- Resource -> Role: `"roles"`
-- Resource -> Permission: `"permissions"`
-- Resource -> ResourceAction: `"actions"`
-
-#### ResourceAction 模型
-
-- ResourceAction -> Resource: `"resource"`
-- ResourceAction -> Permission: `"permission"`
+- `category:category:add` - 添加分类
+- `category:category:edit` - 编辑分类
+- `category:category:delete` - 删除分类
+- `category:category:view` - 查看分类

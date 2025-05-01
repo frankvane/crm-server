@@ -1,0 +1,18 @@
+{
+    "sourceFile": "docs/conventions.md",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1746070287442,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1746070287442,
+            "name": "Commit-0",
+            "content": "# 命名规范\r\n\r\n> **注意**: 本文档中的模型关联别名命名规范已迁移到更详细的文档中。请参阅 [模型关联别名命名规范](./standards/model-alias-conventions.md)。\r\n\r\n## 权限命名规范\r\n\r\n在整个系统中，权限命名应遵循以下规范：\r\n\r\n### 1. 权限代码格式\r\n\r\n- **资源操作权限**: `{resource-code}:{action-code}`\r\n  - 示例: `system:user:add`, `category:type:view`\r\n\r\n### 2. 资源代码规则\r\n\r\n- 使用小写字母\r\n- 使用英文冒号(`:`)作为分隔符\r\n- 示例: `system`, `system:user`, `category:type`\r\n\r\n### 3. 操作代码规则\r\n\r\n- 标准操作: `add`, `edit`, `delete`, `view`\r\n- 其他特殊操作: `export`, `assign` 等\r\n- 示例: `system:user:add`, `system:role:assign`\r\n\r\n### 4. 权限与路由对应\r\n\r\n- API路由中使用的权限名称必须与数据库中存储的权限名称完全一致\r\n- 登录返回的JWT令牌中包含的权限名称格式也应与此一致\r\n\r\n### 5. 当前使用的权限列表\r\n\r\n#### 系统管理\r\n\r\n- `system:user:add` - 添加用户\r\n- `system:user:edit` - 编辑用户\r\n- `system:user:delete` - 删除用户\r\n- `system:user:export` - 导出用户\r\n\r\n- `system:role:add` - 添加角色\r\n- `system:role:edit` - 编辑角色\r\n- `system:role:delete` - 删除角色\r\n- `system:role:assign` - 分配角色权限\r\n\r\n- `system:resource:add` - 添加资源\r\n- `system:resource:edit` - 编辑资源\r\n- `system:resource:delete` - 删除资源\r\n\r\n#### 分类管理\r\n\r\n- `category:type:add` - 添加分类类型\r\n- `category:type:edit` - 编辑分类类型\r\n- `category:type:delete` - 删除分类类型\r\n- `category:type:view` - 查看分类类型\r\n\r\n- `category:category:add` - 添加分类\r\n- `category:category:edit` - 编辑分类\r\n- `category:category:delete` - 删除分类\r\n- `category:category:view` - 查看分类\r\n"
+        }
+    ]
+}

@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 4,
+            "activePatchIndex": 5,
             "patches": [
                 {
                     "date": 1745924019557,
@@ -24,6 +24,10 @@
                 {
                     "date": 1746019028084,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,14 +13,14 @@\n         permissions: role.Permissions?.map((p) => p.name) || [],\r\n       })) || [],\r\n   };\r\n \r\n-  if (!config.jwtSecret) {\r\n+  if (!config.jwt.secret) {\r\n     console.error(\"JWT secret is not defined in configuration!\");\r\n   }\r\n \r\n-  return jwt.sign(payload, config.jwtSecret, {\r\n-    expiresIn: config.jwtExpiration,\r\n+  return jwt.sign(payload, config.jwt.secret, {\r\n+    expiresIn: config.jwt.accessTokenExpiration,\r\n   });\r\n };\r\n \r\n // 生成刷新令牌\r\n@@ -29,25 +29,25 @@\n     id: user.id,\r\n     username: user.username,\r\n   };\r\n \r\n-  if (!config.refreshTokenSecret) {\r\n+  if (!config.jwt.refreshSecret) {\r\n     console.error(\"JWT refresh token secret is not defined in configuration!\");\r\n   }\r\n \r\n-  return jwt.sign(payload, config.refreshTokenSecret, {\r\n-    expiresIn: config.refreshTokenExpiration,\r\n+  return jwt.sign(payload, config.jwt.refreshSecret, {\r\n+    expiresIn: config.jwt.refreshTokenExpiration,\r\n   });\r\n };\r\n \r\n // 验证访问令牌\r\n const verifyAccessToken = (token) => {\r\n   try {\r\n-    if (!config.jwtSecret) {\r\n+    if (!config.jwt.secret) {\r\n       console.error(\"JWT secret is not defined in configuration!\");\r\n     }\r\n \r\n-    return jwt.verify(token, config.jwtSecret);\r\n+    return jwt.verify(token, config.jwt.secret);\r\n   } catch (error) {\r\n     console.error(\"JWT Token verification failed:\", error.message);\r\n     throw error;\r\n   }\r\n@@ -55,15 +55,15 @@\n \r\n // 验证刷新令牌\r\n const verifyRefreshToken = (token) => {\r\n   try {\r\n-    if (!config.refreshTokenSecret) {\r\n+    if (!config.jwt.refreshSecret) {\r\n       console.error(\r\n         \"JWT refresh token secret is not defined in configuration!\"\r\n       );\r\n     }\r\n \r\n-    return jwt.verify(token, config.refreshTokenSecret);\r\n+    return jwt.verify(token, config.jwt.refreshSecret);\r\n   } catch (error) {\r\n     console.error(\"JWT Refresh Token verification failed:\", error.message);\r\n     throw error;\r\n   }\r\n"
+                },
+                {
+                    "date": 1746064456336,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -6,12 +6,12 @@\n   const payload = {\r\n     id: user.id,\r\n     username: user.username,\r\n     roles:\r\n-      user.Roles?.map((role) => ({\r\n+      user.roles?.map((role) => ({\r\n         id: role.id,\r\n         name: role.name,\r\n-        permissions: role.Permissions?.map((p) => p.name) || [],\r\n+        permissions: role.permissions?.map((p) => p.name) || [],\r\n       })) || [],\r\n   };\r\n \r\n   if (!config.jwt.secret) {\r\n"
                 }
             ],
             "date": 1745924019557,

@@ -5,7 +5,14 @@ const resourceController = {
   // 创建资源
   async create(req, res) {
     try {
-      const resource = await Resource.create(req.body);
+      const resourceData = { ...req.body };
+
+      // 检查是否有meta字段且为对象，如果是则序列化为JSON字符串
+      if (resourceData.meta && typeof resourceData.meta === "object") {
+        resourceData.meta = JSON.stringify(resourceData.meta);
+      }
+
+      const resource = await Resource.create(resourceData);
       res.json(ResponseUtil.success(resource, "资源创建成功"));
     } catch (error) {
       res.status(500).json(ResponseUtil.error(error.message, 500));
@@ -15,7 +22,22 @@ const resourceController = {
   async list(req, res) {
     try {
       const resources = await Resource.findAll();
-      res.json(ResponseUtil.success(resources, "资源列表获取成功"));
+
+      // 尝试将meta字段解析回对象
+      const processedResources = resources.map((resource) => {
+        const resourceObj = resource.toJSON();
+        if (resourceObj.meta && typeof resourceObj.meta === "string") {
+          try {
+            resourceObj.meta = JSON.parse(resourceObj.meta);
+          } catch (e) {
+            // 如果解析失败，保留原始字符串
+            console.error("Failed to parse meta JSON:", e);
+          }
+        }
+        return resourceObj;
+      });
+
+      res.json(ResponseUtil.success(processedResources, "资源列表获取成功"));
     } catch (error) {
       res.status(500).json(ResponseUtil.error(error.message, 500));
     }
@@ -27,7 +49,19 @@ const resourceController = {
       if (!resource) {
         return res.status(404).json(ResponseUtil.error("资源不存在", 404));
       }
-      res.json(ResponseUtil.success(resource, "资源获取成功"));
+
+      // 尝试将meta字段解析回对象
+      const resourceObj = resource.toJSON();
+      if (resourceObj.meta && typeof resourceObj.meta === "string") {
+        try {
+          resourceObj.meta = JSON.parse(resourceObj.meta);
+        } catch (e) {
+          // 如果解析失败，保留原始字符串
+          console.error("Failed to parse meta JSON:", e);
+        }
+      }
+
+      res.json(ResponseUtil.success(resourceObj, "资源获取成功"));
     } catch (error) {
       res.status(500).json(ResponseUtil.error(error.message, 500));
     }
@@ -39,8 +73,29 @@ const resourceController = {
       if (!resource) {
         return res.status(404).json(ResponseUtil.error("资源不存在", 404));
       }
-      await resource.update(req.body);
-      res.json(ResponseUtil.success(resource, "资源更新成功"));
+
+      const resourceData = { ...req.body };
+
+      // 检查是否有meta字段且为对象，如果是则序列化为JSON字符串
+      if (resourceData.meta && typeof resourceData.meta === "object") {
+        resourceData.meta = JSON.stringify(resourceData.meta);
+      }
+
+      await resource.update(resourceData);
+
+      // 获取更新后的资源并处理meta字段
+      const updatedResource = await Resource.findByPk(req.params.id);
+      const resourceObj = updatedResource.toJSON();
+      if (resourceObj.meta && typeof resourceObj.meta === "string") {
+        try {
+          resourceObj.meta = JSON.parse(resourceObj.meta);
+        } catch (e) {
+          // 如果解析失败，保留原始字符串
+          console.error("Failed to parse meta JSON:", e);
+        }
+      }
+
+      res.json(ResponseUtil.success(resourceObj, "资源更新成功"));
     } catch (error) {
       res.status(500).json(ResponseUtil.error(error.message, 500));
     }

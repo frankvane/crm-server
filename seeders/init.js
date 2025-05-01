@@ -253,39 +253,58 @@ module.exports = {
       });
 
       const managerRole = await Role.create({
-        name: "高级管理员",
+        name: "经理",
         code: "manager",
-        description: "高级管理员，拥有分类管理的所有权限",
+        description: "部门经理，拥有部分管理权限",
       });
 
       const userRole = await Role.create({
-        name: "普通管理员",
+        name: "普通用户",
         code: "user",
-        description: "普通管理员，只有分类管理的查看权限",
+        description: "普通用户，仅有基本权限",
       });
 
-      // 4. 分配权限
+      // 4. 关联角色和资源，以及对应的权限
       // 获取所有权限
       const allPermissions = await Permission.findAll();
 
-      // 为管理员分配所有权限
-      await adminRole.addPermissions(allPermissions);
+      // 管理员拥有所有资源和权限
+      const allResources = await Resource.findAll();
+      await adminRole.setResources(allResources);
+      await adminRole.setPermissions(allPermissions);
 
-      // 为高级管理员分配分类管理相关权限
-      const categoryPermissions = allPermissions.filter(
-        (permission) =>
-          permission.code.startsWith("category:type:") ||
-          permission.code.startsWith("category:category:")
-      );
-      await managerRole.addPermissions(categoryPermissions);
+      // 经理拥有用户管理和分类管理权限
+      const managerResources = [
+        userResource,
+        category,
+        categoryTypeResource,
+        categoryResource,
+      ];
+      await managerRole.setResources(managerResources);
+      // 设置经理的权限
+      const managerPermissions = allPermissions.filter((permission) => {
+        const code = permission.code;
+        return (
+          code.startsWith("system:user:") ||
+          code.startsWith("category:type:") ||
+          code.startsWith("category:category:")
+        );
+      });
+      await managerRole.setPermissions(managerPermissions);
 
-      // 为普通管理员分配分类查看权限
-      const categoryViewPermissions = allPermissions.filter(
-        (permission) => permission.code === "category:category:view"
-      );
-      await userRole.addPermissions(categoryViewPermissions);
+      // 普通用户只有分类查看权限
+      const userResources = [category, categoryTypeResource, categoryResource];
+      await userRole.setResources(userResources);
+      // 设置普通用户的权限
+      const userPermissions = allPermissions.filter((permission) => {
+        const code = permission.code;
+        return (
+          code === "category:type:view" || code === "category:category:view"
+        );
+      });
+      await userRole.setPermissions(userPermissions);
 
-      // 5. 创建默认用户
+      // 5. 创建用户
       const adminUser = await User.create({
         username: "admin",
         password: "admin123",

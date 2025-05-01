@@ -4,7 +4,7 @@
 
 - **用户（User）**：系统登录主体，可分配多个角色。
 - **角色（Role）**：权限集合，定义一类用户的操作范围。
-- **权限（Permission）**：对资源的操作能力（如 create_user、view_users）。
+- **权限（Permission）**：对资源的操作能力（如 `system:user:add`、`system:user:edit`）。
 - **资源（Resource）**：菜单、页面、功能点等，支持多级结构。
 - **资源操作（ResourceAction）**：按钮级操作（如新增、编辑、删除）。
 
@@ -19,15 +19,18 @@ flowchart TD
     RBAC -->|角色-权限-资源| Allow[允许/拒绝]
 ```
 
-- 用户登录（/api/auth/login）只返回 accessToken：
+- 用户登录（/api/auth/login）返回 accessToken 和 refreshToken：
   ```json
-  { "accessToken": "..." }
+  {
+    "accessToken": "...",
+    "refreshToken": "..."
+  }
   ```
 - 前端持有 accessToken 后，再调用用户信息接口（如 /api/users/me）获取：
   - 用户基本信息（id, username, email, ...）
   - roles：所有可用角色清单（如 ["admin", "manager", "user"]）
   - routes：当前用户可见的菜单资源（Resource）树，适配前端路由
-  - permissions：当前用户拥有的按钮级权限清单（如 ["add", "edit", "delete"]）
+  - permissions：当前用户拥有的按钮级权限清单（如 ["system:user:add", "system:user:edit", "system:user:delete"]）
 
 ## 3. 角色-权限-资源分配关系
 
@@ -61,9 +64,16 @@ flowchart TD
   "user": { "id": 1, "username": "admin", ... },
   "roles": ["admin", "manager", "user"],
   "routes": [ ... 菜单资源树 ... ],
-  "permissions": ["add", "edit", "delete", ...]
+  "permissions": ["system:user:add", "system:user:edit", "system:user:delete", ...]
 }
 ```
+
+## 7. 权限验证机制
+
+- 系统使用中间件进行权限验证，位于 `middlewares/auth.js`。
+- 权限验证基于 JWT 令牌中的用户 ID，从数据库查询用户的角色及权限。
+- 权限格式必须严格匹配，如 `system:user:add`。
+- 管理员角色拥有所有系统权限。
 
 ---
 

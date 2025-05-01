@@ -43,11 +43,11 @@ const hasPermission = (permission) => {
         include: [
           {
             model: Role,
-            as: "roles",
+            as: "roles", // 使用小写，与模型定义保持一致
             include: [
               {
                 model: Permission,
-                as: "Permissions",
+                as: "permissions", // 使用小写，与模型定义保持一致
                 through: { attributes: [] },
               },
             ],
@@ -60,8 +60,8 @@ const hasPermission = (permission) => {
       }
 
       // 检查用户的所有角色中是否有所需权限
-      const hasRequiredPermission = user.roles.some((role) =>
-        role.Permissions.some((p) => p.name === permission)
+      const hasRequiredPermission = user.roles.some(
+        (role) => role.permissions.some((p) => p.name === permission) // 使用小写，与上面定义的别名保持一致
       );
 
       if (!hasRequiredPermission) {

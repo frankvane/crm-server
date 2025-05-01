@@ -7,10 +7,10 @@ const generateAccessToken = (user) => {
     id: user.id,
     username: user.username,
     roles:
-      user.Roles?.map((role) => ({
+      user.roles?.map((role) => ({
         id: role.id,
         name: role.name,
-        permissions: role.Permissions?.map((p) => p.name) || [],
+        permissions: role.permissions?.map((p) => p.name) || [],
       })) || [],
   };
 
