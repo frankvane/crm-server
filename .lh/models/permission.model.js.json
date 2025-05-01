@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 3,
+            "activePatchIndex": 5,
             "patches": [
                 {
                     "date": 1745924977798,
@@ -20,6 +20,14 @@
                 {
                     "date": 1746018445728,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,9 +22,12 @@\n   });\r\n \r\n   Permission.associate = (models) => {\r\n     Permission.belongsToMany(models.Role, {\r\n-      through: \"RolePermissions\",\r\n+      through: {\r\n+        model: \"RolePermissions\",\r\n+        tableName: \"RolePermissions\",\r\n+      },\r\n       foreignKey: \"permissionId\",\r\n       otherKey: \"roleId\",\r\n       as: \"Roles\",\r\n     });\r\n"
+                },
+                {
+                    "date": 1746057427276,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -6,31 +6,51 @@\n       type: DataTypes.STRING,\r\n       allowNull: false,\r\n       unique: true,\r\n     },\r\n-    action: {\r\n+    code: {\r\n       type: DataTypes.STRING,\r\n       allowNull: false,\r\n+      unique: true,\r\n     },\r\n-    resource: {\r\n-      type: DataTypes.STRING,\r\n-      allowNull: false,\r\n-    },\r\n     description: {\r\n       type: DataTypes.STRING,\r\n       allowNull: true,\r\n     },\r\n+    actionId: {\r\n+      type: DataTypes.INTEGER,\r\n+      allowNull: true,\r\n+      comment: \"关联的操作ID\",\r\n+    },\r\n+    resourceId: {\r\n+      type: DataTypes.INTEGER,\r\n+      allowNull: false,\r\n+      comment: \"关联的资源ID\",\r\n+    },\r\n   });\r\n \r\n   Permission.associate = (models) => {\r\n+    // 与资源的多对一关系\r\n+    Permission.belongsTo(models.Resource, {\r\n+      foreignKey: \"resourceId\",\r\n+      as: \"resource\",\r\n+    });\r\n+\r\n+    // 与操作的一对一关系\r\n+    Permission.belongsTo(models.ResourceAction, {\r\n+      foreignKey: \"actionId\",\r\n+      as: \"action\",\r\n+    });\r\n+\r\n+    // 与角色的多对多关系\r\n     Permission.belongsToMany(models.Role, {\r\n       through: {\r\n         model: \"RolePermissions\",\r\n-        tableName: \"RolePermissions\",\r\n+        unique: false,\r\n       },\r\n       foreignKey: \"permissionId\",\r\n       otherKey: \"roleId\",\r\n-      as: \"Roles\",\r\n+      as: \"roles\",\r\n     });\r\n   };\r\n \r\n   return Permission;\r\n"
+                },
+                {
+                    "date": 1746057948559,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -19,13 +19,25 @@\n     actionId: {\r\n       type: DataTypes.INTEGER,\r\n       allowNull: true,\r\n       comment: \"关联的操作ID\",\r\n+      references: {\r\n+        model: \"ResourceActions\",\r\n+        key: \"id\",\r\n+      },\r\n+      onUpdate: \"CASCADE\",\r\n+      onDelete: \"SET NULL\",\r\n     },\r\n     resourceId: {\r\n       type: DataTypes.INTEGER,\r\n       allowNull: false,\r\n       comment: \"关联的资源ID\",\r\n+      references: {\r\n+        model: \"Resources\",\r\n+        key: \"id\",\r\n+      },\r\n+      onUpdate: \"CASCADE\",\r\n+      onDelete: \"CASCADE\",\r\n     },\r\n   });\r\n \r\n   Permission.associate = (models) => {\r\n"
                 }
             ],
             "date": 1745924977798,

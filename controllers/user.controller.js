@@ -295,17 +295,22 @@ exports.me = async (req, res, next) => {
           as: "roles",
           include: [
             {
-              model: Permission,
-              as: "Permissions",
-              through: { attributes: [] },
-            },
-            {
               model: Resource,
-              as: "Resources",
-              through: { attributes: [] },
+              as: "resources",
+              include: [
+                {
+                  model: ResourceAction,
+                  as: "actions",
+                  include: [
+                    {
+                      model: Permission,
+                      as: "permission",
+                    },
+                  ],
+                },
+              ],
             },
           ],
-          through: { attributes: [] },
         },
       ],
       attributes: { exclude: ["password"] },
@@ -315,65 +320,53 @@ exports.me = async (req, res, next) => {
       return res.status(404).json(ResponseUtil.error("User not found", 404));
     }
 
-    // 角色清单（过滤掉null值）
-    const roles = user.roles
-      .filter((role) => role !== null)
-      .map((role) => ({
+    // 构建用户信息响应
+    const response = {
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        status: user.status,
+      },
+      roles: user.roles.map((role) => ({
         id: role.id,
         name: role.name,
         code: role.code,
-      }));
-
-    // 构建资源树
-    const buildResourceTree = (resources, parentId = null) => {
-      return resources
-        .filter((resource) => resource.parentId === parentId)
-        .map((resource) => ({
-          ...resource.toJSON(),
-          children: buildResourceTree(resources, resource.id),
-        }))
-        .filter((node) => node.children.length > 0 || !node.hidden);
+      })),
+      resources: user.roles.reduce((acc, role) => {
+        role.resources.forEach((resource) => {
+          if (!acc.find((r) => r.id === resource.id)) {
+            acc.push({
+              id: resource.id,
+              name: resource.name,
+              code: resource.code,
+              type: resource.type,
+              path: resource.path,
+              component: resource.component,
+              meta: resource.meta,
+              actions: resource.actions.map((action) => ({
+                id: action.id,
+                name: action.name,
+                code: action.code,
+                icon: action.icon,
+                needConfirm: action.needConfirm,
+                confirmMessage: action.confirmMessage,
+                permission: action.permission
+                  ? {
+                      id: action.permission.id,
+                      name: action.permission.name,
+                      code: action.permission.code,
+                    }
+                  : null,
+              })),
+            });
+          }
+        });
+        return acc;
+      }, []),
     };
 
-    // 获取所有资源并构建树形结构
-    const allResources = [];
-    user.roles.forEach((role) => {
-      if (role && role.Resources) {
-        role.Resources.forEach((resource) => {
-          if (!allResources.find((r) => r.id === resource.id)) {
-            allResources.push(resource);
-          }
-        });
-      }
-    });
-    const routes = buildResourceTree(allResources);
-
-    // 权限列表（使用配置的规则验证权限）
-    const permSet = new Set();
-    user.roles.forEach((role) => {
-      if (role && role.Permissions) {
-        role.Permissions.forEach((permission) => {
-          if (PERMISSION_RULES.isValidPermission(permission.name)) {
-            permSet.add(permission.name);
-          }
-        });
-      }
-    });
-    const permissions = Array.from(permSet);
-
-    res.json(
-      ResponseUtil.success({
-        user: {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          status: user.status,
-        },
-        roles,
-        routes,
-        permissions,
-      })
-    );
+    res.json(ResponseUtil.success(response));
   } catch (err) {
     next(err);
   }

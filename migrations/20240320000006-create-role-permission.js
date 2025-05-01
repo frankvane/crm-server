@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("RoleResources", {
+    await queryInterface.createTable("RolePermissions", {
       roleId: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -10,18 +10,18 @@ module.exports = {
           model: "Roles",
           key: "id",
         },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE",
+        onUpdate: "NO ACTION",
+        onDelete: "NO ACTION",
       },
-      resourceId: {
+      permissionId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "Resources",
+          model: "Permissions",
           key: "id",
         },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE",
+        onUpdate: "NO ACTION",
+        onDelete: "NO ACTION",
       },
       createdAt: {
         allowNull: false,
@@ -34,14 +34,14 @@ module.exports = {
     });
 
     // Add a composite primary key
-    await queryInterface.addConstraint("RoleResources", {
-      fields: ["roleId", "resourceId"],
+    await queryInterface.addConstraint("RolePermissions", {
+      fields: ["roleId", "permissionId"],
       type: "primary key",
-      name: "role_resource_pkey",
+      name: "role_permission_pkey",
     });
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("RoleResources");
+    await queryInterface.dropTable("RolePermissions");
   },
 };

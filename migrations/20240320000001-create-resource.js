@@ -13,14 +13,18 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      type: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      description: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       code: {
         type: Sequelize.STRING,
         allowNull: false,
         unique: true,
-      },
-      type: {
-        type: Sequelize.STRING,
-        allowNull: false,
       },
       path: {
         type: Sequelize.STRING,
@@ -33,6 +37,8 @@ module.exports = {
           model: "Resources",
           key: "id",
         },
+        onUpdate: "NO ACTION",
+        onDelete: "NO ACTION",
       },
       component: {
         type: Sequelize.STRING,
@@ -60,10 +66,6 @@ module.exports = {
       },
       meta: {
         type: Sequelize.TEXT,
-        allowNull: true,
-      },
-      description: {
-        type: Sequelize.STRING,
         allowNull: true,
       },
       createdAt: {

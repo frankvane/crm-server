@@ -1,47 +1,58 @@
 const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
-  const Role = sequelize.define("Role", {
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
+  const Role = sequelize.define(
+    "Role",
+    {
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      code: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      description: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
     },
-    description: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-  });
+    {
+      tableName: "roles",
+    }
+  );
 
   Role.associate = (models) => {
     Role.belongsToMany(models.User, {
       through: {
         model: "UserRoles",
-        tableName: "UserRoles",
+        unique: false,
       },
       foreignKey: "roleId",
       otherKey: "userId",
-      as: "Users",
+      as: "users",
     });
 
     Role.belongsToMany(models.Permission, {
       through: {
         model: "RolePermissions",
-        tableName: "RolePermissions",
+        unique: false,
       },
       foreignKey: "roleId",
       otherKey: "permissionId",
-      as: "Permissions",
+      as: "permissions",
     });
 
     Role.belongsToMany(models.Resource, {
       through: {
-        model: "RoleResource",
-        tableName: "RoleResource",
+        model: "RoleResources",
+        unique: false,
       },
       foreignKey: "roleId",
       otherKey: "resourceId",
-      as: "Resources",
+      as: "resources",
     });
   };
 

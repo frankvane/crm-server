@@ -1,90 +1,76 @@
 const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
-  const Resource = sequelize.define("Resource", {
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-    },
-    type: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    description: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    code: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-      comment: "资源代码",
-    },
-    path: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      comment: "前端路由路径",
-    },
-    parentId: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      comment: "父级资源ID",
-    },
-    component: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      comment: "前端组件路径",
-    },
-    icon: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      comment: "图标标识",
-    },
-    sort: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0,
-      comment: "排序",
-    },
-    hidden: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-      comment: "是否隐藏",
-    },
-    redirect: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      comment: "重定向路径",
-    },
-    alwaysShow: {
-      type: DataTypes.BOOLEAN,
-      allowNull: true,
-      comment: "是否总是显示",
-    },
-    meta: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-      comment: "额外元数据",
-      defaultValue: JSON.stringify({
-        title: "",
-        icon: "",
-        noCache: false,
-        link: null,
-      }),
-      get() {
-        const rawValue = this.getDataValue("meta");
-        return rawValue ? JSON.parse(rawValue) : null;
+  const Resource = sequelize.define(
+    "Resource",
+    {
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
       },
-      set(value) {
-        this.setDataValue("meta", JSON.stringify(value));
+      type: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      description: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      code: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      path: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      parentId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: "Resources",
+          key: "id",
+        },
+        onUpdate: "NO ACTION",
+        onDelete: "NO ACTION",
+      },
+      component: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      icon: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      sort: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      hidden: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      redirect: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      alwaysShow: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      meta: {
+        type: DataTypes.TEXT,
+        allowNull: true,
       },
     },
-  });
+    {
+      tableName: "resources",
+    }
+  );
 
   Resource.associate = (models) => {
-    // 自关联（树形结构）
+    // 自引用关系（父子菜单）
     Resource.belongsTo(Resource, {
       foreignKey: "parentId",
       as: "parent",
@@ -96,10 +82,25 @@ module.exports = (sequelize) => {
 
     // 与角色的多对多关系
     Resource.belongsToMany(models.Role, {
-      through: "RoleResource",
+      through: {
+        model: "RoleResources",
+        unique: false,
+      },
       foreignKey: "resourceId",
       otherKey: "roleId",
       as: "roles",
+    });
+
+    // 与权限的一对多关系
+    Resource.hasMany(models.Permission, {
+      foreignKey: "resourceId",
+      as: "permissions",
+    });
+
+    // 与资源操作的一对多关系
+    Resource.hasMany(models.ResourceAction, {
+      foreignKey: "resourceId",
+      as: "actions",
     });
   };
 

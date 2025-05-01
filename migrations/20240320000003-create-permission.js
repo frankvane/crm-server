@@ -2,29 +2,48 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("Users", {
+    await queryInterface.createTable("Permissions", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      username: {
+      name: {
         type: Sequelize.STRING,
         allowNull: false,
         unique: true,
       },
-      password: {
+      code: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: true,
       },
-      email: {
+      description: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      status: {
+      actionId: {
         type: Sequelize.INTEGER,
-        defaultValue: 1,
+        allowNull: true,
+        comment: "关联的操作ID",
+        references: {
+          model: "ResourceActions",
+          key: "id",
+        },
+        onUpdate: "NO ACTION",
+        onDelete: "NO ACTION",
+      },
+      resourceId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        comment: "关联的资源ID",
+        references: {
+          model: "Resources",
+          key: "id",
+        },
+        onUpdate: "NO ACTION",
+        onDelete: "NO ACTION",
       },
       createdAt: {
         allowNull: false,
@@ -38,6 +57,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("Users");
+    await queryInterface.dropTable("Permissions");
   },
 };

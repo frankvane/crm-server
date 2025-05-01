@@ -1,0 +1,26 @@
+{
+    "sourceFile": "scripts/init-db.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1746058966739,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1746059020288,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,7 @@\n-const { Sequelize } = require('sequelize');\r\n-const config = require('../config/config.json').development;\r\n-const init = require('../seeders/init');\r\n+const { Sequelize } = require(\"sequelize\");\r\n+const config = require(\"../config/config.json\").development;\r\n+const init = require(\"../seeders/init\");\r\n \r\n const sequelize = new Sequelize(\r\n   config.database,\r\n   config.username,\r\n@@ -10,25 +10,25 @@\n     host: config.host,\r\n     port: config.port,\r\n     dialect: config.dialect,\r\n     dialectOptions: config.dialectOptions,\r\n-    logging: false\r\n+    logging: false,\r\n   }\r\n );\r\n \r\n async function initialize() {\r\n   try {\r\n     // 测试数据库连接\r\n     await sequelize.authenticate();\r\n-    console.log('数据库连接成功');\r\n+    console.log(\"数据库连接成功\");\r\n \r\n     // 执行初始化\r\n     await init.up(sequelize.getQueryInterface(), Sequelize);\r\n-    console.log('数据库初始化完成');\r\n+    console.log(\"数据库初始化完成\");\r\n     process.exit(0);\r\n   } catch (error) {\r\n-    console.error('初始化失败:', error);\r\n+    console.error(\"初始化失败:\", error);\r\n     process.exit(1);\r\n\\ No newline at end of file\n   }\r\n }\r\n \r\n-initialize(); \n+initialize();\r\n"
+                },
+                {
+                    "date": 1746059060356,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -30,5 +30,5 @@\n     process.exit(1);\r\n   }\r\n }\r\n \r\n-initialize();\n\\ No newline at end of file\n+initialize();\r\n"
+                }
+            ],
+            "date": 1746058966739,
+            "name": "Commit-0",
+            "content": "const { Sequelize } = require('sequelize');\r\nconst config = require('../config/config.json').development;\r\nconst init = require('../seeders/init');\r\n\r\nconst sequelize = new Sequelize(\r\n  config.database,\r\n  config.username,\r\n  config.password,\r\n  {\r\n    host: config.host,\r\n    port: config.port,\r\n    dialect: config.dialect,\r\n    dialectOptions: config.dialectOptions,\r\n    logging: false\r\n  }\r\n);\r\n\r\nasync function initialize() {\r\n  try {\r\n    // 测试数据库连接\r\n    await sequelize.authenticate();\r\n    console.log('数据库连接成功');\r\n\r\n    // 执行初始化\r\n    await init.up(sequelize.getQueryInterface(), Sequelize);\r\n    console.log('数据库初始化完成');\r\n    process.exit(0);\r\n  } catch (error) {\r\n    console.error('初始化失败:', error);\r\n    process.exit(1);\r\n  }\r\n}\r\n\r\ninitialize(); "
+        }
+    ]
+}

@@ -1,0 +1,51 @@
+数据库初始化失败: Error
+    at Query.run (E:\crm-server\node_modules\sequelize\lib\dialects\mssql\query.js:107:25)
+    at E:\crm-server\node_modules\sequelize\lib\sequelize.js:315:28
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async MSSqlQueryInterface.dropTable (E:\crm-server\node_modules\sequelize\lib\dialects\abstract\query-interface.js:111:5)
+    at async ResourceAction.drop (E:\crm-server\node_modules\sequelize\lib\model.js:1007:12)
+    at async Sequelize.drop (E:\crm-server\node_modules\sequelize\lib\sequelize.js:429:9)
+    at async Sequelize.sync (E:\crm-server\node_modules\sequelize\lib\sequelize.js:366:7)
+    at async init (E:\crm-server\scripts\db-init.js:15:5) {
+  name: 'SequelizeDatabaseError',
+  parent: RequestError: Could not drop object 'resourceactions' because it is referenced by a FOREIGN KEY constraint.
+      at RequestTokenHandler.onErrorMessage (E:\crm-server\node_modules\tedious\lib\token\handler.js:287:21)
+      at Readable.<anonymous> (E:\crm-server\node_modules\tedious\lib\token\token-stream-parser.js:18:33)
+      at Readable.emit (node:events:524:28)
+      at addChunk (node:internal/streams/readable:561:12)
+      at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+      at Readable.push (node:internal/streams/readable:393:5)
+      at nextAsync (node:internal/streams/from:194:22)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+    code: 'EREQUEST',
+    number: 3726,
+    state: 1,
+    class: 16,
+    serverName: 'PC-202405221723',
+    procName: '',
+    lineNumber: 1,
+    sql: "IF OBJECT_ID('[resourceactions]', 'U') IS NOT NULL DROP TABLE [resourceactions];",
+    parameters: undefined
+  },
+  original: RequestError: Could not drop object 'resourceactions' because it is referenced by a FOREIGN KEY constraint.
+      at RequestTokenHandler.onErrorMessage (E:\crm-server\node_modules\tedious\lib\token\handler.js:287:21)
+      at Readable.<anonymous> (E:\crm-server\node_modules\tedious\lib\token\token-stream-parser.js:18:33)
+      at Readable.emit (node:events:524:28)
+      at addChunk (node:internal/streams/readable:561:12)
+      at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+      at Readable.push (node:internal/streams/readable:393:5)
+      at nextAsync (node:internal/streams/from:194:22)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+    code: 'EREQUEST',
+    number: 3726,
+    state: 1,
+    class: 16,
+    serverName: 'PC-202405221723',
+    procName: '',
+    lineNumber: 1,
+    sql: "IF OBJECT_ID('[resourceactions]', 'U') IS NOT NULL DROP TABLE [resourceactions];",
+    parameters: undefined
+  },
+  sql: "IF OBJECT_ID('[resourceactions]', 'U') IS NOT NULL DROP TABLE [resourceactions];",
+  parameters: {}
+}

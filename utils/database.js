@@ -2,6 +2,8 @@ const { sequelize } = require("../models");
 
 async function clearDatabase() {
   try {
+    console.log("开始清理数据库...");
+
     // 禁用外键约束
     await sequelize.query(
       "EXEC sp_MSforeachtable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'"
@@ -17,7 +19,7 @@ async function clearDatabase() {
 
     console.log("数据库清理完成");
   } catch (error) {
-    console.error("清理数据库时出错:", error);
+    console.error("数据库清理失败:", error);
     throw error;
   }
 }

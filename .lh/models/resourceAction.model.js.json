@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 2,
+            "activePatchIndex": 5,
             "patches": [
                 {
                     "date": 1746008161432,
@@ -16,6 +16,18 @@
                 {
                     "date": 1746008210810,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -42,5 +42,4 @@\n   });\r\n \r\n   return ResourceAction;\r\n };\r\n- \n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1746057067986,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -38,8 +38,27 @@\n       type: DataTypes.STRING,\r\n       allowNull: true,\r\n       comment: \"确认提示信息\",\r\n     },\r\n+    resourceId: {\r\n+      type: DataTypes.INTEGER,\r\n+      allowNull: false,\r\n+      comment: \"关联的资源ID\",\r\n+    }\r\n   });\r\n \r\n+  ResourceAction.associate = (models) => {\r\n+    // 与资源的多对一关系\r\n+    ResourceAction.belongsTo(models.Resource, {\r\n+      foreignKey: 'resourceId',\r\n+      as: 'resource'\r\n+    });\r\n+\r\n+    // 与权限的一对一关系\r\n+    ResourceAction.hasOne(models.Permission, {\r\n+      foreignKey: 'actionId',\r\n+      as: 'permission'\r\n+    });\r\n+  };\r\n+\r\n   return ResourceAction;\r\n };\r\n"
+                },
+                {
+                    "date": 1746057427281,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -42,22 +42,22 @@\n     resourceId: {\r\n       type: DataTypes.INTEGER,\r\n       allowNull: false,\r\n       comment: \"关联的资源ID\",\r\n-    }\r\n+    },\r\n   });\r\n \r\n   ResourceAction.associate = (models) => {\r\n     // 与资源的多对一关系\r\n     ResourceAction.belongsTo(models.Resource, {\r\n-      foreignKey: 'resourceId',\r\n-      as: 'resource'\r\n+      foreignKey: \"resourceId\",\r\n+      as: \"resource\",\r\n     });\r\n \r\n     // 与权限的一对一关系\r\n     ResourceAction.hasOne(models.Permission, {\r\n-      foreignKey: 'actionId',\r\n-      as: 'permission'\r\n+      foreignKey: \"actionId\",\r\n+      as: \"permission\",\r\n     });\r\n   };\r\n \r\n   return ResourceAction;\r\n"
+                },
+                {
+                    "date": 1746059057176,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -42,8 +42,14 @@\n     resourceId: {\r\n       type: DataTypes.INTEGER,\r\n       allowNull: false,\r\n       comment: \"关联的资源ID\",\r\n+      references: {\r\n+        model: \"Resources\",\r\n+        key: \"id\",\r\n+      },\r\n+      onUpdate: \"CASCADE\",\r\n+      onDelete: \"CASCADE\",\r\n     },\r\n   });\r\n \r\n   ResourceAction.associate = (models) => {\r\n"
                 }
             ],
             "date": 1746008161432,

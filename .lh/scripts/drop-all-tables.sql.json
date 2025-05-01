@@ -1,0 +1,22 @@
+{
+    "sourceFile": "scripts/drop-all-tables.sql",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1746057903239,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1746058372166,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -10,5 +10,5 @@\n \r\n EXEC sp_executesql @sql;\r\n \r\n -- 启用外键约束\r\n-EXEC sp_MSforeachtable \"ALTER TABLE ? WITH CHECK CHECK CONSTRAINT ALL\" \n\\ No newline at end of file\n+EXEC sp_MSforeachtable \"ALTER TABLE ? WITH CHECK CHECK CONSTRAINT ALL\"\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1746057903239,
+            "name": "Commit-0",
+            "content": "-- 禁用外键约束\r\nEXEC sp_MSforeachtable \"ALTER TABLE ? NOCHECK CONSTRAINT ALL\"\r\n\r\n-- 删除所有表\r\nDECLARE @sql NVARCHAR(MAX) = N'';\r\nSELECT @sql += N'DROP TABLE ' + QUOTENAME(SCHEMA_NAME(schema_id)) + N'.' + QUOTENAME(name) + N'; '\r\nFROM sys.tables\r\nWHERE type = 'U'\r\nORDER BY create_date DESC;\r\n\r\nEXEC sp_executesql @sql;\r\n\r\n-- 启用外键约束\r\nEXEC sp_MSforeachtable \"ALTER TABLE ? WITH CHECK CHECK CONSTRAINT ALL\" "
+        }
+    ]
+}

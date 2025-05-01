@@ -1,4 +1,11 @@
-const { Role, Permission } = require("../models");
+const {
+  Role,
+  Permission,
+  RoleResource,
+  ResourceAction,
+  RolePermission,
+  Resource,
+} = require("../models");
 const ResponseUtil = require("../utils/response");
 const { Op } = require("sequelize");
 
@@ -175,6 +182,89 @@ const roleController = {
     } catch (error) {
       console.error("删除角色失败:", error);
       return res.status(500).json(ResponseUtil.error("删除角色失败", 500));
+    }
+  },
+
+  // 分配资源
+  assignResources: async (req, res) => {
+    try {
+      const { roleId } = req.params;
+      const { resources } = req.body;
+
+      const role = await Role.findByPk(roleId);
+      if (!role) {
+        return res.status(404).json({
+          success: false,
+          message: "Role not found",
+        });
+      }
+
+      // 清除现有的资源和权限关联
+      await role.setResources([]);
+      await role.setPermissions([]);
+
+      // 重新建立关联
+      for (const item of resources) {
+        const { resourceId, actionIds } = item;
+
+        // 分配资源
+        await RoleResource.create({ roleId, resourceId });
+
+        // 如果指定了操作ID，分配对应的权限
+        if (actionIds && actionIds.length > 0) {
+          const actions = await ResourceAction.findAll({
+            where: { id: actionIds, resourceId },
+            include: [
+              {
+                model: Permission,
+                as: "permission",
+              },
+            ],
+          });
+
+          // 分配权限给角色
+          for (const action of actions) {
+            if (action.permission) {
+              await RolePermission.create({
+                roleId,
+                permissionId: action.permission.id,
+              });
+            }
+          }
+        }
+      }
+
+      // 获取更新后的角色信息
+      const updatedRole = await Role.findByPk(roleId, {
+        include: [
+          {
+            model: Resource,
+            as: "resources",
+            include: [
+              {
+                model: ResourceAction,
+                as: "actions",
+                include: [
+                  {
+                    model: Permission,
+                    as: "permission",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+
+      res.json({
+        success: true,
+        data: updatedRole,
+      });
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      });
     }
   },
 };

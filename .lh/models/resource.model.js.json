@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 5,
+            "activePatchIndex": 6,
             "patches": [
                 {
                     "date": 1746007654593,
@@ -28,6 +28,10 @@
                 {
                     "date": 1746008299951,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -73,14 +73,14 @@\n         noCache: false,\r\n         link: null,\r\n       }),\r\n       get() {\r\n-        const rawValue = this.getDataValue('meta');\r\n+        const rawValue = this.getDataValue(\"meta\");\r\n         return rawValue ? JSON.parse(rawValue) : null;\r\n       },\r\n       set(value) {\r\n-        this.setDataValue('meta', JSON.stringify(value));\r\n-      }\r\n+        this.setDataValue(\"meta\", JSON.stringify(value));\r\n+      },\r\n     },\r\n   });\r\n \r\n   Resource.associate = (models) => {\r\n"
+                },
+                {
+                    "date": 1746058025081,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -29,8 +29,14 @@\n     parentId: {\r\n       type: DataTypes.INTEGER,\r\n       allowNull: true,\r\n       comment: \"父级资源ID\",\r\n+      references: {\r\n+        model: \"Resources\",\r\n+        key: \"id\",\r\n+      },\r\n+      onUpdate: \"CASCADE\",\r\n+      onDelete: \"SET NULL\",\r\n     },\r\n     component: {\r\n       type: DataTypes.STRING,\r\n       allowNull: true,\r\n@@ -95,13 +101,25 @@\n     });\r\n \r\n     // 与角色的多对多关系\r\n     Resource.belongsToMany(models.Role, {\r\n-      through: \"RoleResource\",\r\n+      through: \"RoleResources\",\r\n       foreignKey: \"resourceId\",\r\n       otherKey: \"roleId\",\r\n       as: \"roles\",\r\n     });\r\n+\r\n+    // 与操作的一对多关系\r\n+    Resource.hasMany(models.ResourceAction, {\r\n+      foreignKey: \"resourceId\",\r\n+      as: \"actions\",\r\n+    });\r\n+\r\n+    // 与权限的一对多关系\r\n+    Resource.hasMany(models.Permission, {\r\n+      foreignKey: \"resourceId\",\r\n+      as: \"permissions\",\r\n+    });\r\n   };\r\n \r\n   return Resource;\r\n };\r\n"
                 }
             ],
             "date": 1746007654593,

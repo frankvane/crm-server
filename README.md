@@ -100,3 +100,20 @@ npm start
 ---
 
 如需详细接口说明、权限模型、响应格式等，请参见 docs 目录下各模块文档。
+
+```sql
+-- 禁用外键约束
+EXEC sp_MSforeachtable "ALTER TABLE ? NOCHECK CONSTRAINT ALL"
+
+-- 删除所有表
+DECLARE @sql NVARCHAR(MAX) = N'';
+SELECT @sql += N'DROP TABLE ' + QUOTENAME(SCHEMA_NAME(schema_id)) + N'.' + QUOTENAME(name) + N'; '
+FROM sys.tables
+WHERE type = 'U'
+ORDER BY create_date DESC;
+
+EXEC sp_executesql @sql;
+
+-- 启用外键约束
+EXEC sp_MSforeachtable "ALTER TABLE ? WITH CHECK CHECK CONSTRAINT ALL"
+```

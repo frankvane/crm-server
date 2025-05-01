@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 2,
+            "activePatchIndex": 3,
             "patches": [
                 {
                     "date": 1746010598583,
@@ -16,6 +16,10 @@
                 {
                     "date": 1746017350191,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,29 +1,32 @@\n \"use strict\";\r\n \r\n module.exports = {\r\n   up: async (queryInterface, Sequelize) => {\r\n-    await queryInterface.createTable(\"RolePermissions\", {\r\n-      roleId: {\r\n+    await queryInterface.createTable(\"Permissions\", {\r\n+      id: {\r\n+        allowNull: false,\r\n+        autoIncrement: true,\r\n+        primaryKey: true,\r\n         type: Sequelize.INTEGER,\r\n+      },\r\n+      name: {\r\n+        type: Sequelize.STRING,\r\n         allowNull: false,\r\n-        references: {\r\n-          model: \"Roles\",\r\n-          key: \"id\",\r\n-        },\r\n-        onUpdate: \"CASCADE\",\r\n-        onDelete: \"CASCADE\",\r\n+        unique: true,\r\n       },\r\n-      permissionId: {\r\n-        type: Sequelize.INTEGER,\r\n+      action: {\r\n+        type: Sequelize.STRING,\r\n         allowNull: false,\r\n-        references: {\r\n-          model: \"Permissions\",\r\n-          key: \"id\",\r\n-        },\r\n-        onUpdate: \"CASCADE\",\r\n-        onDelete: \"CASCADE\",\r\n       },\r\n+      resource: {\r\n+        type: Sequelize.STRING,\r\n+        allowNull: false,\r\n+      },\r\n+      description: {\r\n+        type: Sequelize.STRING,\r\n+        allowNull: true,\r\n+      },\r\n       createdAt: {\r\n         allowNull: false,\r\n         type: Sequelize.DATE,\r\n       },\r\n@@ -31,17 +34,10 @@\n         allowNull: false,\r\n         type: Sequelize.DATE,\r\n       },\r\n     });\r\n-\r\n-    // Add a composite primary key\r\n-    await queryInterface.addConstraint(\"RolePermissions\", {\r\n-      fields: [\"roleId\", \"permissionId\"],\r\n-      type: \"primary key\",\r\n-      name: \"role_permission_pkey\",\r\n-    });\r\n   },\r\n \r\n   down: async (queryInterface, Sequelize) => {\r\n-    await queryInterface.dropTable(\"RolePermissions\");\r\n+    await queryInterface.dropTable(\"Permissions\");\r\n   },\r\n };\r\n"
+                },
+                {
+                    "date": 1746057685706,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,20 +13,39 @@\n         type: Sequelize.STRING,\r\n         allowNull: false,\r\n         unique: true,\r\n       },\r\n-      action: {\r\n+      code: {\r\n         type: Sequelize.STRING,\r\n         allowNull: false,\r\n+        unique: true,\r\n       },\r\n-      resource: {\r\n-        type: Sequelize.STRING,\r\n-        allowNull: false,\r\n-      },\r\n       description: {\r\n         type: Sequelize.STRING,\r\n         allowNull: true,\r\n       },\r\n+      actionId: {\r\n+        type: Sequelize.INTEGER,\r\n+        allowNull: true,\r\n+        comment: \"关联的操作ID\",\r\n+        references: {\r\n+          model: \"ResourceActions\",\r\n+          key: \"id\",\r\n+        },\r\n+        onUpdate: \"CASCADE\",\r\n+        onDelete: \"SET NULL\",\r\n+      },\r\n+      resourceId: {\r\n+        type: Sequelize.INTEGER,\r\n+        allowNull: false,\r\n+        comment: \"关联的资源ID\",\r\n+        references: {\r\n+          model: \"Resources\",\r\n+          key: \"id\",\r\n+        },\r\n+        onUpdate: \"CASCADE\",\r\n+        onDelete: \"CASCADE\",\r\n+      },\r\n       createdAt: {\r\n         allowNull: false,\r\n         type: Sequelize.DATE,\r\n       },\r\n"
                 }
             ],
             "date": 1746010598583,

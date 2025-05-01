@@ -8,6 +8,7 @@ module.exports = (sequelize) => {
       username: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true,
       },
       password: {
         type: DataTypes.STRING,
@@ -27,7 +28,7 @@ module.exports = (sequelize) => {
       },
     },
     {
-      tableName: "Users",
+      tableName: "users",
       timestamps: true,
       indexes: [
         {
@@ -53,10 +54,18 @@ module.exports = (sequelize) => {
 
   User.associate = (models) => {
     User.belongsToMany(models.Role, {
-      through: "UserRoles",
+      through: {
+        model: "UserRoles",
+        unique: false,
+      },
       foreignKey: "userId",
       otherKey: "roleId",
       as: "roles",
+    });
+
+    User.hasMany(models.RefreshToken, {
+      foreignKey: "userId",
+      as: "refreshTokens",
     });
   };
 

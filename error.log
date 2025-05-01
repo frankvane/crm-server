@@ -1,0 +1,12 @@
+
+执行迁移 20240320000003-create-permission.js 时出错:
+错误类型: SequelizeDatabaseError
+错误消息: Property cannot be added. Property 'MS_Description' already exists for 'dbo.Permissions.actionId'.
+
+原始错误:
+SQL: IF OBJECT_ID('[Permissions]', 'U') IS NULL CREATE TABLE [Permissions] ([id] INTEGER NOT NULL IDENTITY(1,1) , [name] NVARCHAR(255) NOT NULL UNIQUE, [code] NVARCHAR(255) NOT NULL UNIQUE, [description] NVARCHAR(255) NULL, [actionId] INTEGER NULL, [resourceId] INTEGER NOT NULL, [createdAt] DATETIMEOFFSET NOT NULL, [updatedAt] DATETIMEOFFSET NOT NULL, PRIMARY KEY ([id]), FOREIGN KEY ([actionId]) REFERENCES [ResourceActions] ([id]) ON DELETE NO ACTION, FOREIGN KEY ([resourceId]) REFERENCES [Resources] ([id]) ON DELETE NO ACTION); EXEC sp_addextendedproperty @name = N'MS_Description', @value = N'关联的操作ID', @level0type = N'Schema', @level0name = 'dbo', @level1type = N'Table', @level1name = [Permissions], @level2type = N'Column', @level2name = [actionId]; EXEC sp_addextendedproperty @name = N'MS_Description', @value = N'关联的资源ID', @level0type = N'Schema', @level0name = 'dbo', @level1type = N'Table', @level1name = [Permissions], @level2type = N'Column', @level2name = [resourceId];
+
+执行失败:
+Error: 迁移 20240320000003-create-permission.js 失败
+    at migrate (E:\crm-server\scripts\migrate.js:54:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
