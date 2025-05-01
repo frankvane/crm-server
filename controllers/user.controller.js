@@ -233,18 +233,21 @@ exports.changePassword = async (req, res, next) => {
 
 // 切换用户状态（启用/禁用）
 exports.toggleStatus = async (req, res, next) => {
+  const transaction = await sequelize.transaction();
   try {
     const userId = req.params.id;
     const user = await User.findByPk(userId);
 
     if (!user) {
+      await transaction.rollback();
       return res.status(404).json(ResponseUtil.error("User not found", 404));
     }
 
     // 切换状态
     user.status = user.status === 1 ? 0 : 1;
-    await user.save();
+    await user.save({ transaction });
 
+    await transaction.commit();
     const statusMessage = user.status === 1 ? "enabled" : "disabled";
     res.json(
       ResponseUtil.success(
@@ -253,6 +256,7 @@ exports.toggleStatus = async (req, res, next) => {
       )
     );
   } catch (err) {
+    await transaction.rollback();
     next(err);
   }
 };
