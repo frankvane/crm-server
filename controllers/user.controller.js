@@ -2,6 +2,7 @@ const { User, Role } = require("../models");
 const bcrypt = require("bcryptjs");
 const { Op } = require("sequelize");
 const ResponseUtil = require("../utils/response");
+const { sequelize } = require("../models");
 
 // 创建用户
 exports.create = async (req, res, next) => {
@@ -161,16 +162,26 @@ exports.update = async (req, res, next) => {
 
 // 删除用户
 exports.delete = async (req, res, next) => {
+  const transaction = await sequelize.transaction();
   try {
     const user = await User.findByPk(req.params.id);
 
     if (!user) {
+      await transaction.rollback();
       return res.status(404).json(ResponseUtil.error("User not found", 404));
     }
 
-    await user.destroy();
+    // First delete related records
+    await user.setRoles([], { transaction });
+    await user.setRefreshTokens([], { transaction });
+
+    // Then delete the user
+    await user.destroy({ transaction });
+
+    await transaction.commit();
     res.json(ResponseUtil.success(null, "User deleted successfully"));
   } catch (err) {
+    await transaction.rollback();
     next(err);
   }
 };
