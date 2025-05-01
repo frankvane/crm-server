@@ -210,14 +210,34 @@ exports.delete = async (req, res) => {
     const t = await CategoryType.sequelize.transaction();
 
     try {
-      // 先删除所有关联的分类
+      // 如果有关联的分类，需要按层级删除
       if (categories.length > 0) {
-        await Promise.all(
-          categories.map((category) => category.destroy({ transaction: t }))
-        );
+        // 1. 按parentId分组
+        const categoryMap = new Map();
+        categories.forEach((category) => {
+          const parentId = category.parentId || "root";
+          if (!categoryMap.has(parentId)) {
+            categoryMap.set(parentId, []);
+          }
+          categoryMap.get(parentId).push(category);
+        });
+
+        // 2. 从底层开始删除
+        const deleteLevel = async (parentId) => {
+          const levelCategories = categoryMap.get(parentId) || [];
+          for (const category of levelCategories) {
+            // 先递归删除子分类
+            await deleteLevel(category.id);
+            // 再删除当前分类
+            await category.destroy({ transaction: t });
+          }
+        };
+
+        // 从根节点开始删除
+        await deleteLevel("root");
       }
 
-      // 然后删除分类类型
+      // 最后删除分类类型
       await categoryType.destroy({ transaction: t });
 
       // 提交事务
