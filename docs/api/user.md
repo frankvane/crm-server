@@ -52,14 +52,34 @@
 - **查询参数**：
   - page: 页码（默认：1）
   - pageSize: 每页数量（默认：10）
-  - search: 搜索关键词
+  - search: 搜索关键词（支持用户名、邮箱的模糊查询）
+  - username: 用户名（支持模糊查询）
+  - email: 邮箱（支持模糊查询）
+  - status: 用户状态（true/1: 启用，false/0: 禁用）
+  - roleId: 角色 ID（筛选具有特定角色的用户）
 - **响应**：
   ```json
   {
     "success": true,
     "message": "Success",
     "data": {
-      "list": [ ... ],
+      "list": [
+        {
+          "id": "number",
+          "username": "string",
+          "email": "string",
+          "status": "number",
+          "roles": [
+            {
+              "id": "number",
+              "name": "string",
+              "code": "string"
+            }
+          ],
+          "createdAt": "string",
+          "updatedAt": "string"
+        }
+      ],
       "pagination": {
         "current": "number",
         "pageSize": "number",
@@ -68,6 +88,25 @@
     }
   }
   ```
+- **查询示例**：
+
+  ```
+  # 全字段搜索
+  GET /api/users?search=关键词
+
+  # 指定字段搜索
+  GET /api/users?username=admin&email=example
+
+  # 状态筛选
+  GET /api/users?status=true
+
+  # 角色筛选
+  GET /api/users?roleId=1
+
+  # 组合查询
+  GET /api/users?username=admin&status=true&roleId=1&page=1&pageSize=10
+  ```
+
 - **错误**：
   - 401: "No token provided" / "Invalid or expired token"
   - 403: "Forbidden"
