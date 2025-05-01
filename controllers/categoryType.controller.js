@@ -203,22 +203,36 @@ exports.delete = async (req, res) => {
       });
     }
 
-    // TODO: 检查是否有关联的分类，如果有则不允许删除
+    // 获取关联的分类
     const categories = await categoryType.getCategories();
-    if (categories.length > 0) {
-      return res.status(400).json({
-        code: 400,
-        message: "Cannot delete category type with associated categories",
+
+    // 开启事务以确保数据一致性
+    const t = await CategoryType.sequelize.transaction();
+
+    try {
+      // 先删除所有关联的分类
+      if (categories.length > 0) {
+        await Promise.all(
+          categories.map((category) => category.destroy({ transaction: t }))
+        );
+      }
+
+      // 然后删除分类类型
+      await categoryType.destroy({ transaction: t });
+
+      // 提交事务
+      await t.commit();
+
+      res.json({
+        code: 200,
+        message: "Category type and associated categories deleted successfully",
         data: null,
       });
+    } catch (error) {
+      // 如果出错，回滚事务
+      await t.rollback();
+      throw error;
     }
-
-    await categoryType.destroy();
-    res.json({
-      code: 200,
-      message: "Category type deleted successfully",
-      data: null,
-    });
   } catch (error) {
     console.error("Error deleting category type:", error);
     res.status(500).json({
