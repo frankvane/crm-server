@@ -5,10 +5,10 @@ const {
   ResourceAction,
   RolePermission,
   Resource,
+  sequelize,
 } = require("../models");
 const ResponseUtil = require("../utils/response");
 const { Op } = require("sequelize");
-const sequelize = require("sequelize");
 
 const roleController = {
   // 创建角色
