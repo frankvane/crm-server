@@ -3,7 +3,7 @@
 ## 1. 创建用户
 
 - **接口**：`POST /api/users`
-- **描述**：创建新用户（需要 create_user 权限）
+- **描述**：创建新用户（需要 system:user:add 权限）
 - **认证**：需要有效的访问令牌（Bearer Token）
 - **请求头**：
   ```
@@ -21,13 +21,17 @@
 - **响应**：
   ```json
   {
-    "id": "number",
-    "username": "string",
-    "email": "string",
-    "status": "boolean",
-    "createdAt": "string",
-    "updatedAt": "string",
-    "Roles": [ ... ]
+    "success": true,
+    "message": "User created successfully",
+    "data": {
+      "id": "number",
+      "username": "string",
+      "email": "string",
+      "status": "number",
+      "createdAt": "string",
+      "updatedAt": "string",
+      "roles": [ ... ]
+    }
   }
   ```
 - **错误**：
@@ -39,7 +43,7 @@
 ## 2. 获取用户列表
 
 - **接口**：`GET /api/users`
-- **描述**：获取用户列表（需要 view_users 权限）
+- **描述**：获取用户列表（需要 system:user:edit 权限）
 - **认证**：需要有效的访问令牌（Bearer Token）
 - **请求头**：
   ```
@@ -47,15 +51,21 @@
   ```
 - **查询参数**：
   - page: 页码（默认：1）
-  - limit: 每页数量（默认：10）
+  - pageSize: 每页数量（默认：10）
   - search: 搜索关键词
 - **响应**：
   ```json
   {
-    "total": "number",
-    "pages": "number",
-    "currentPage": "number",
-    "data": [ ... ]
+    "success": true,
+    "message": "Success",
+    "data": {
+      "list": [ ... ],
+      "pagination": {
+        "current": "number",
+        "pageSize": "number",
+        "total": "number"
+      }
+    }
   }
   ```
 - **错误**：
@@ -66,7 +76,7 @@
 ## 3. 获取单个用户
 
 - **接口**：`GET /api/users/:id`
-- **描述**：获取指定用户信息（需要 view_users 权限）
+- **描述**：获取指定用户信息（需要 system:user:edit 权限）
 - **认证**：需要有效的访问令牌（Bearer Token）
 - **请求头**：
   ```
@@ -75,13 +85,17 @@
 - **响应**：
   ```json
   {
-    "id": "number",
-    "username": "string",
-    "email": "string",
-    "status": "boolean",
-    "createdAt": "string",
-    "updatedAt": "string",
-    "Roles": [ ... ]
+    "success": true,
+    "message": "Success",
+    "data": {
+      "id": "number",
+      "username": "string",
+      "email": "string",
+      "status": "number",
+      "createdAt": "string",
+      "updatedAt": "string",
+      "roles": [ ... ]
+    }
   }
   ```
 - **错误**：
@@ -93,7 +107,7 @@
 ## 4. 更新用户
 
 - **接口**：`PUT /api/users/:id`
-- **描述**：更新指定用户信息（需要 update_user 权限）
+- **描述**：更新指定用户信息（需要 system:user:edit 权限）
 - **认证**：需要有效的访问令牌（Bearer Token）
 - **请求头**：
   ```
@@ -105,7 +119,7 @@
     "username": "string",
     "password": "string",
     "email": "string",
-    "status": "boolean",
+    "status": "number",
     "roleIds": "number[]"
   }
   ```
@@ -120,7 +134,7 @@
 ## 5. 删除用户
 
 - **接口**：`DELETE /api/users/:id`
-- **描述**：删除指定用户（需要 delete_user 权限）
+- **描述**：删除指定用户（需要 system:user:delete 权限）
 - **认证**：需要有效的访问令牌（Bearer Token）
 - **请求头**：
   ```
@@ -129,7 +143,9 @@
 - **响应**：
   ```json
   {
-    "message": "User deleted successfully"
+    "success": true,
+    "message": "User deleted successfully",
+    "data": null
   }
   ```
 - **错误**：
@@ -138,20 +154,104 @@
   - 404: "User not found"
   - 500: "Internal Server Error"
 
-## 获取当前登录用户信息
+## 6. 修改用户密码
 
-获取当前登录用户的详细信息，包括用户基本信息、角色、权限和菜单。
+- **接口**：`PUT /api/users/:id/password`
+- **描述**：修改指定用户的密码（用户本人或管理员）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **请求头**：
+  ```
+  Authorization: Bearer <accessToken>
+  ```
+- **请求体**：
+  ```json
+  {
+    "currentPassword": "string", // 当前用户修改自己的密码时需要提供
+    "newPassword": "string"
+  }
+  ```
+- **响应**：
+  ```json
+  {
+    "success": true,
+    "message": "Password changed successfully",
+    "data": null
+  }
+  ```
+- **错误**：
+  - 400: "Current password is incorrect"
+  - 401: "No token provided" / "Invalid or expired token"
+  - 403: "You can only change your own password"
+  - 404: "User not found"
+  - 500: "Internal Server Error"
 
-- **URL**: `/api/users/me`
-- **Method**: `GET`
-- **Auth Required**: Yes
-- **Permissions Required**: None
+## 7. 切换用户状态
 
-### 请求头
+- **接口**：`PUT /api/users/:id/toggle-status`
+- **描述**：启用或禁用指定用户（需要 system:user:edit 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **请求头**：
+  ```
+  Authorization: Bearer <accessToken>
+  ```
+- **响应**：
+  ```json
+  {
+    "success": true,
+    "message": "User enabled/disabled successfully",
+    "data": {
+      "id": "number",
+      "status": "number"
+    }
+  }
+  ```
+- **错误**：
+  - 401: "No token provided" / "Invalid or expired token"
+  - 403: "Forbidden"
+  - 404: "User not found"
+  - 500: "Internal Server Error"
 
-```
-Authorization: Bearer <token>
-```
+## 8. 批量删除用户
+
+- **接口**：`DELETE /api/users/batch`
+- **描述**：批量删除用户（需要 system:user:delete 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **请求头**：
+  ```
+  Authorization: Bearer <accessToken>
+  ```
+- **请求体**：
+  ```json
+  {
+    "ids": "number[]"
+  }
+  ```
+- **响应**：
+  ```json
+  {
+    "success": true,
+    "message": "Users deleted successfully",
+    "data": {
+      "deletedCount": "number"
+    }
+  }
+  ```
+- **错误**：
+  - 400: "Invalid user IDs provided"
+  - 401: "No token provided" / "Invalid or expired token"
+  - 403: "Forbidden"
+  - 500: "Internal Server Error"
+
+## 9. 获取当前登录用户信息
+
+- **接口**: `/api/users/me`
+- **方法**: `GET`
+- **描述**: 获取当前登录用户的详细信息，包括用户基本信息、角色、权限和菜单
+- **认证**: 需要有效的访问令牌（Bearer Token）
+- **请求头**：
+  ```
+  Authorization: Bearer <accessToken>
+  ```
 
 ### 响应
 
@@ -159,7 +259,7 @@ Authorization: Bearer <token>
 
 ```json
 {
-  "code": 200,
+  "success": true,
   "message": "Success",
   "data": {
     "user": {
@@ -204,11 +304,11 @@ Authorization: Bearer <token>
       }
     ],
     "permissions": [
-      "create_user",
-      "view_users",
-      "update_user",
-      "delete_user",
-      "manage_roles"
+      "system:user:add",
+      "system:user:edit",
+      "system:user:delete",
+      "system:role:add",
+      "system:role:edit"
     ]
   }
 }
@@ -220,7 +320,7 @@ Authorization: Bearer <token>
 
 ```json
 {
-  "code": 401,
+  "success": false,
   "message": "No token provided",
   "data": null
 }
@@ -230,7 +330,7 @@ Authorization: Bearer <token>
 
 ```json
 {
-  "code": 404,
+  "success": false,
   "message": "User not found",
   "data": null
 }
@@ -265,4 +365,4 @@ Authorization: Bearer <token>
   - `children`: 子路由
 
 - `permissions`: 权限列表
-  - 包含所有以 `create_`、`view_`、`update_`、`delete_`、`manage_` 开头的权限
+  - 采用 `{资源编码}:{操作}` 格式，如 `system:user:add`

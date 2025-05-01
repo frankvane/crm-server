@@ -23,15 +23,11 @@
 
 ```json
 {
-  "code": 200,
-  "message": "Success",
+  "success": true,
+  "message": "登录成功",
   "data": {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "user": {
-      "id": 1,
-      "username": "admin",
-      "email": "admin@example.com"
-    }
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVC..."
   }
 }
 ```
@@ -46,7 +42,7 @@
 
 ```json
 {
-  "code": 200,
+  "success": true,
   "message": "Success",
   "data": {
     "user": {
@@ -59,7 +55,7 @@
       {
         "id": 1,
         "name": "超级管理员",
-        "code": "super_admin"
+        "code": "admin"
       }
     ],
     "routes": [
@@ -97,14 +93,17 @@
       }
     ],
     "permissions": [
-      "create_user",
-      "view_users",
-      "update_user",
-      "delete_user",
-      "manage_roles",
-      "view_roles",
-      "manage_resources",
-      "view_resources"
+      "system:user:add",
+      "system:user:edit",
+      "system:user:delete",
+      "system:user:view",
+      "system:role:add",
+      "system:role:edit",
+      "system:role:delete",
+      "system:role:assign",
+      "system:resource:add",
+      "system:resource:edit",
+      "system:resource:delete"
     ]
   }
 }
@@ -131,8 +130,8 @@
 
 ```json
 {
-  "code": 200,
-  "message": "Success",
+  "success": true,
+  "message": "User created successfully",
   "data": {
     "id": 2,
     "username": "testuser",
@@ -156,7 +155,7 @@
 ```json
 {
   "name": "普通用户",
-  "code": "normal_user",
+  "code": "user",
   "description": "普通用户角色",
   "permissionIds": [], // 初始不分配权限
   "resourceIds": [] // 初始不分配资源
@@ -167,12 +166,12 @@
 
 ```json
 {
-  "code": 200,
-  "message": "Success",
+  "success": true,
+  "message": "Role created successfully",
   "data": {
     "id": 2,
     "name": "普通用户",
-    "code": "normal_user",
+    "code": "user",
     "description": "普通用户角色",
     "permissions": [],
     "resources": []
@@ -212,8 +211,8 @@
 
 ```json
 {
-  "code": 200,
-  "message": "Success",
+  "success": true,
+  "message": "Resource created successfully",
   "data": {
     "id": 2,
     "name": "用户管理",
@@ -231,60 +230,20 @@
 }
 ```
 
-#### 4.1.2 创建按钮资源
+#### 4.1.2 创建资源操作
 
-- **URL**: `/api/resources`
+- **URL**: `/api/resource-actions`
 - **Method**: `POST`
 - **请求体**:
 
 ```json
 {
   "name": "查看用户",
-  "code": "system:user:view",
-  "type": "button",
-  "parentId": 2, // 关联到用户管理菜单
-  "meta": {
-    "title": "查看用户",
-    "icon": "查看"
-  }
-}
-```
-
-- **响应**:
-
-```json
-{
-  "code": 200,
-  "message": "Success",
-  "data": {
-    "id": 3,
-    "name": "查看用户",
-    "code": "system:user:view",
-    "type": "button",
-    "parentId": 2,
-    "meta": {
-      "title": "查看用户",
-      "icon": "查看"
-    }
-  }
-}
-```
-
-### 4.2 创建权限
-
-为每个资源创建对应的权限。
-
-- **URL**: `/api/permissions`
-- **Method**: `POST`
-- **请求体**:
-
-```json
-{
-  "name": "view_users",
-  "code": "view_users",
+  "code": "view",
   "description": "查看用户列表",
-  "resourceId": 3, // 关联到"查看用户"按钮资源
-  "type": "button"
+  "icon": "查看",
+  "sort": 1,
+  "resourceId": 2 // 关联到用户管理资源
 }
 ```
 
@@ -292,48 +251,35 @@
 
 ```json
 {
-  "code": 200,
-  "message": "Success",
+  "success": true,
+  "message": "Resource action created successfully",
   "data": {
     "id": 1,
-    "name": "view_users",
-    "code": "view_users",
+    "name": "查看用户",
+    "code": "system:user:view",
     "description": "查看用户列表",
-    "resourceId": 3,
-    "type": "button",
-    "resource": {
-      "id": 3,
-      "name": "查看用户",
-      "code": "system:user:view"
+    "icon": "查看",
+    "sort": 1,
+    "resourceId": 2,
+    "permission": {
+      "id": 1,
+      "name": "system:user:view",
+      "code": "system:user:view",
+      "description": "查看用户列表"
     }
   }
 }
 ```
 
-### 4.3 给角色分配资源
+### 4.2 为角色分配权限
 
-分配资源时可以同时指定该资源下的具体权限。
-
-- **URL**: `/api/roles/:id/resources`
+- **URL**: `/api/roles/:id/permissions`
 - **Method**: `PUT`
 - **请求体**:
 
 ```json
 {
-  "resources": [
-    {
-      "resourceId": 2, // 用户管理菜单
-      "permissionIds": [] // 菜单资源通常不需要具体权限
-    },
-    {
-      "resourceId": 3, // 查看用户按钮
-      "permissionIds": [1] // 分配查看权限
-    },
-    {
-      "resourceId": 4, // 编辑用户按钮
-      "permissionIds": [2, 3] // 分配查看和编辑权限
-    }
-  ]
+  "permissionIds": [1, 2, 3] // 权限ID列表
 }
 ```
 
@@ -341,49 +287,27 @@
 
 ```json
 {
-  "code": 200,
-  "message": "Success",
+  "success": true,
+  "message": "Permissions assigned successfully",
   "data": {
     "id": 2,
     "name": "普通用户",
-    "resources": [
+    "code": "user",
+    "permissions": [
+      {
+        "id": 1,
+        "name": "system:user:view",
+        "code": "system:user:view"
+      },
       {
         "id": 2,
-        "name": "用户管理",
-        "type": "menu",
-        "path": "user",
-        "permissions": []
+        "name": "system:user:add",
+        "code": "system:user:add"
       },
       {
         "id": 3,
-        "name": "查看用户",
-        "type": "button",
-        "parentId": 2,
-        "permissions": [
-          {
-            "id": 1,
-            "name": "view_users",
-            "code": "view_users"
-          }
-        ]
-      },
-      {
-        "id": 4,
-        "name": "编辑用户",
-        "type": "button",
-        "parentId": 2,
-        "permissions": [
-          {
-            "id": 2,
-            "name": "view_users",
-            "code": "view_users"
-          },
-          {
-            "id": 3,
-            "name": "update_users",
-            "code": "update_users"
-          }
-        ]
+        "name": "system:user:edit",
+        "code": "system:user:edit"
       }
     ]
   }
@@ -408,8 +332,8 @@
 
 ```json
 {
-  "code": 200,
-  "message": "Success",
+  "success": true,
+  "message": "Roles assigned successfully",
   "data": {
     "id": 2,
     "username": "testuser",
@@ -417,45 +341,22 @@
       {
         "id": 2,
         "name": "普通用户",
-        "code": "normal_user",
-        "resources": [
+        "code": "user",
+        "permissions": [
+          {
+            "id": 1,
+            "name": "system:user:view",
+            "code": "system:user:view"
+          },
           {
             "id": 2,
-            "name": "用户管理",
-            "type": "menu",
-            "path": "user",
-            "permissions": []
+            "name": "system:user:add",
+            "code": "system:user:add"
           },
           {
             "id": 3,
-            "name": "查看用户",
-            "type": "button",
-            "parentId": 2,
-            "permissions": [
-              {
-                "id": 1,
-                "name": "view_users",
-                "code": "view_users"
-              }
-            ]
-          },
-          {
-            "id": 4,
-            "name": "编辑用户",
-            "type": "button",
-            "parentId": 2,
-            "permissions": [
-              {
-                "id": 2,
-                "name": "view_users",
-                "code": "view_users"
-              },
-              {
-                "id": 3,
-                "name": "update_users",
-                "code": "update_users"
-              }
-            ]
+            "name": "system:user:edit",
+            "code": "system:user:edit"
           }
         ]
       }
@@ -485,15 +386,11 @@
 
 ```json
 {
-  "code": 200,
-  "message": "Success",
+  "success": true,
+  "message": "登录成功",
   "data": {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "user": {
-      "id": 2,
-      "username": "testuser",
-      "email": "test@example.com"
-    }
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVC..."
   }
 }
 ```
@@ -506,7 +403,7 @@
 
 ```json
 {
-  "code": 200,
+  "success": true,
   "message": "Success",
   "data": {
     "user": {
@@ -519,7 +416,7 @@
       {
         "id": 2,
         "name": "普通用户",
-        "code": "normal_user"
+        "code": "user"
       }
     ],
     "routes": [
@@ -546,7 +443,7 @@
         ]
       }
     ],
-    "permissions": ["view_users", "create_user", "update_user"]
+    "permissions": ["system:user:view", "system:user:add", "system:user:edit"]
   }
 }
 ```
@@ -555,33 +452,32 @@
 
 1. 权限分配顺序：
 
-   - 先创建资源（菜单和按钮）
-   - 为资源创建对应的权限
+   - 先创建资源（菜单）
+   - 为资源创建对应的资源操作（自动创建对应权限）
    - 创建角色
-   - 给角色分配资源（自动包含对应的权限）
+   - 给角色分配权限
    - 最后给用户分配角色
 
 2. 资源类型：
 
    - 菜单（type = "menu"）：系统菜单项
-   - 按钮（type = "button"）：菜单下的操作按钮
-   - 每个按钮资源必须关联到其所属的菜单资源
+   - 页面（type = "page"）：菜单下的页面
+   - 按钮（type = "button"）：页面上的操作按钮
 
 3. 权限与资源关系：
 
-   - 每个资源都有对应的权限
-   - 权限与资源是多对一的关系（一个资源可以有多个权限）
-   - 分配资源时可以指定该资源下的具体权限组合
-   - 菜单资源通常不需要具体权限，按钮资源需要指定权限
+   - 每个资源操作都会自动创建对应的权限
+   - 权限与资源操作是一对一的关系
+   - 资源操作的代码与权限的代码保持一致
 
 4. 权限命名规范：
 
-   - 创建：create_xxx
-   - 查看：view_xxx
-   - 更新：update_xxx
-   - 删除：delete_xxx
-   - 管理：manage_xxx
+   - 添加：`{resource}:add`
+   - 查看：`{resource}:view`
+   - 编辑：`{resource}:edit`
+   - 删除：`{resource}:delete`
+   - 分配：`{resource}:assign`
 
 5. 资源编码规范：
-   - 菜单：system:module
-   - 按钮：system:module:action
+   - 资源：`system:module`
+   - 资源操作：`system:module:action`

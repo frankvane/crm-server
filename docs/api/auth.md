@@ -14,15 +14,18 @@
 - **响应**：
   ```json
   {
-    "code": 200,
+    "success": true,
     "message": "Login successful",
-    "data": { ... }
+    "data": {
+      "accessToken": "string",
+      "refreshToken": "string"
+    }
   }
   ```
 - **错误响应**：
   ```json
   {
-    "code": 401,
+    "success": false,
     "message": "User not found" | "Invalid password",
     "data": null
   }
@@ -41,7 +44,7 @@
 - **响应**：
   ```json
   {
-    "code": 200,
+    "success": true,
     "message": "Token refreshed successfully",
     "data": { "accessToken": "string" }
   }
@@ -49,8 +52,8 @@
 - **错误响应**：
   ```json
   {
-    "code": 401,
-    "message": "No refresh token provided" | "Invalid refresh token",
+    "success": false,
+    "message": "No refresh token provided" | "Invalid refresh token" | "Refresh token expired",
     "data": null
   }
   ```
@@ -68,7 +71,7 @@
 - **响应**：
   ```json
   {
-    "code": 200,
+    "success": true,
     "message": "Logged out successfully",
     "data": null
   }
@@ -76,7 +79,7 @@
 - **错误响应**：
   ```json
   {
-    "code": 401,
+    "success": false,
     "message": "No refresh token provided",
     "data": null
   }
