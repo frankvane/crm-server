@@ -299,6 +299,22 @@ exports.me = async (req, res, next) => {
               as: "resources",
               include: [
                 {
+                  model: Resource,
+                  as: "children",
+                  include: [
+                    {
+                      model: ResourceAction,
+                      as: "actions",
+                      include: [
+                        {
+                          model: Permission,
+                          as: "permission",
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
                   model: ResourceAction,
                   as: "actions",
                   include: [
@@ -320,6 +336,53 @@ exports.me = async (req, res, next) => {
       return res.status(404).json(ResponseUtil.error("User not found", 404));
     }
 
+    // 构建资源树
+    const buildResourceTree = (resources, parentId = null) => {
+      return resources
+        .filter((resource) => resource.parentId === parentId)
+        .map((resource) => ({
+          id: resource.id,
+          name: resource.name,
+          code: resource.code,
+          type: resource.type,
+          path: resource.path,
+          component: resource.component,
+          meta: resource.meta,
+          actions: resource.actions.map((action) => ({
+            id: action.id,
+            name: action.name,
+            code: action.code,
+            icon: action.icon,
+            needConfirm: action.needConfirm,
+            confirmMessage: action.confirmMessage,
+            permission: action.permission
+              ? {
+                  id: action.permission.id,
+                  name: action.permission.name,
+                  code: action.permission.code,
+                }
+              : null,
+          })),
+          children: buildResourceTree(resources, resource.id),
+        }));
+    };
+
+    // 收集所有资源
+    const allResources = user.roles.reduce((acc, role) => {
+      role.resources.forEach((resource) => {
+        if (!acc.find((r) => r.id === resource.id)) {
+          acc.push(resource);
+          // 添加子资源
+          resource.children.forEach((child) => {
+            if (!acc.find((r) => r.id === child.id)) {
+              acc.push(child);
+            }
+          });
+        }
+      });
+      return acc;
+    }, []);
+
     // 构建用户信息响应
     const response = {
       user: {
@@ -333,37 +396,7 @@ exports.me = async (req, res, next) => {
         name: role.name,
         code: role.code,
       })),
-      resources: user.roles.reduce((acc, role) => {
-        role.resources.forEach((resource) => {
-          if (!acc.find((r) => r.id === resource.id)) {
-            acc.push({
-              id: resource.id,
-              name: resource.name,
-              code: resource.code,
-              type: resource.type,
-              path: resource.path,
-              component: resource.component,
-              meta: resource.meta,
-              actions: resource.actions.map((action) => ({
-                id: action.id,
-                name: action.name,
-                code: action.code,
-                icon: action.icon,
-                needConfirm: action.needConfirm,
-                confirmMessage: action.confirmMessage,
-                permission: action.permission
-                  ? {
-                      id: action.permission.id,
-                      name: action.permission.name,
-                      code: action.permission.code,
-                    }
-                  : null,
-              })),
-            });
-          }
-        });
-        return acc;
-      }, []),
+      resources: buildResourceTree(allResources),
     };
 
     res.json(ResponseUtil.success(response));
