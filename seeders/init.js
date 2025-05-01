@@ -250,18 +250,21 @@ module.exports = {
         name: "管理员",
         code: "admin",
         description: "系统管理员，拥有所有权限",
+        status: 1,
       });
 
       const managerRole = await Role.create({
         name: "经理",
         code: "manager",
         description: "部门经理，拥有部分管理权限",
+        status: 1,
       });
 
       const userRole = await Role.create({
-        name: "普通用户",
+        name: "用户",
         code: "user",
-        description: "普通用户，仅有基本权限",
+        description: "普通用户，仅拥有基本权限",
+        status: 1,
       });
 
       // 4. 关联角色和资源，以及对应的权限
