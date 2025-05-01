@@ -8,6 +8,7 @@ const {
 } = require("../models");
 const ResponseUtil = require("../utils/response");
 const { Op } = require("sequelize");
+const sequelize = require("sequelize");
 
 const roleController = {
   // 创建角色
@@ -278,6 +279,36 @@ const roleController = {
     } catch (error) {
       console.error("分配权限失败:", error);
       return res.status(500).json(ResponseUtil.error("分配权限失败", 500));
+    }
+  },
+
+  // 切换角色状态（启用/禁用）
+  toggleStatus: async (req, res, next) => {
+    const transaction = await sequelize.transaction();
+    try {
+      const roleId = req.params.id;
+      const role = await Role.findByPk(roleId);
+
+      if (!role) {
+        await transaction.rollback();
+        return res.status(404).json(ResponseUtil.error("Role not found", 404));
+      }
+
+      // 切换状态
+      role.status = role.status === 1 ? 0 : 1;
+      await role.save({ transaction });
+
+      await transaction.commit();
+      const statusMessage = role.status === 1 ? "enabled" : "disabled";
+      res.json(
+        ResponseUtil.success(
+          { id: role.id, status: role.status },
+          `Role ${statusMessage} successfully`
+        )
+      );
+    } catch (err) {
+      await transaction.rollback();
+      next(err);
     }
   },
 };

@@ -18,6 +18,14 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      status: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 1,
+        validate: {
+          isIn: [[0, 1]],
+        },
+      },
     },
     {
       tableName: "roles",

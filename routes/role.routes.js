@@ -38,4 +38,16 @@ router.delete(
   roleController.deleteRole
 );
 
+// 切换角色状态
+router
+  .route("/:id/toggle-status")
+  .put(
+    [authJwt.verifyToken, authJwt.hasPermission("system:role:edit")],
+    roleController.toggleStatus
+  )
+  .patch(
+    [authJwt.verifyToken, authJwt.hasPermission("system:role:edit")],
+    roleController.toggleStatus
+  );
+
 module.exports = router;
