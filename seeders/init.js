@@ -288,7 +288,7 @@ module.exports = {
       // 5. 创建默认用户
       const adminUser = await User.create({
         username: "admin",
-        password: await bcrypt.hash("admin123", 10),
+        password: "admin123",
         nickname: "系统管理员",
         email: "admin@example.com",
         status: 1,
@@ -296,7 +296,7 @@ module.exports = {
 
       const managerUser = await User.create({
         username: "manager",
-        password: await bcrypt.hash("manager123", 10),
+        password: "manager123",
         nickname: "高级管理员",
         email: "manager@example.com",
         status: 1,
@@ -304,7 +304,7 @@ module.exports = {
 
       const normalUser = await User.create({
         username: "user",
-        password: await bcrypt.hash("user123", 10),
+        password: "user123",
         nickname: "普通管理员",
         email: "user@example.com",
         status: 1,
