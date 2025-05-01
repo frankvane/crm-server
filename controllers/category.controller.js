@@ -50,21 +50,17 @@ exports.create = async (req, res, next) => {
 exports.list = async (req, res, next) => {
   try {
     const { typeId } = req.query;
-
-    if (!typeId) {
-      return res
-        .status(400)
-        .json(ResponseUtil.error("TypeId is required", 400));
+    const where = {};
+    if (typeId) {
+      where.typeId = typeId;
     }
-
     const categories = await Category.findAll({
-      where: { typeId },
+      where,
       order: [
         ["sort", "ASC"],
         ["id", "ASC"],
       ],
     });
-
     res.json(ResponseUtil.success(categories));
   } catch (err) {
     next(err);
