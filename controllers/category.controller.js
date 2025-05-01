@@ -70,16 +70,17 @@ exports.list = async (req, res, next) => {
 // 获取分类树
 exports.getTree = async (req, res, next) => {
   try {
-    const { typeId } = req.query;
+    let { typeId } = req.query;
+    typeId = typeId ? String(typeId) : "0"; // 确保 typeId 是字符串，undefined 转为 '0'
 
-    if (!typeId) {
-      return res
-        .status(400)
-        .json(ResponseUtil.error("TypeId is required", 400));
+    // typeId 为 0 时，查全部分类
+    const where = {};
+    if (typeId !== "0") {
+      where.typeId = typeId;
     }
 
     const categories = await Category.findAll({
-      where: { typeId },
+      where,
       order: [
         ["sort", "ASC"],
         ["id", "ASC"],
