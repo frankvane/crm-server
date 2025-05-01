@@ -47,10 +47,25 @@ exports.create = async (req, res, next) => {
 // 获取用户列表（支持分页和搜索）
 exports.list = async (req, res, next) => {
   try {
-    const { page = 1, pageSize = 10, search } = req.query;
-    const offset = (page - 1) * pageSize;
+    const {
+      page = 1,
+      pageSize = 10,
+      search,
+      username,
+      email,
+      status,
+      roleId,
+    } = req.query;
 
+    const offset = (page - 1) * pageSize;
     const where = {};
+
+    // 状态查询
+    if (status !== undefined) {
+      where.status = status === "true" || status === "1" ? 1 : 0;
+    }
+
+    // 关键字搜索（支持用户名、邮箱的模糊查询）
     if (search) {
       where[Op.or] = [
         { username: { [Op.like]: `%${search}%` } },
@@ -58,14 +73,36 @@ exports.list = async (req, res, next) => {
       ];
     }
 
-    const { count, rows } = await User.findAndCountAll({
+    // 指定字段搜索
+    if (username) {
+      where.username = { [Op.like]: `%${username}%` };
+    }
+    if (email) {
+      where.email = { [Op.like]: `%${email}%` };
+    }
+
+    // 构建查询选项
+    const queryOptions = {
       where,
-      include: [{ model: Role, as: "roles", through: { attributes: [] } }],
+      include: [
+        {
+          model: Role,
+          as: "roles",
+          through: { attributes: [] },
+          // 如果指定了角色ID，只查询具有该角色的用户
+          ...(roleId && {
+            where: { id: roleId },
+          }),
+        },
+      ],
       attributes: { exclude: ["password"] },
       offset,
       limit: parseInt(pageSize),
       distinct: true,
-    });
+      order: [["createdAt", "DESC"]],
+    };
+
+    const { count, rows } = await User.findAndCountAll(queryOptions);
 
     // 格式化用户数据
     const formattedUsers = rows.map((user) => ({
@@ -76,6 +113,7 @@ exports.list = async (req, res, next) => {
       roles: user.roles.map((role) => ({
         id: role.id,
         name: role.name,
+        code: role.code,
       })),
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
