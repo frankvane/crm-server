@@ -100,8 +100,12 @@ const roleController = {
             through: { attributes: [] },
           },
         ],
+        distinct: true, // 关键点
         order: [["createdAt", "DESC"]],
       });
+
+      // count 数值为什么不对，查询出来的记录3条，但count数值为187，为什么？
+      console.log(count, "count");
 
       return res
         .status(200)
