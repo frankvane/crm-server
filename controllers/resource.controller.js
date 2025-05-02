@@ -1,5 +1,30 @@
 const { Resource } = require("../models");
 const ResponseUtil = require("../utils/response");
+const { Op } = require("sequelize");
+
+// 将meta字段处理逻辑抽出来作为工具函数
+const processMeta = (resource) => {
+  const resourceObj = resource.toJSON();
+  if (resourceObj.meta && typeof resourceObj.meta === "string") {
+    try {
+      resourceObj.meta = JSON.parse(resourceObj.meta);
+    } catch (e) {
+      console.error("Failed to parse meta JSON:", e);
+    }
+  }
+  return resourceObj;
+};
+
+// 构建资源树的递归函数
+const buildResourceTree = (resources, parentId = null) => {
+  return resources
+    .filter((resource) => resource.parentId === parentId)
+    .map((resource) => ({
+      ...resource,
+      children: buildResourceTree(resources, resource.id),
+    }))
+    .sort((a, b) => a.sort - b.sort); // 按sort字段排序
+};
 
 const resourceController = {
   // 创建资源
@@ -18,26 +43,39 @@ const resourceController = {
       res.status(500).json(ResponseUtil.error(error.message, 500));
     }
   },
-  // 获取资源列表
+  // 获取资源列表（扁平结构）
   async list(req, res) {
     try {
-      const resources = await Resource.findAll();
-
-      // 尝试将meta字段解析回对象
-      const processedResources = resources.map((resource) => {
-        const resourceObj = resource.toJSON();
-        if (resourceObj.meta && typeof resourceObj.meta === "string") {
-          try {
-            resourceObj.meta = JSON.parse(resourceObj.meta);
-          } catch (e) {
-            // 如果解析失败，保留原始字符串
-            console.error("Failed to parse meta JSON:", e);
-          }
-        }
-        return resourceObj;
+      const resources = await Resource.findAll({
+        order: [
+          ["sort", "ASC"],
+          ["createdAt", "ASC"],
+        ],
       });
 
+      const processedResources = resources.map(processMeta);
       res.json(ResponseUtil.success(processedResources, "资源列表获取成功"));
+    } catch (error) {
+      res.status(500).json(ResponseUtil.error(error.message, 500));
+    }
+  },
+  // 获取资源树
+  async tree(req, res) {
+    try {
+      const resources = await Resource.findAll({
+        order: [
+          ["sort", "ASC"],
+          ["createdAt", "ASC"],
+        ],
+      });
+
+      // 处理所有资源的meta字段
+      const processedResources = resources.map(processMeta);
+
+      // 构建树形结构
+      const tree = buildResourceTree(processedResources);
+
+      res.json(ResponseUtil.success(tree, "资源树获取成功"));
     } catch (error) {
       res.status(500).json(ResponseUtil.error(error.message, 500));
     }

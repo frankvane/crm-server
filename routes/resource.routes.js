@@ -3,6 +3,13 @@ const router = express.Router();
 const resourceController = require("../controllers/resource.controller");
 const { authJwt } = require("../middlewares");
 
+// 获取资源树
+router.get(
+  "/tree",
+  [authJwt.verifyToken, authJwt.hasPermission("system:resource:edit")],
+  resourceController.tree
+);
+
 // 创建资源（修改为使用正确的权限格式）
 router.post(
   "/",
