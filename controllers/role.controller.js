@@ -222,6 +222,11 @@ const roleController = {
         return res.status(404).json(ResponseUtil.error("角色不存在", 404));
       }
 
+      // 先清空所有权限和资源关联，避免外键约束冲突
+      await role.setPermissions([]);
+      await role.setResources([]);
+      // 如有用户关联，也建议先检查/清空
+
       // 检查角色是否有关联的用户
       const userCount = await role.countUsers();
       if (userCount > 0) {
@@ -238,19 +243,21 @@ const roleController = {
     }
   },
 
-  // 分配资源
+  // 分配资源（及按钮权限）
   assignResources: async (req, res) => {
     try {
       const { roleId } = req.params;
-      const { resourceIds } = req.body;
+      const { resourceIds, permissionIds } = req.body;
 
       const role = await Role.findByPk(roleId);
       if (!role) {
         return res.status(404).json(ResponseUtil.error("角色不存在", 404));
       }
 
-      // 更新角色的资源关联
-      await role.setResources(resourceIds);
+      // 分配资源
+      await role.setResources(resourceIds || []);
+      // 分配按钮权限
+      await role.setPermissions(permissionIds || []);
 
       // 获取更新后的角色信息
       const updatedRole = await Role.findByPk(roleId, {
@@ -260,12 +267,17 @@ const roleController = {
             as: "resources",
             through: { attributes: [] },
           },
+          {
+            model: Permission,
+            as: "permissions",
+            through: { attributes: [] },
+          },
         ],
       });
 
       return res
         .status(200)
-        .json(ResponseUtil.success(updatedRole, "资源分配成功"));
+        .json(ResponseUtil.success(updatedRole, "资源及按钮权限分配成功"));
     } catch (error) {
       console.error("分配资源失败:", error);
       return res.status(500).json(ResponseUtil.error("分配资源失败", 500));
@@ -362,6 +374,64 @@ const roleController = {
     } catch (error) {
       console.error("获取所有角色失败:", error);
       return res.status(500).json(ResponseUtil.error("获取所有角色失败", 500));
+    }
+  },
+
+  // 获取指定角色的资源及其按钮权限（仅返回该角色实际拥有的按钮权限）
+  getResources: async (req, res) => {
+    try {
+      const { id } = req.params;
+      // 查询角色及其资源、权限
+      const role = await Role.findByPk(id, {
+        include: [
+          {
+            model: Resource,
+            as: "resources",
+            through: { attributes: [] },
+          },
+          {
+            model: Permission,
+            as: "permissions",
+            through: { attributes: [] },
+          },
+        ],
+      });
+      if (!role) {
+        return res.status(404).json(ResponseUtil.error("角色不存在", 404));
+      }
+      const permissionIds = role.permissions.map((p) => p.id);
+      // 查询每个资源下的 actions，只保留该角色拥有的按钮权限
+      const resourcesWithActions = await Promise.all(
+        role.resources.map(async (resource) => {
+          const actions = await ResourceAction.findAll({
+            where: { resourceId: resource.id },
+            include: [{ model: Permission, as: "permission" }],
+            order: [["sort", "ASC"]],
+          });
+          // 只保留该角色拥有的按钮权限
+          const filteredActions = actions.filter(
+            (action) =>
+              action.permission && permissionIds.includes(action.permission.id)
+          );
+          return {
+            ...resource.toJSON(),
+            actions: filteredActions.map((a) => a.toJSON()),
+          };
+        })
+      );
+      return res
+        .status(200)
+        .json(
+          ResponseUtil.success(
+            resourcesWithActions,
+            "获取角色资源及按钮权限成功"
+          )
+        );
+    } catch (error) {
+      console.error("获取角色资源及按钮权限失败:", error);
+      return res
+        .status(500)
+        .json(ResponseUtil.error("获取角色资源及按钮权限失败", 500));
     }
   },
 };

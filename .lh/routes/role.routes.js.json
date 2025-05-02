@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 7,
+            "activePatchIndex": 8,
             "patches": [
                 {
                     "date": 1745936740995,
@@ -36,6 +36,10 @@
                 {
                     "date": 1746143613845,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,8 +9,15 @@\n   [authJwt.verifyToken, authJwt.hasPermission(\"system:role:add\")],\r\n   roleController.create\r\n );\r\n \r\n+// 获取所有角色（不分页）\r\n+router.get(\r\n+  \"/all\",\r\n+  [authJwt.verifyToken, authJwt.hasPermission(\"system:role:edit\")],\r\n+  roleController.listAll\r\n+);\r\n+\r\n // 获取角色列表\r\n router.get(\r\n   \"/\",\r\n   [authJwt.verifyToken, authJwt.hasPermission(\"system:role:edit\")],\r\n"
+                },
+                {
+                    "date": 1746188341767,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -70,5 +70,12 @@\n   [authJwt.verifyToken, authJwt.hasPermission(\"system:role:edit\")],\r\n   roleController.assignPermissions\r\n );\r\n \r\n+// 获取指定角色的资源列表\r\n+router.get(\r\n+  \"/:id/resources\",\r\n+  [authJwt.verifyToken, authJwt.hasPermission(\"system:role:edit\")],\r\n+  roleController.getResources\r\n+);\r\n+\r\n module.exports = router;\r\n"
                 }
             ],
             "date": 1745936740995,

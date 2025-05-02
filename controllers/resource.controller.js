@@ -202,6 +202,50 @@ const resourceController = {
       res.status(500).json(ResponseUtil.error(error.message, 500));
     }
   },
+  // 获取资源树及其下所有按钮权限
+  async treeWithActions(req, res) {
+    try {
+      // 查询所有资源及其 actions
+      const resources = await Resource.findAll({
+        include: [
+          {
+            model: ResourceAction,
+            as: "actions",
+            include: [
+              {
+                model: Permission,
+                as: "permission",
+              },
+            ],
+          },
+        ],
+        order: [
+          ["sort", "ASC"],
+          ["createdAt", "ASC"],
+        ],
+      });
+
+      // 处理 meta 字段
+      const processedResources = resources.map(processMeta);
+
+      // 构建树形结构，actions 直接挂在每个节点下
+      const buildTreeWithActions = (resources, parentId = null) => {
+        return resources
+          .filter((resource) => resource.parentId === parentId)
+          .map((resource) => ({
+            ...resource,
+            children: buildTreeWithActions(resources, resource.id),
+            actions: resource.actions || [],
+          }))
+          .sort((a, b) => a.sort - b.sort);
+      };
+
+      const tree = buildTreeWithActions(processedResources);
+      res.json(ResponseUtil.success(tree, "资源树及按钮权限获取成功"));
+    } catch (error) {
+      res.status(500).json(ResponseUtil.error(error.message, 500));
+    }
+  },
 };
 
 module.exports = resourceController;

@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 4,
+            "activePatchIndex": 5,
             "patches": [
                 {
                     "date": 1746022475712,
@@ -24,6 +24,10 @@
                 {
                     "date": 1746151652718,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,13 @@\n const express = require(\"express\");\r\n const router = express.Router();\r\n const resourceController = require(\"../controllers/resource.controller\");\r\n+const resourceActionRoutes = require(\"./resourceAction.routes\");\r\n const { authJwt } = require(\"../middlewares\");\r\n \r\n+// 资源操作相关路由\r\n+router.use(\"/\", resourceActionRoutes);\r\n+\r\n // 获取资源树\r\n router.get(\r\n   \"/tree\",\r\n   [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:edit\")],\r\n"
+                },
+                {
+                    "date": 1746190068077,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,8 +13,15 @@\n   [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:edit\")],\r\n   resourceController.tree\r\n );\r\n \r\n+// 获取资源树及其下所有按钮权限\r\n+router.get(\r\n+  \"/tree-with-actions\",\r\n+  [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:edit\")],\r\n+  resourceController.treeWithActions\r\n+);\r\n+\r\n // 创建资源（修改为使用正确的权限格式）\r\n router.post(\r\n   \"/\",\r\n   [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:add\")],\r\n"
                 }
             ],
             "date": 1746022475711,

@@ -71,4 +71,11 @@ router.post(
   roleController.assignPermissions
 );
 
+// 获取指定角色的资源列表
+router.get(
+  "/:id/resources",
+  [authJwt.verifyToken, authJwt.hasPermission("system:role:edit")],
+  roleController.getResources
+);
+
 module.exports = router;

@@ -14,6 +14,13 @@ router.get(
   resourceController.tree
 );
 
+// 获取资源树及其下所有按钮权限
+router.get(
+  "/tree-with-actions",
+  [authJwt.verifyToken, authJwt.hasPermission("system:resource:edit")],
+  resourceController.treeWithActions
+);
+
 // 创建资源（修改为使用正确的权限格式）
 router.post(
   "/",
