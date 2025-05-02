@@ -1,4 +1,9 @@
-const { Resource } = require("../models");
+const {
+  Resource,
+  ResourceAction,
+  Permission,
+  sequelize,
+} = require("../models");
 const ResponseUtil = require("../utils/response");
 const { Op } = require("sequelize");
 
@@ -140,14 +145,60 @@ const resourceController = {
   },
   // 删除资源
   async delete(req, res) {
+    const t = await sequelize.transaction();
     try {
-      const resource = await Resource.findByPk(req.params.id);
+      const { id } = req.params;
+
+      // 查找资源及其关联的资源操作和权限
+      const resource = await Resource.findByPk(id, {
+        include: [
+          {
+            model: ResourceAction,
+            as: "actions",
+            include: [
+              {
+                model: Permission,
+                as: "permission",
+              },
+            ],
+          },
+        ],
+        transaction: t,
+      });
+
       if (!resource) {
+        await t.rollback();
         return res.status(404).json(ResponseUtil.error("资源不存在", 404));
       }
-      await resource.destroy();
+
+      // 检查是否有子资源
+      const hasChildren = await Resource.count({
+        where: { parentId: id },
+        transaction: t,
+      });
+
+      if (hasChildren > 0) {
+        await t.rollback();
+        return res.status(400).json(ResponseUtil.error("请先删除子资源", 400));
+      }
+
+      // 删除关联的权限和资源操作
+      if (resource.actions && resource.actions.length > 0) {
+        for (const action of resource.actions) {
+          if (action.permission) {
+            await action.permission.destroy({ transaction: t });
+          }
+          await action.destroy({ transaction: t });
+        }
+      }
+
+      // 删除资源本身
+      await resource.destroy({ transaction: t });
+
+      await t.commit();
       res.json(ResponseUtil.success(null, "资源删除成功"));
     } catch (error) {
+      await t.rollback();
       res.status(500).json(ResponseUtil.error(error.message, 500));
     }
   },
