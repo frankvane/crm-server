@@ -244,13 +244,67 @@
     }
   }
   ```
-- **错误**：
-  - 401: "No token provided" / "Invalid or expired token"
-  - 403: "Forbidden"
-  - 404: "User not found"
-  - 500: "Internal Server Error"
+- **错误响应**：
+  ```json
+  {
+    "success": false,
+    "message": "User not found",
+    "data": null
+  }
+  ```
 
-## 8. 批量删除用户
+## 8. 分配角色
+
+- **接口**：`POST /api/users/:id/roles`
+- **描述**：为指定用户分配角色（需要 system:user:edit 权限）
+- **认证**：需要有效的访问令牌（Bearer Token）
+- **请求头**：
+  ```
+  Authorization: Bearer <accessToken>
+  ```
+- **请求体**：
+  ```json
+  {
+    "roleIds": "number[]" // 角色ID数组
+  }
+  ```
+- **请求示例**：
+  ```json
+  {
+    "roleIds": [1, 2, 3] // 分配多个角色
+  }
+  ```
+- **响应**：
+  ```json
+  {
+    "success": true,
+    "message": "Roles assigned successfully",
+    "data": {
+      "id": "number",
+      "username": "string",
+      "email": "string",
+      "status": "number",
+      "roles": [
+        {
+          "id": "number",
+          "name": "string",
+          "code": "string",
+          "status": "number"
+        }
+      ]
+    }
+  }
+  ```
+- **错误响应**：
+  ```json
+  {
+    "success": false,
+    "message": "User not found",
+    "data": null
+  }
+  ```
+
+## 9. 批量删除用户
 
 - **接口**：`DELETE /api/users/batch`
 - **描述**：批量删除用户（需要 system:user:delete 权限）
@@ -281,7 +335,7 @@
   - 403: "Forbidden"
   - 500: "Internal Server Error"
 
-## 9. 获取当前登录用户信息
+## 10. 获取当前登录用户信息
 
 - **接口**: `/api/users/me`
 - **方法**: `GET`

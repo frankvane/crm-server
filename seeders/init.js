@@ -229,6 +229,7 @@ module.exports = {
           needConfirm: true,
           confirmMessage: "确定要删除该分类类型吗？",
         },
+        { name: "查看", code: "view", description: "查看分类类型" },
       ]);
 
       // 分类管理操作

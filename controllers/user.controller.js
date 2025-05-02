@@ -299,6 +299,79 @@ exports.toggleStatus = async (req, res, next) => {
   }
 };
 
+// 分配角色
+exports.assignRoles = async (req, res, next) => {
+  const transaction = await sequelize.transaction();
+  try {
+    const { roleIds } = req.body;
+    const userId = req.params.id;
+
+    // 验证角色ID数组
+    if (!roleIds || !Array.isArray(roleIds) || roleIds.length === 0) {
+      await transaction.rollback();
+      return res.status(400).json(ResponseUtil.error("Invalid role IDs", 400));
+    }
+
+    // 验证用户是否存在，同时获取基本信息
+    const user = await User.findByPk(userId, {
+      attributes: ["id", "username", "email", "status"],
+    });
+
+    if (!user) {
+      await transaction.rollback();
+      return res.status(404).json(ResponseUtil.error("User not found", 404));
+    }
+
+    // 验证所有角色是否存在
+    const roles = await Role.findAll({
+      where: {
+        id: { [Op.in]: roleIds },
+      },
+      attributes: ["id", "name", "code", "status"],
+    });
+
+    if (roles.length !== roleIds.length) {
+      await transaction.rollback();
+      return res
+        .status(400)
+        .json(ResponseUtil.error("Some role IDs are invalid", 400));
+    }
+
+    // 更新用户的角色
+    await user.setRoles(roleIds, { transaction });
+
+    // 构建响应数据
+    const responseData = {
+      ...user.toJSON(),
+      roles: roles.map((role) => ({
+        id: role.id,
+        name: role.name,
+        code: role.code,
+        status: role.status,
+      })),
+    };
+
+    await transaction.commit();
+    res.json(ResponseUtil.success(responseData, "Roles assigned successfully"));
+  } catch (err) {
+    await transaction.rollback();
+    console.error("分配角色失败:", err);
+    // 检查是否是超时错误
+    if (
+      err.name === "SequelizeDatabaseError" &&
+      err.parent &&
+      err.parent.code === "ETIMEOUT"
+    ) {
+      return res
+        .status(504)
+        .json(ResponseUtil.error("Request timeout while assigning roles", 504));
+    }
+    return res
+      .status(500)
+      .json(ResponseUtil.error("Failed to assign roles", 500));
+  }
+};
+
 // 批量删除用户
 exports.batchDelete = async (req, res, next) => {
   try {

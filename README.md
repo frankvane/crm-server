@@ -72,8 +72,18 @@ npm start
    npx sequelize-cli db:migrate
    ```
 3. 重新执行种子数据脚本：
+
    ```bash
    npx sequelize-cli db:seed:all
+
+   ```
+
+4. 分类执行种子数据脚本
+
+   ```bash
+   npx sequelize-cli db:seed --seed 20240321000000-init-medical-categories.js
+   npx sequelize-cli db:seed:undo --seed 20240321000000-init-medical-categories.js
+
    ```
 
 ## ▶️ 启动方式

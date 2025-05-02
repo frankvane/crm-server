@@ -14,7 +14,14 @@ router.post(
 router.get(
   "/",
   [authJwt.verifyToken, authJwt.hasPermission("category:type:view")],
-  categoryTypeController.findAll
+  categoryTypeController.list
+);
+
+// 获取所有分类类型（不分页）
+router.get(
+  "/all",
+  [authJwt.verifyToken, authJwt.hasPermission("category:type:view")],
+  categoryTypeController.listAll
 );
 
 // 获取单个分类类型（添加查看权限验证）

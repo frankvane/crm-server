@@ -19,7 +19,6 @@ const verifyToken = async (req, res, next) => {
     try {
       const decoded = jwt.verifyAccessToken(token);
       req.user = decoded;
-      console.log("auth step 1");
       next();
     } catch (err) {
       if (err.name === "TokenExpiredError") {
@@ -33,7 +32,6 @@ const verifyToken = async (req, res, next) => {
 };
 
 const hasPermission = (permission) => {
-  console.log("hasPermission", permission);
   return async (req, res, next) => {
     try {
       const userId = req.user.id;

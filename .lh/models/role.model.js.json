@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 7,
+            "activePatchIndex": 8,
             "patches": [
                 {
                     "date": 1745924964063,
@@ -36,6 +36,10 @@
                 {
                     "date": 1746058066325,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -6,43 +6,39 @@\n       type: DataTypes.STRING,\r\n       allowNull: false,\r\n       unique: true,\r\n     },\r\n+    code: {\r\n+      type: DataTypes.STRING,\r\n+      allowNull: false,\r\n+      unique: true,\r\n+    },\r\n     description: {\r\n       type: DataTypes.STRING,\r\n       allowNull: true,\r\n     },\r\n   });\r\n \r\n   Role.associate = (models) => {\r\n     Role.belongsToMany(models.User, {\r\n-      through: {\r\n-        model: \"UserRoles\",\r\n-        tableName: \"UserRoles\",\r\n-      },\r\n+      through: \"UserRoles\",\r\n       foreignKey: \"roleId\",\r\n       otherKey: \"userId\",\r\n-      as: \"Users\",\r\n+      as: \"users\",\r\n     });\r\n \r\n     Role.belongsToMany(models.Permission, {\r\n-      through: {\r\n-        model: \"RolePermissions\",\r\n-        tableName: \"RolePermissions\",\r\n-      },\r\n+      through: \"RolePermissions\",\r\n       foreignKey: \"roleId\",\r\n       otherKey: \"permissionId\",\r\n-      as: \"Permissions\",\r\n+      as: \"permissions\",\r\n     });\r\n \r\n     Role.belongsToMany(models.Resource, {\r\n-      through: {\r\n-        model: \"RoleResource\",\r\n-        tableName: \"RoleResource\",\r\n-      },\r\n+      through: \"RoleResources\",\r\n       foreignKey: \"roleId\",\r\n       otherKey: \"resourceId\",\r\n-      as: \"Resources\",\r\n+      as: \"resources\",\r\n     });\r\n   };\r\n \r\n   return Role;\r\n"
+                },
+                {
+                    "date": 1746099011227,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,8 +17,16 @@\n       description: {\r\n         type: DataTypes.STRING,\r\n         allowNull: true,\r\n       },\r\n+      status: {\r\n+        type: DataTypes.INTEGER,\r\n+        allowNull: false,\r\n+        defaultValue: 1,\r\n+        validate: {\r\n+          isIn: [[0, 1]],\r\n+        },\r\n+      },\r\n     },\r\n     {\r\n       tableName: \"roles\",\r\n     }\r\n"
                 }
             ],
             "date": 1745924964063,

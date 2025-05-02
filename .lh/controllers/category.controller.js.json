@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 1,
+            "activePatchIndex": 7,
             "patches": [
                 {
                     "date": 1746026148836,
@@ -12,6 +12,30 @@
                 {
                     "date": 1746026204440,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -186,13 +186,17 @@\n async function getById(req, res) {\r\n   try {\r\n     const category = await Category.findByPk(req.params.id);\r\n     if (!category) {\r\n-      return res.status(404).json({ code: 404, message: 'Category not found', data: null });\r\n+      return res\r\n+        .status(404)\r\n+        .json({ code: 404, message: \"Category not found\", data: null });\r\n     }\r\n-    res.json({ code: 200, message: 'Success', data: category });\r\n+    res.json({ code: 200, message: \"Success\", data: category });\r\n   } catch (error) {\r\n-    res.status(500).json({ code: 500, message: 'Internal server error', data: null });\r\n+    res\r\n+      .status(500)\r\n+      .json({ code: 500, message: \"Internal server error\", data: null });\r\n   }\r\n }\r\n \r\n module.exports.getById = getById;\r\n"
+                },
+                {
+                    "date": 1746102062108,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -49,23 +49,19 @@\n // 获取分类列表\r\n exports.list = async (req, res, next) => {\r\n   try {\r\n     const { typeId } = req.query;\r\n-\r\n-    if (!typeId) {\r\n-      return res\r\n-        .status(400)\r\n-        .json(ResponseUtil.error(\"TypeId is required\", 400));\r\n+    const where = {};\r\n+    if (typeId) {\r\n+      where.typeId = typeId;\r\n     }\r\n-\r\n     const categories = await Category.findAll({\r\n-      where: { typeId },\r\n+      where,\r\n       order: [\r\n         [\"sort\", \"ASC\"],\r\n         [\"id\", \"ASC\"],\r\n       ],\r\n     });\r\n-\r\n     res.json(ResponseUtil.success(categories));\r\n   } catch (err) {\r\n     next(err);\r\n   }\r\n"
+                },
+                {
+                    "date": 1746103980340,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -71,16 +71,16 @@\n exports.getTree = async (req, res, next) => {\r\n   try {\r\n     const { typeId } = req.query;\r\n \r\n-    if (!typeId) {\r\n-      return res\r\n-        .status(400)\r\n-        .json(ResponseUtil.error(\"TypeId is required\", 400));\r\n+    // typeId 未传或为 0 时，查全部分类\r\n+    const where = {};\r\n+    if (typeId && typeId !== '0') {\r\n+      where.typeId = typeId;\r\n     }\r\n \r\n     const categories = await Category.findAll({\r\n-      where: { typeId },\r\n+      where,\r\n       order: [\r\n         [\"sort\", \"ASC\"],\r\n         [\"id\", \"ASC\"],\r\n       ],\r\n"
+                },
+                {
+                    "date": 1746103993385,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -73,9 +73,9 @@\n     const { typeId } = req.query;\r\n \r\n     // typeId 未传或为 0 时，查全部分类\r\n     const where = {};\r\n-    if (typeId && typeId !== '0') {\r\n+    if (typeId && typeId !== \"0\") {\r\n       where.typeId = typeId;\r\n     }\r\n \r\n     const categories = await Category.findAll({\r\n"
+                },
+                {
+                    "date": 1746104017076,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -77,8 +77,9 @@\n     if (typeId && typeId !== \"0\") {\r\n       where.typeId = typeId;\r\n     }\r\n \r\n+    console.log(where);\r\n     const categories = await Category.findAll({\r\n       where,\r\n       order: [\r\n         [\"sort\", \"ASC\"],\r\n"
+                },
+                {
+                    "date": 1746109929466,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -77,9 +77,8 @@\n     if (typeId && typeId !== \"0\") {\r\n       where.typeId = typeId;\r\n     }\r\n \r\n-    console.log(where);\r\n     const categories = await Category.findAll({\r\n       where,\r\n       order: [\r\n         [\"sort\", \"ASC\"],\r\n"
+                },
+                {
+                    "date": 1746110701294,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -69,13 +69,14 @@\n \r\n // 获取分类树\r\n exports.getTree = async (req, res, next) => {\r\n   try {\r\n-    const { typeId } = req.query;\r\n+    let { typeId } = req.query;\r\n+    typeId = typeId ? String(typeId) : \"0\"; // 确保 typeId 是字符串，undefined 转为 '0'\r\n \r\n-    // typeId 未传或为 0 时，查全部分类\r\n+    // typeId 为 0 时，查全部分类\r\n     const where = {};\r\n-    if (typeId && typeId !== \"0\") {\r\n+    if (typeId !== \"0\") {\r\n       where.typeId = typeId;\r\n     }\r\n \r\n     const categories = await Category.findAll({\r\n"
                 }
             ],
             "date": 1746026148836,

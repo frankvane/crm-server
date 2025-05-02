@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 3,
+            "activePatchIndex": 6,
             "patches": [
                 {
                     "date": 1745926083374,
@@ -20,6 +20,18 @@
                 {
                     "date": 1746069542675,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,32 +2,40 @@\n const router = express.Router();\r\n const categoryTypeController = require(\"../controllers/categoryType.controller\");\r\n const { authJwt } = require(\"../middlewares\");\r\n \r\n-// 创建分类类型（修改为实际存在的权限）\r\n+// 创建分类类型\r\n router.post(\r\n   \"/\",\r\n   [authJwt.verifyToken, authJwt.hasPermission(\"category:type:add\")],\r\n   categoryTypeController.create\r\n );\r\n \r\n-// 获取分类类型列表（无需特定权限，只需验证令牌）\r\n-router.get(\"/\", [authJwt.verifyToken], categoryTypeController.findAll);\r\n+// 获取分类类型列表（添加查看权限验证）\r\n+router.get(\r\n+  \"/\",\r\n+  [authJwt.verifyToken, authJwt.hasPermission(\"category:type:view\")],\r\n+  categoryTypeController.findAll\r\n+);\r\n \r\n-// 获取单个分类类型（无需特定权限，只需验证令牌）\r\n-router.get(\"/:id\", [authJwt.verifyToken], categoryTypeController.findOne);\r\n+// 获取单个分类类型（添加查看权限验证）\r\n+router.get(\r\n+  \"/:id\",\r\n+  [authJwt.verifyToken, authJwt.hasPermission(\"category:type:view\")],\r\n+  categoryTypeController.findOne\r\n+);\r\n \r\n-// 更新分类类型（修改为实际存在的权限）\r\n+// 更新分类类型\r\n\\ No newline at end of file\n router.put(\r\n   \"/:id\",\r\n   [authJwt.verifyToken, authJwt.hasPermission(\"category:type:edit\")],\r\n   categoryTypeController.update\r\n );\r\n \r\n-// 删除分类类型（修改为实际存在的权限）\r\n+// 删除分类类型\r\n router.delete(\r\n   \"/:id\",\r\n   [authJwt.verifyToken, authJwt.hasPermission(\"category:type:delete\")],\r\n   categoryTypeController.delete\r\n );\r\n \r\n-module.exports = router;\n+module.exports = router;\r\n"
+                },
+                {
+                    "date": 1746101201574,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,9 +13,9 @@\n // 获取分类类型列表（添加查看权限验证）\r\n router.get(\r\n   \"/\",\r\n   [authJwt.verifyToken, authJwt.hasPermission(\"category:type:view\")],\r\n-  categoryTypeController.findAll\r\n+  categoryTypeController.list\r\n );\r\n \r\n // 获取单个分类类型（添加查看权限验证）\r\n router.get(\r\n"
+                },
+                {
+                    "date": 1746138587106,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -16,8 +16,15 @@\n   [authJwt.verifyToken, authJwt.hasPermission(\"category:type:view\")],\r\n   categoryTypeController.list\r\n );\r\n \r\n+// 获取所有分类类型（不分页）\r\n+router.get(\r\n+  \"/all\",\r\n+  [authJwt.verifyToken, authJwt.hasPermission(\"category:type:view\")],\r\n+  categoryTypeController.listAll\r\n+);\r\n+\r\n // 获取单个分类类型（添加查看权限验证）\r\n router.get(\r\n   \"/:id\",\r\n   [authJwt.verifyToken, authJwt.hasPermission(\"category:type:view\")],\r\n"
+                },
+                {
+                    "date": 1746138599006,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -44,5 +44,5 @@\n   [authJwt.verifyToken, authJwt.hasPermission(\"category:type:delete\")],\r\n   categoryTypeController.delete\r\n );\r\n \r\n-module.exports = router;\n\\ No newline at end of file\n+module.exports = router;\r\n"
                 }
             ],
             "date": 1745926083374,

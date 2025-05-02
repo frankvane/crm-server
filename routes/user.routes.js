@@ -60,6 +60,13 @@ router
     userController.toggleStatus
   );
 
+// 分配角色
+router.post(
+  "/:id/roles",
+  [authJwt.verifyToken, authJwt.hasPermission("system:user:edit")],
+  userController.assignRoles
+);
+
 // 批量删除用户
 router.delete(
   "/batch",
