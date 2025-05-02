@@ -1,7 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const resourceController = require("../controllers/resource.controller");
+const resourceActionRoutes = require("./resourceAction.routes");
 const { authJwt } = require("../middlewares");
+
+// 资源操作相关路由
+router.use("/", resourceActionRoutes);
 
 // 获取资源树
 router.get(

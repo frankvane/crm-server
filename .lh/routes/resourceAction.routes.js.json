@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 2,
+            "activePatchIndex": 3,
             "patches": [
                 {
                     "date": 1746022494454,
@@ -16,6 +16,10 @@
                 {
                     "date": 1746066974989,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,40 +2,40 @@\n const router = express.Router();\r\n const resourceActionController = require(\"../controllers/resourceAction.controller\");\r\n const { authJwt } = require(\"../middlewares\");\r\n \r\n-// 创建资源操作（需要manage_resource_actions权限）\r\n+// 创建资源操作（修改为使用正确的权限格式）\r\n router.post(\r\n   \"/\",\r\n-  [authJwt.verifyToken, authJwt.hasPermission(\"manage_resource_actions\")],\r\n+  [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:add\")],\r\n   resourceActionController.create\r\n );\r\n \r\n-// 获取资源操作列表（需要view_resource_actions权限）\r\n+// 获取资源操作列表（修改为使用正确的权限格式）\r\n router.get(\r\n   \"/\",\r\n-  [authJwt.verifyToken, authJwt.hasPermission(\"view_resource_actions\")],\r\n+  [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:edit\")],\r\n   resourceActionController.list\r\n );\r\n \r\n-// 获取单个资源操作（需要view_resource_actions权限）\r\n+// 获取单个资源操作（修改为使用正确的权限格式）\r\n router.get(\r\n   \"/:id\",\r\n-  [authJwt.verifyToken, authJwt.hasPermission(\"view_resource_actions\")],\r\n+  [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:edit\")],\r\n   resourceActionController.getById\r\n );\r\n \r\n-// 更新资源操作（需要manage_resource_actions权限）\r\n+// 更新资源操作（修改为使用正确的权限格式）\r\n router.put(\r\n   \"/:id\",\r\n-  [authJwt.verifyToken, authJwt.hasPermission(\"manage_resource_actions\")],\r\n+  [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:edit\")],\r\n   resourceActionController.update\r\n );\r\n \r\n-// 删除资源操作（需要manage_resource_actions权限）\r\n+// 删除资源操作（修改为使用正确的权限格式）\r\n router.delete(\r\n   \"/:id\",\r\n-  [authJwt.verifyToken, authJwt.hasPermission(\"manage_resource_actions\")],\r\n+  [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:delete\")],\r\n   resourceActionController.delete\r\n );\r\n \r\n module.exports = router;\r\n"
+                },
+                {
+                    "date": 1746151629592,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,39 +2,39 @@\n const router = express.Router();\r\n const resourceActionController = require(\"../controllers/resourceAction.controller\");\r\n const { authJwt } = require(\"../middlewares\");\r\n \r\n-// 创建资源操作（修改为使用正确的权限格式）\r\n+// 创建资源操作\r\n router.post(\r\n-  \"/\",\r\n+  \"/:resourceId/actions\",\r\n   [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:add\")],\r\n   resourceActionController.create\r\n );\r\n \r\n-// 获取资源操作列表（修改为使用正确的权限格式）\r\n+// 获取资源操作列表\r\n router.get(\r\n-  \"/\",\r\n+  \"/:resourceId/actions\",\r\n   [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:edit\")],\r\n   resourceActionController.list\r\n );\r\n \r\n-// 获取单个资源操作（修改为使用正确的权限格式）\r\n+// 获取单个资源操作\r\n router.get(\r\n-  \"/:id\",\r\n+  \"/:resourceId/actions/:id\",\r\n   [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:edit\")],\r\n   resourceActionController.getById\r\n );\r\n \r\n-// 更新资源操作（修改为使用正确的权限格式）\r\n+// 更新资源操作\r\n router.put(\r\n-  \"/:id\",\r\n+  \"/:resourceId/actions/:id\",\r\n   [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:edit\")],\r\n   resourceActionController.update\r\n );\r\n \r\n-// 删除资源操作（修改为使用正确的权限格式）\r\n+// 删除资源操作\r\n router.delete(\r\n-  \"/:id\",\r\n+  \"/:resourceId/actions/:id\",\r\n   [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:delete\")],\r\n   resourceActionController.delete\r\n );\r\n \r\n"
                 }
             ],
             "date": 1746022494454,

@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 3,
+            "activePatchIndex": 4,
             "patches": [
                 {
                     "date": 1745880394978,
@@ -20,6 +20,10 @@
                 {
                     "date": 1746022505611,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -5,6 +5,8 @@\n router.use(\"/users\", require(\"./user.routes\"));\r\n router.use(\"/categories\", require(\"./category.routes\"));\r\n router.use(\"/category-types\", require(\"./categoryType.routes\"));\r\n router.use(\"/roles\", require(\"./role.routes\"));\r\n+router.use(\"/resources\", require(\"./resource.routes\"));\r\n+router.use(\"/resource-actions\", require(\"./resourceAction.routes\"));\r\n \r\n module.exports = router;\r\n"
+                },
+                {
+                    "date": 1746151639920,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -6,7 +6,7 @@\n router.use(\"/categories\", require(\"./category.routes\"));\r\n router.use(\"/category-types\", require(\"./categoryType.routes\"));\r\n router.use(\"/roles\", require(\"./role.routes\"));\r\n router.use(\"/resources\", require(\"./resource.routes\"));\r\n-router.use(\"/resource-actions\", require(\"./resourceAction.routes\"));\r\n+// router.use(\"/resource-actions\", require(\"./resourceAction.routes\"));\r\n \r\n module.exports = router;\r\n"
                 }
             ],
             "date": 1745880394978,

@@ -1,11 +1,13 @@
 const { ResourceAction, Resource, Permission } = require("../models");
 const ResponseUtil = require("../utils/response");
+const { Op } = require("sequelize");
 
 const resourceActionController = {
   // 创建资源操作
   async create(req, res) {
     try {
-      const { resourceId, ...actionData } = req.body;
+      const { resourceId } = req.params;
+      const actionData = req.body;
 
       // 检查资源是否存在
       const resource = await Resource.findByPk(resourceId);
@@ -39,19 +41,31 @@ const resourceActionController = {
 
       // 自动创建对应的权限
       const permission = await Permission.create({
-        name: `${action.code}_${resource.code}`,
-        code: `${action.code}_${resource.code}`,
+        name: `${resource.code}:${action.code}`,
+        code: `${resource.code}:${action.code}`,
         description: action.description,
         actionId: action.id,
         resourceId,
       });
 
+      const result = await ResourceAction.findByPk(action.id, {
+        include: [
+          {
+            model: Resource,
+            as: "resource",
+            attributes: ["id", "name", "code"],
+          },
+          {
+            model: Permission,
+            as: "permission",
+            attributes: ["id", "name", "code"],
+          },
+        ],
+      });
+
       res.status(201).json({
         success: true,
-        data: {
-          ...action.toJSON(),
-          permission: permission.toJSON(),
-        },
+        data: result,
       });
     } catch (error) {
       res.status(400).json({
@@ -64,11 +78,19 @@ const resourceActionController = {
   // 获取资源操作列表
   async list(req, res) {
     try {
-      const { resourceId } = req.query;
-      const where = resourceId ? { resourceId } : {};
+      const { resourceId } = req.params;
+
+      // 检查资源是否存在
+      const resource = await Resource.findByPk(resourceId);
+      if (!resource) {
+        return res.status(404).json({
+          success: false,
+          message: "Resource not found",
+        });
+      }
 
       const actions = await ResourceAction.findAll({
-        where,
+        where: { resourceId },
         include: [
           {
             model: Resource,
@@ -99,7 +121,13 @@ const resourceActionController = {
   // 获取单个资源操作
   async getById(req, res) {
     try {
-      const action = await ResourceAction.findByPk(req.params.id, {
+      const { resourceId, id } = req.params;
+
+      const action = await ResourceAction.findOne({
+        where: {
+          id,
+          resourceId,
+        },
         include: [
           {
             model: Resource,
@@ -136,10 +164,14 @@ const resourceActionController = {
   // 更新资源操作
   async update(req, res) {
     try {
-      const { id } = req.params;
-      const { resourceId, ...updateData } = req.body;
+      const { resourceId, id } = req.params;
+      const updateData = req.body;
 
-      const action = await ResourceAction.findByPk(id, {
+      const action = await ResourceAction.findOne({
+        where: {
+          id,
+          resourceId,
+        },
         include: [
           {
             model: Permission,
@@ -159,8 +191,9 @@ const resourceActionController = {
       if (updateData.code && updateData.code !== action.code) {
         const existingAction = await ResourceAction.findOne({
           where: {
-            resourceId: action.resourceId,
+            resourceId,
             code: updateData.code,
+            id: { [Op.ne]: id },
           },
         });
 
@@ -173,19 +206,35 @@ const resourceActionController = {
 
         // 更新对应的权限代码
         if (action.permission) {
-          const resource = await Resource.findByPk(action.resourceId);
+          const resource = await Resource.findByPk(resourceId);
           await action.permission.update({
-            name: `${updateData.code}_${resource.code}`,
-            code: `${updateData.code}_${resource.code}`,
+            name: `${resource.code}:${updateData.code}`,
+            code: `${resource.code}:${updateData.code}`,
+            description: updateData.description || action.description,
           });
         }
       }
 
       await action.update(updateData);
 
+      const result = await ResourceAction.findByPk(id, {
+        include: [
+          {
+            model: Resource,
+            as: "resource",
+            attributes: ["id", "name", "code"],
+          },
+          {
+            model: Permission,
+            as: "permission",
+            attributes: ["id", "name", "code"],
+          },
+        ],
+      });
+
       res.json({
         success: true,
-        data: action,
+        data: result,
       });
     } catch (error) {
       res.status(400).json({
@@ -198,7 +247,13 @@ const resourceActionController = {
   // 删除资源操作
   async delete(req, res) {
     try {
-      const action = await ResourceAction.findByPk(req.params.id, {
+      const { resourceId, id } = req.params;
+
+      const action = await ResourceAction.findOne({
+        where: {
+          id,
+          resourceId,
+        },
         include: [
           {
             model: Permission,

@@ -3,37 +3,37 @@ const router = express.Router();
 const resourceActionController = require("../controllers/resourceAction.controller");
 const { authJwt } = require("../middlewares");
 
-// 创建资源操作（修改为使用正确的权限格式）
+// 创建资源操作
 router.post(
-  "/",
+  "/:resourceId/actions",
   [authJwt.verifyToken, authJwt.hasPermission("system:resource:add")],
   resourceActionController.create
 );
 
-// 获取资源操作列表（修改为使用正确的权限格式）
+// 获取资源操作列表
 router.get(
-  "/",
+  "/:resourceId/actions",
   [authJwt.verifyToken, authJwt.hasPermission("system:resource:edit")],
   resourceActionController.list
 );
 
-// 获取单个资源操作（修改为使用正确的权限格式）
+// 获取单个资源操作
 router.get(
-  "/:id",
+  "/:resourceId/actions/:id",
   [authJwt.verifyToken, authJwt.hasPermission("system:resource:edit")],
   resourceActionController.getById
 );
 
-// 更新资源操作（修改为使用正确的权限格式）
+// 更新资源操作
 router.put(
-  "/:id",
+  "/:resourceId/actions/:id",
   [authJwt.verifyToken, authJwt.hasPermission("system:resource:edit")],
   resourceActionController.update
 );
 
-// 删除资源操作（修改为使用正确的权限格式）
+// 删除资源操作
 router.delete(
-  "/:id",
+  "/:resourceId/actions/:id",
   [authJwt.verifyToken, authJwt.hasPermission("system:resource:delete")],
   resourceActionController.delete
 );
