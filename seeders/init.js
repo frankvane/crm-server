@@ -304,8 +304,9 @@ module.exports = {
       await adminRole.setResources(allResources);
       await adminRole.setPermissions(allPermissions);
 
-      // 经理拥有用户管理和分类管理权限
+      // 经理拥有用户管理和分类管理权限和仪表盘
       const managerResources = [
+        dashboardResource,
         userResource,
         categoryMenu,
         categoryTypeResource,
@@ -323,8 +324,9 @@ module.exports = {
       });
       await managerRole.setPermissions(managerPermissions);
 
-      // 普通用户只有分类查看权限
+      // 普通用户只有分类查看权限和仪表盘
       const userResources = [
+        dashboardResource,
         categoryMenu,
         categoryTypeResource,
         categoryResource,
