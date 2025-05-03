@@ -449,6 +449,64 @@ exports.me = async (req, res, next) => {
       return res.status(404).json(ResponseUtil.error("User not found", 404));
     }
 
+    // 工具函数：将扁平资源数组转为树形结构
+    function buildResourceTree(resources) {
+      const idMap = {};
+      const tree = [];
+      resources.forEach((res) => {
+        idMap[res.id] = { ...res, children: [] };
+      });
+      resources.forEach((res) => {
+        const item = idMap[res.id];
+        if (res.parentId) {
+          if (idMap[res.parentId]) {
+            idMap[res.parentId].children.push(item);
+          }
+        } else {
+          tree.push(item);
+        }
+      });
+      return tree;
+    }
+
+    // 先收集所有资源（带parentId）
+    const flatResources = user.roles.reduce((acc, role) => {
+      role.resources.forEach((resource) => {
+        if (!acc.find((r) => r.id === resource.id)) {
+          acc.push({
+            id: resource.id,
+            name: resource.name,
+            code: resource.code,
+            type: resource.type,
+            path: resource.path,
+            component: resource.component,
+            meta: resource.meta,
+            parentId: resource.parentId, // 关键：要带parentId
+            icon: resource.icon,
+            actions: resource.actions.map((action) => ({
+              id: action.id,
+              name: action.name,
+              code: action.code,
+              icon: action.icon,
+              needConfirm: action.needConfirm,
+              confirmMessage: action.confirmMessage,
+              permission: action.permission
+                ? {
+                    id: action.permission.id,
+                    name: action.permission.name,
+                    code: action.permission.code,
+                  }
+                : null,
+            })),
+          });
+        }
+      });
+      return acc;
+    }, []);
+
+    // 组装树形结构
+    const resourceTree = buildResourceTree(flatResources);
+
     // 构建用户信息响应
     const response = {
       user: {
@@ -467,37 +525,7 @@ exports.me = async (req, res, next) => {
           code: permission.code,
         })),
       })),
-      resources: user.roles.reduce((acc, role) => {
-        role.resources.forEach((resource) => {
-          if (!acc.find((r) => r.id === resource.id)) {
-            acc.push({
-              id: resource.id,
-              name: resource.name,
-              code: resource.code,
-              type: resource.type,
-              path: resource.path,
-              component: resource.component,
-              meta: resource.meta,
-              actions: resource.actions.map((action) => ({
-                id: action.id,
-                name: action.name,
-                code: action.code,
-                icon: action.icon,
-                needConfirm: action.needConfirm,
-                confirmMessage: action.confirmMessage,
-                permission: action.permission
-                  ? {
-                      id: action.permission.id,
-                      name: action.permission.name,
-                      code: action.permission.code,
-                    }
-                  : null,
-              })),
-            });
-          }
-        });
-        return acc;
-      }, []),
+      resources: resourceTree,
     };
 
     res.json(ResponseUtil.success(response));

@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 5,
+            "activePatchIndex": 6,
             "patches": [
                 {
                     "date": 1746022475712,
@@ -28,6 +28,10 @@
                 {
                     "date": 1746190068077,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,8 +13,15 @@\n   [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:edit\")],\r\n   resourceController.tree\r\n );\r\n \r\n+// 获取资源树及其下所有按钮权限\r\n+router.get(\r\n+  \"/tree-with-actions\",\r\n+  [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:edit\")],\r\n+  resourceController.treeWithActions\r\n+);\r\n+\r\n // 创建资源（修改为使用正确的权限格式）\r\n router.post(\r\n   \"/\",\r\n   [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:add\")],\r\n"
+                },
+                {
+                    "date": 1746208308057,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,51 +9,51 @@\n \r\n // 获取资源树\r\n router.get(\r\n   \"/tree\",\r\n-  [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:edit\")],\r\n+  [authJwt.verifyToken, authJwt.hasPermission(\"permission:resources:edit\")],\r\n   resourceController.tree\r\n );\r\n \r\n // 获取资源树及其下所有按钮权限\r\n router.get(\r\n   \"/tree-with-actions\",\r\n-  [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:edit\")],\r\n+  [authJwt.verifyToken, authJwt.hasPermission(\"permission:resources:edit\")],\r\n   resourceController.treeWithActions\r\n );\r\n \r\n // 创建资源（修改为使用正确的权限格式）\r\n router.post(\r\n   \"/\",\r\n-  [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:add\")],\r\n+  [authJwt.verifyToken, authJwt.hasPermission(\"permission:resources:add\")],\r\n   resourceController.create\r\n );\r\n \r\n // 获取资源列表（由于没有view，使用edit权限）\r\n router.get(\r\n   \"/\",\r\n-  [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:edit\")],\r\n+  [authJwt.verifyToken, authJwt.hasPermission(\"permission:resources:edit\")],\r\n   resourceController.list\r\n );\r\n \r\n // 获取单个资源（由于没有view，使用edit权限）\r\n router.get(\r\n   \"/:id\",\r\n-  [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:edit\")],\r\n+  [authJwt.verifyToken, authJwt.hasPermission(\"permission:resources:edit\")],\r\n   resourceController.getById\r\n );\r\n \r\n // 更新资源\r\n router.put(\r\n   \"/:id\",\r\n-  [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:edit\")],\r\n+  [authJwt.verifyToken, authJwt.hasPermission(\"permission:resources:edit\")],\r\n   resourceController.update\r\n );\r\n \r\n // 删除资源\r\n router.delete(\r\n   \"/:id\",\r\n-  [authJwt.verifyToken, authJwt.hasPermission(\"system:resource:delete\")],\r\n+  [authJwt.verifyToken, authJwt.hasPermission(\"permission:resources:delete\")],\r\n   resourceController.delete\r\n );\r\n \r\n module.exports = router;\r\n"
                 }
             ],
             "date": 1746022475711,

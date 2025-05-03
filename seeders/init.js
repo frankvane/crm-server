@@ -19,51 +19,54 @@ module.exports = {
       console.log("数据库清理完成");
       console.log("开始创建核心初始数据...");
 
-      // 1. 先创建资源菜单
-      const system = await Resource.create({
-        name: "系统管理",
-        code: "system",
+      // 1. 先创建资源菜单（与前端路由完全一致，结构调整）
+
+      // 仪表盘（一级菜单）
+      const dashboardResource = await Resource.create({
+        name: "仪表盘",
+        code: "dashboard",
         type: "menu",
-        path: "/system",
-        component: "Layout",
+        path: "dashboard",
+        component: "/pages/dashboard",
+        icon: "dashboard",
+        hidden: false,
+        meta: JSON.stringify({
+          title: "仪表盘",
+          icon: "dashboard",
+          noCache: false,
+          link: null,
+        }),
+        description: "仪表盘页面",
+      });
+
+      // 权限管理（一级菜单）
+      const permissionMenu = await Resource.create({
+        name: "权限管理",
+        code: "permission",
+        type: "menu",
+        path: "permission",
+        component: "/layouts/BasicLayout",
         icon: "系统",
         hidden: false,
         redirect: "noRedirect",
         alwaysShow: true,
         meta: JSON.stringify({
-          title: "系统管理",
+          title: "权限管理",
           icon: "系统",
           noCache: false,
           link: null,
         }),
-        description: "系统管理模块",
+        description: "权限管理模块",
       });
 
-      const userResource = await Resource.create({
-        name: "用户管理",
-        code: "system:user",
-        type: "menu",
-        path: "user",
-        parentId: system.id,
-        component: "system/user/index",
-        icon: "#",
-        hidden: false,
-        meta: JSON.stringify({
-          title: "用户管理",
-          icon: "#",
-          noCache: false,
-          link: null,
-        }),
-        description: "用户管理菜单",
-      });
-
+      // 角色管理（permission子菜单）
       const roleResource = await Resource.create({
         name: "角色管理",
-        code: "system:role",
+        code: "permission:roles",
         type: "menu",
-        path: "role",
-        parentId: system.id,
-        component: "system/role/index",
+        path: "roles",
+        parentId: permissionMenu.id,
+        component: "/pages/permission/roles",
         icon: "#",
         hidden: false,
         meta: JSON.stringify({
@@ -75,13 +78,14 @@ module.exports = {
         description: "角色管理菜单",
       });
 
+      // 资源管理（permission子菜单）
       const resourceResource = await Resource.create({
         name: "资源管理",
-        code: "system:resource",
+        code: "permission:resources",
         type: "menu",
-        path: "resource",
-        parentId: system.id,
-        component: "system/resource/index",
+        path: "resources",
+        parentId: permissionMenu.id,
+        component: "/pages/permission/resources",
         icon: "#",
         hidden: false,
         meta: JSON.stringify({
@@ -93,12 +97,32 @@ module.exports = {
         description: "资源管理菜单",
       });
 
-      const category = await Resource.create({
+      // 用户管理（permission子菜单）
+      const userResource = await Resource.create({
+        name: "用户管理",
+        code: "permission:users",
+        type: "menu",
+        path: "users",
+        parentId: permissionMenu.id,
+        component: "/pages/permission/users",
+        icon: "#",
+        hidden: false,
+        meta: JSON.stringify({
+          title: "用户管理",
+          icon: "#",
+          noCache: false,
+          link: null,
+        }),
+        description: "用户管理菜单",
+      });
+
+      // 分类管理（一级菜单）
+      const categoryMenu = await Resource.create({
         name: "分类管理",
         code: "category",
         type: "menu",
-        path: "/category",
-        component: "Layout",
+        path: "category",
+        component: "/layouts/BasicLayout",
         icon: "分类",
         hidden: false,
         redirect: "noRedirect",
@@ -112,40 +136,42 @@ module.exports = {
         description: "分类管理模块",
       });
 
+      // 分类类型（category子菜单）
       const categoryTypeResource = await Resource.create({
-        name: "分类类型管理",
-        code: "category:type",
+        name: "分类类型",
+        code: "category:category-types",
         type: "menu",
-        path: "type",
-        parentId: category.id,
-        component: "category/type/index",
+        path: "category-types",
+        parentId: categoryMenu.id,
+        component: "/pages/category/category-types",
         icon: "#",
         hidden: false,
         meta: JSON.stringify({
-          title: "分类类型管理",
+          title: "分类类型",
           icon: "#",
           noCache: false,
           link: null,
         }),
-        description: "分类类型管理菜单",
+        description: "分类类型菜单",
       });
 
+      // 分类列表（category子菜单）
       const categoryResource = await Resource.create({
-        name: "分类管理",
-        code: "category:category",
+        name: "分类列表",
+        code: "category:categories",
         type: "menu",
-        path: "category",
-        parentId: category.id,
-        component: "category/category/index",
+        path: "categories",
+        parentId: categoryMenu.id,
+        component: "/pages/category/categories",
         icon: "#",
         hidden: false,
         meta: JSON.stringify({
-          title: "分类管理",
+          title: "分类列表",
           icon: "#",
           noCache: false,
           link: null,
         }),
-        description: "分类管理菜单",
+        description: "分类列表菜单",
       });
 
       // 2. 创建资源操作
@@ -280,7 +306,7 @@ module.exports = {
       // 经理拥有用户管理和分类管理权限
       const managerResources = [
         userResource,
-        category,
+        categoryMenu,
         categoryTypeResource,
         categoryResource,
       ];
@@ -289,21 +315,26 @@ module.exports = {
       const managerPermissions = allPermissions.filter((permission) => {
         const code = permission.code;
         return (
-          code.startsWith("system:user:") ||
-          code.startsWith("category:type:") ||
-          code.startsWith("category:category:")
+          code.startsWith("permission:users:") ||
+          code.startsWith("category:category-types:") ||
+          code.startsWith("category:categories:")
         );
       });
       await managerRole.setPermissions(managerPermissions);
 
       // 普通用户只有分类查看权限
-      const userResources = [category, categoryTypeResource, categoryResource];
+      const userResources = [
+        categoryMenu,
+        categoryTypeResource,
+        categoryResource,
+      ];
       await userRole.setResources(userResources);
       // 设置普通用户的权限
       const userPermissions = allPermissions.filter((permission) => {
         const code = permission.code;
         return (
-          code === "category:type:view" || code === "category:category:view"
+          code === "category:category-types:view" ||
+          code === "category:categories:view"
         );
       });
       await userRole.setPermissions(userPermissions);

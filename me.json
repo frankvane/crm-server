@@ -1,0 +1,469 @@
+{
+  "state": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTcsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlcyI6W3siaWQiOjE4LCJuYW1lIjoi566h55CG5ZGYIiwicGVybWlzc2lvbnMiOlsicGVybWlzc2lvbjp1c2VyczphZGQiLCJwZXJtaXNzaW9uOnVzZXJzOmVkaXQiLCJwZXJtaXNzaW9uOnVzZXJzOmRlbGV0ZSIsInBlcm1pc3Npb246dXNlcnM6ZXhwb3J0IiwicGVybWlzc2lvbjpyb2xlczphZGQiLCJwZXJtaXNzaW9uOnJvbGVzOmVkaXQiLCJwZXJtaXNzaW9uOnJvbGVzOmRlbGV0ZSIsInBlcm1pc3Npb246cm9sZXM6YXNzaWduIiwicGVybWlzc2lvbjpyZXNvdXJjZXM6YWRkIiwicGVybWlzc2lvbjpyZXNvdXJjZXM6ZWRpdCIsInBlcm1pc3Npb246cmVzb3VyY2VzOmRlbGV0ZSIsImNhdGVnb3J5OmNhdGVnb3J5LXR5cGVzOmFkZCIsImNhdGVnb3J5OmNhdGVnb3J5LXR5cGVzOmVkaXQiLCJjYXRlZ29yeTpjYXRlZ29yeS10eXBlczpkZWxldGUiLCJjYXRlZ29yeTpjYXRlZ29yeS10eXBlczp2aWV3IiwiY2F0ZWdvcnk6Y2F0ZWdvcmllczphZGQiLCJjYXRlZ29yeTpjYXRlZ29yaWVzOmVkaXQiLCJjYXRlZ29yeTpjYXRlZ29yaWVzOmRlbGV0ZSIsImNhdGVnb3J5OmNhdGVnb3JpZXM6dmlldyJdfV0sImlhdCI6MTc0NjIwMzA0MSwiZXhwIjoxNzQ2Mjg5NDQxfQ.QC5dQlmPqiII9w-vvhpTFTbGoMLVylr6Ur6hIqwMDTk",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTcsInVzZXJuYW1lIjoiYWRtaW4iLCJpYXQiOjE3NDYyMDMwNDEsImV4cCI6MTc0NjgwNzg0MX0.jhpsVuLXHZULiAfRYCAuVQI9318N1pf99coxmRRFQAo",
+    "user": {
+      "id": 17,
+      "username": "admin",
+      "email": "admin@example.com",
+      "status": 1
+    },
+    "roles": [
+      {
+        "id": 18,
+        "name": "管理员",
+        "code": "admin",
+        "permissions": [
+          {
+            "id": 105,
+            "name": "permission:users:add",
+            "code": "permission:users:add"
+          },
+          {
+            "id": 106,
+            "name": "permission:users:edit",
+            "code": "permission:users:edit"
+          },
+          {
+            "id": 107,
+            "name": "permission:users:delete",
+            "code": "permission:users:delete"
+          },
+          {
+            "id": 108,
+            "name": "permission:users:export",
+            "code": "permission:users:export"
+          },
+          {
+            "id": 109,
+            "name": "permission:roles:add",
+            "code": "permission:roles:add"
+          },
+          {
+            "id": 110,
+            "name": "permission:roles:edit",
+            "code": "permission:roles:edit"
+          },
+          {
+            "id": 111,
+            "name": "permission:roles:delete",
+            "code": "permission:roles:delete"
+          },
+          {
+            "id": 112,
+            "name": "permission:roles:assign",
+            "code": "permission:roles:assign"
+          },
+          {
+            "id": 113,
+            "name": "permission:resources:add",
+            "code": "permission:resources:add"
+          },
+          {
+            "id": 114,
+            "name": "permission:resources:edit",
+            "code": "permission:resources:edit"
+          },
+          {
+            "id": 115,
+            "name": "permission:resources:delete",
+            "code": "permission:resources:delete"
+          },
+          {
+            "id": 116,
+            "name": "category:category-types:add",
+            "code": "category:category-types:add"
+          },
+          {
+            "id": 117,
+            "name": "category:category-types:edit",
+            "code": "category:category-types:edit"
+          },
+          {
+            "id": 118,
+            "name": "category:category-types:delete",
+            "code": "category:category-types:delete"
+          },
+          {
+            "id": 119,
+            "name": "category:category-types:view",
+            "code": "category:category-types:view"
+          },
+          {
+            "id": 120,
+            "name": "category:categories:add",
+            "code": "category:categories:add"
+          },
+          {
+            "id": 121,
+            "name": "category:categories:edit",
+            "code": "category:categories:edit"
+          },
+          {
+            "id": 122,
+            "name": "category:categories:delete",
+            "code": "category:categories:delete"
+          },
+          {
+            "id": 123,
+            "name": "category:categories:view",
+            "code": "category:categories:view"
+          }
+        ]
+      }
+    ],
+    "resources": [
+      {
+        "id": 51,
+        "name": "仪表盘",
+        "code": "dashboard",
+        "type": "menu",
+        "path": "dashboard",
+        "component": "dashboard",
+        "meta": "{\"title\":\"仪表盘\",\"icon\":\"dashboard\",\"noCache\":false,\"link\":null}",
+        "parentId": null,
+        "actions": [],
+        "children": []
+      },
+      {
+        "id": 52,
+        "name": "权限管理",
+        "code": "permission",
+        "type": "menu",
+        "path": "permission",
+        "component": "Layout",
+        "meta": "{\"title\":\"权限管理\",\"icon\":\"系统\",\"noCache\":false,\"link\":null}",
+        "parentId": null,
+        "actions": [],
+        "children": [
+          {
+            "id": 53,
+            "name": "角色管理",
+            "code": "permission:roles",
+            "type": "menu",
+            "path": "roles",
+            "component": "permission/roles",
+            "meta": "{\"title\":\"角色管理\",\"icon\":\"#\",\"noCache\":false,\"link\":null}",
+            "parentId": 52,
+            "actions": [
+              {
+                "id": 109,
+                "name": "新增",
+                "code": "permission:roles:add",
+                "icon": null,
+                "needConfirm": false,
+                "confirmMessage": null,
+                "permission": {
+                  "id": 109,
+                  "name": "permission:roles:add",
+                  "code": "permission:roles:add"
+                }
+              },
+              {
+                "id": 110,
+                "name": "编辑",
+                "code": "permission:roles:edit",
+                "icon": null,
+                "needConfirm": false,
+                "confirmMessage": null,
+                "permission": {
+                  "id": 110,
+                  "name": "permission:roles:edit",
+                  "code": "permission:roles:edit"
+                }
+              },
+              {
+                "id": 111,
+                "name": "删除",
+                "code": "permission:roles:delete",
+                "icon": null,
+                "needConfirm": true,
+                "confirmMessage": "确定要删除该角色吗？",
+                "permission": {
+                  "id": 111,
+                  "name": "permission:roles:delete",
+                  "code": "permission:roles:delete"
+                }
+              },
+              {
+                "id": 112,
+                "name": "分配权限",
+                "code": "permission:roles:assign",
+                "icon": null,
+                "needConfirm": false,
+                "confirmMessage": null,
+                "permission": {
+                  "id": 112,
+                  "name": "permission:roles:assign",
+                  "code": "permission:roles:assign"
+                }
+              }
+            ],
+            "children": []
+          },
+          {
+            "id": 54,
+            "name": "资源管理",
+            "code": "permission:resources",
+            "type": "menu",
+            "path": "resources",
+            "component": "permission/resources",
+            "meta": "{\"title\":\"资源管理\",\"icon\":\"#\",\"noCache\":false,\"link\":null}",
+            "parentId": 52,
+            "actions": [
+              {
+                "id": 113,
+                "name": "新增",
+                "code": "permission:resources:add",
+                "icon": null,
+                "needConfirm": false,
+                "confirmMessage": null,
+                "permission": {
+                  "id": 113,
+                  "name": "permission:resources:add",
+                  "code": "permission:resources:add"
+                }
+              },
+              {
+                "id": 114,
+                "name": "编辑",
+                "code": "permission:resources:edit",
+                "icon": null,
+                "needConfirm": false,
+                "confirmMessage": null,
+                "permission": {
+                  "id": 114,
+                  "name": "permission:resources:edit",
+                  "code": "permission:resources:edit"
+                }
+              },
+              {
+                "id": 115,
+                "name": "删除",
+                "code": "permission:resources:delete",
+                "icon": null,
+                "needConfirm": true,
+                "confirmMessage": "确定要删除该资源吗？",
+                "permission": {
+                  "id": 115,
+                  "name": "permission:resources:delete",
+                  "code": "permission:resources:delete"
+                }
+              }
+            ],
+            "children": []
+          },
+          {
+            "id": 55,
+            "name": "用户管理",
+            "code": "permission:users",
+            "type": "menu",
+            "path": "users",
+            "component": "permission/users",
+            "meta": "{\"title\":\"用户管理\",\"icon\":\"#\",\"noCache\":false,\"link\":null}",
+            "parentId": 52,
+            "actions": [
+              {
+                "id": 105,
+                "name": "新增",
+                "code": "permission:users:add",
+                "icon": null,
+                "needConfirm": false,
+                "confirmMessage": null,
+                "permission": {
+                  "id": 105,
+                  "name": "permission:users:add",
+                  "code": "permission:users:add"
+                }
+              },
+              {
+                "id": 106,
+                "name": "编辑",
+                "code": "permission:users:edit",
+                "icon": null,
+                "needConfirm": false,
+                "confirmMessage": null,
+                "permission": {
+                  "id": 106,
+                  "name": "permission:users:edit",
+                  "code": "permission:users:edit"
+                }
+              },
+              {
+                "id": 107,
+                "name": "删除",
+                "code": "permission:users:delete",
+                "icon": null,
+                "needConfirm": true,
+                "confirmMessage": "确定要删除该用户吗？",
+                "permission": {
+                  "id": 107,
+                  "name": "permission:users:delete",
+                  "code": "permission:users:delete"
+                }
+              },
+              {
+                "id": 108,
+                "name": "导出",
+                "code": "permission:users:export",
+                "icon": null,
+                "needConfirm": false,
+                "confirmMessage": null,
+                "permission": {
+                  "id": 108,
+                  "name": "permission:users:export",
+                  "code": "permission:users:export"
+                }
+              }
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": 56,
+        "name": "分类管理",
+        "code": "category",
+        "type": "menu",
+        "path": "category",
+        "component": "Layout",
+        "meta": "{\"title\":\"分类管理\",\"icon\":\"分类\",\"noCache\":false,\"link\":null}",
+        "parentId": null,
+        "actions": [],
+        "children": [
+          {
+            "id": 57,
+            "name": "分类类型",
+            "code": "category:category-types",
+            "type": "menu",
+            "path": "category-types",
+            "component": "category/category-types",
+            "meta": "{\"title\":\"分类类型\",\"icon\":\"#\",\"noCache\":false,\"link\":null}",
+            "parentId": 56,
+            "actions": [
+              {
+                "id": 116,
+                "name": "新增",
+                "code": "category:category-types:add",
+                "icon": null,
+                "needConfirm": false,
+                "confirmMessage": null,
+                "permission": {
+                  "id": 116,
+                  "name": "category:category-types:add",
+                  "code": "category:category-types:add"
+                }
+              },
+              {
+                "id": 117,
+                "name": "编辑",
+                "code": "category:category-types:edit",
+                "icon": null,
+                "needConfirm": false,
+                "confirmMessage": null,
+                "permission": {
+                  "id": 117,
+                  "name": "category:category-types:edit",
+                  "code": "category:category-types:edit"
+                }
+              },
+              {
+                "id": 118,
+                "name": "删除",
+                "code": "category:category-types:delete",
+                "icon": null,
+                "needConfirm": true,
+                "confirmMessage": "确定要删除该分类类型吗？",
+                "permission": {
+                  "id": 118,
+                  "name": "category:category-types:delete",
+                  "code": "category:category-types:delete"
+                }
+              },
+              {
+                "id": 119,
+                "name": "查看",
+                "code": "category:category-types:view",
+                "icon": null,
+                "needConfirm": false,
+                "confirmMessage": null,
+                "permission": {
+                  "id": 119,
+                  "name": "category:category-types:view",
+                  "code": "category:category-types:view"
+                }
+              }
+            ],
+            "children": []
+          },
+          {
+            "id": 58,
+            "name": "分类列表",
+            "code": "category:categories",
+            "type": "menu",
+            "path": "categories",
+            "component": "category/categories",
+            "meta": "{\"title\":\"分类列表\",\"icon\":\"#\",\"noCache\":false,\"link\":null}",
+            "parentId": 56,
+            "actions": [
+              {
+                "id": 120,
+                "name": "新增",
+                "code": "category:categories:add",
+                "icon": null,
+                "needConfirm": false,
+                "confirmMessage": null,
+                "permission": {
+                  "id": 120,
+                  "name": "category:categories:add",
+                  "code": "category:categories:add"
+                }
+              },
+              {
+                "id": 121,
+                "name": "编辑",
+                "code": "category:categories:edit",
+                "icon": null,
+                "needConfirm": false,
+                "confirmMessage": null,
+                "permission": {
+                  "id": 121,
+                  "name": "category:categories:edit",
+                  "code": "category:categories:edit"
+                }
+              },
+              {
+                "id": 122,
+                "name": "删除",
+                "code": "category:categories:delete",
+                "icon": null,
+                "needConfirm": true,
+                "confirmMessage": "确定要删除该分类吗？",
+                "permission": {
+                  "id": 122,
+                  "name": "category:categories:delete",
+                  "code": "category:categories:delete"
+                }
+              },
+              {
+                "id": 123,
+                "name": "查看",
+                "code": "category:categories:view",
+                "icon": null,
+                "needConfirm": false,
+                "confirmMessage": null,
+                "permission": {
+                  "id": 123,
+                  "name": "category:categories:view",
+                  "code": "category:categories:view"
+                }
+              }
+            ],
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "version": 0
+}
