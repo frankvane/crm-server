@@ -127,3 +127,9 @@ EXEC sp_executesql @sql;
 -- 启用外键约束
 EXEC sp_MSforeachtable "ALTER TABLE ? WITH CHECK CHECK CONSTRAINT ALL"
 ```
+
+## 统计项目代码行数
+
+```bash
+sloc ./config ./controllers ./middlewares ./models ./routes ./services ./utils/ app.js
+```
