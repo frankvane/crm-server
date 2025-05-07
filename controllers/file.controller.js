@@ -6,7 +6,10 @@ const crypto = require("crypto");
 // 秒传确认
 exports.instantCheck = async (req, res) => {
   try {
-    const { file_id, md5 } = req.body;
+    const { file_id, md5, name, size } = req.body;
+    if (!file_id || !md5 || !name || !size) {
+      return res.json({ code: 400, message: "参数缺失", data: {} });
+    }
     const file = await File.findOne({ where: { file_id, md5, status: 1 } });
     if (file) {
       return res.json({
@@ -24,10 +27,17 @@ exports.instantCheck = async (req, res) => {
 // 状态查询
 exports.statusQuery = async (req, res) => {
   try {
-    const { file_id } = req.query;
+    const { file_id, md5 } = req.query;
+    if (!file_id || !md5) {
+      return res.json({ code: 400, message: "参数缺失", data: {} });
+    }
     const chunks = await FileChunk.findAll({ where: { file_id, status: 1 } });
-    const uploadedChunks = chunks.map((c) => c.chunk_index);
-    return res.json({ code: 200, message: "ok", data: { uploadedChunks } });
+    const chunkIndexes = chunks.map((c) => c.chunk_index);
+    return res.json({
+      code: 200,
+      message: "ok",
+      data: { chunks: chunkIndexes },
+    });
   } catch (err) {
     return res.json({ code: 500, message: err.message, data: {} });
   }
@@ -36,27 +46,18 @@ exports.statusQuery = async (req, res) => {
 // 分片上传
 exports.uploadChunk = async (req, res) => {
   try {
-    let { file_id, chunk_index, index, user_id } = req.body;
-    // 兼容前端 index 字段
-    if (chunk_index === undefined && index !== undefined) {
-      chunk_index = index;
-    }
-    // 兼容 user_id 缺失
-    if (!user_id) user_id = "test";
-    if (!file_id || chunk_index === undefined) {
+    let { file_id, index, user_id } = req.body;
+    if (!file_id || index === undefined) {
       return res.json({ code: 400, message: "参数缺失", data: {} });
     }
-    chunk_index = parseInt(chunk_index, 10);
-    if (isNaN(chunk_index)) {
-      return res.json({
-        code: 400,
-        message: "chunk_index必须为数字",
-        data: {},
-      });
+    index = parseInt(index, 10);
+    if (isNaN(index)) {
+      return res.json({ code: 400, message: "index必须为数字", data: {} });
     }
+    if (!user_id) user_id = "test";
     await FileChunk.upsert({
       file_id,
-      chunk_index,
+      chunk_index: index,
       status: 1,
       user_id,
       upload_time: new Date(),
@@ -71,11 +72,14 @@ exports.uploadChunk = async (req, res) => {
 exports.mergeChunks = async (req, res) => {
   const transaction = await File.sequelize.transaction();
   try {
-    const { file_id, file_name, size, user_id, md5, total_chunks } = req.body;
+    const { file_id, md5, name, size, total, user_id } = req.body;
+    if (!file_id || !md5 || !name || !size || !total) {
+      return res.json({ code: 400, message: "参数缺失", data: {} });
+    }
     const tmpDir = path.join(__dirname, "../tmp/upload");
-    const targetPath = path.join(__dirname, "../uploads", file_name);
+    const targetPath = path.join(__dirname, "../uploads", name);
     const writeStream = fs.createWriteStream(targetPath);
-    for (let i = 0; i < total_chunks; i++) {
+    for (let i = 0; i < total; i++) {
       const chunkPath = path.join(tmpDir, `${file_id}_${i}`);
       if (!fs.existsSync(chunkPath)) throw new Error(`分片${i}不存在`);
       await new Promise((resolve, reject) => {
@@ -92,7 +96,14 @@ exports.mergeChunks = async (req, res) => {
     const hash = crypto.createHash("md5").update(fileBuffer).digest("hex");
     if (hash !== md5) throw new Error("文件MD5校验失败");
     // 更新数据库
-    await File.upsert({ file_id, file_name, size, user_id, status: 1, md5 });
+    await File.upsert({
+      file_id,
+      file_name: name,
+      size,
+      user_id: user_id || "test",
+      status: 1,
+      md5,
+    });
     await FileChunk.update({ status: 2 }, { where: { file_id } }); // 标记分片已合并
     await transaction.commit();
     return res.json({ code: 200, message: "ok", data: {} });
