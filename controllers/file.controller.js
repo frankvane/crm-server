@@ -36,8 +36,18 @@ exports.statusQuery = async (req, res) => {
 // 分片上传
 exports.uploadChunk = async (req, res) => {
   try {
-    const { file_id, chunk_index, user_id } = req.body;
-    // 记录分片上传
+    let { file_id, chunk_index, user_id } = req.body;
+    if (!file_id || chunk_index === undefined || !user_id) {
+      return res.json({ code: 400, message: "参数缺失", data: {} });
+    }
+    chunk_index = parseInt(chunk_index, 10);
+    if (isNaN(chunk_index)) {
+      return res.json({
+        code: 400,
+        message: "chunk_index必须为数字",
+        data: {},
+      });
+    }
     await FileChunk.upsert({
       file_id,
       chunk_index,
