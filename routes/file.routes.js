@@ -7,7 +7,9 @@ const fs = require("fs");
 
 // 临时分片存储目录
 const tmpDir = path.join(__dirname, "../tmp/upload");
-if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+if (!fs.existsSync(tmpDir)) {
+  fs.mkdirSync(tmpDir, { recursive: true });
+}
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

@@ -262,3 +262,5 @@ git log --pretty=format:"%h|%cd|%s" --date=short --reverse > gitlog.txt && type 
 - feat: 分片上传接口兼容前端 index 字段为 chunk_index，user_id 缺失时自动填充默认值，前端无需改动即可上传。
 - refactor: file.controller.js 所有方法重构，所有参数严格以前端为准，字段名、校验、返回格式全部统一。
 - fix: 分片合并时自动创建 uploads 目录，解决因目录不存在导致的 ENOENT 错误。
+- fix: 分片上传和合并时自动创建 tmp/upload 目录，保证健壮性。
+- fix: 强化 routes/file.routes.js 中 multer 初始化前自动创建 tmp/upload 目录，彻底解决分片上传时目录不存在导致的 ENOENT 错误。
