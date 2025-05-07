@@ -44,6 +44,7 @@ module.exports = (sequelize) => {
       },
     },
     {
+      tableName: "categories",
       indexes: [
         {
           unique: true,

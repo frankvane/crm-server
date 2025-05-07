@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 5,
+            "activePatchIndex": 7,
             "patches": [
                 {
                     "date": 1745924977798,
@@ -28,6 +28,14 @@
                 {
                     "date": 1746057948559,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -19,13 +19,25 @@\n     actionId: {\r\n       type: DataTypes.INTEGER,\r\n       allowNull: true,\r\n       comment: \"关联的操作ID\",\r\n+      references: {\r\n+        model: \"ResourceActions\",\r\n+        key: \"id\",\r\n+      },\r\n+      onUpdate: \"CASCADE\",\r\n+      onDelete: \"SET NULL\",\r\n     },\r\n     resourceId: {\r\n       type: DataTypes.INTEGER,\r\n       allowNull: false,\r\n       comment: \"关联的资源ID\",\r\n+      references: {\r\n+        model: \"Resources\",\r\n+        key: \"id\",\r\n+      },\r\n+      onUpdate: \"CASCADE\",\r\n+      onDelete: \"CASCADE\",\r\n     },\r\n   });\r\n \r\n   Permission.associate = (models) => {\r\n"
+                },
+                {
+                    "date": 1746589090697,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -61,9 +61,9 @@\n \r\n     // 与角色的多对多关系\r\n     Permission.belongsToMany(models.Role, {\r\n       through: {\r\n-        model: \"RolePermissions\",\r\n+        model: \"role_permissions\",\r\n         unique: false,\r\n       },\r\n       foreignKey: \"permissionId\",\r\n       otherKey: \"roleId\",\r\n"
+                },
+                {
+                    "date": 1746589105648,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,9 +22,9 @@\n         type: DataTypes.INTEGER,\r\n         allowNull: true,\r\n         comment: \"关联的操作ID\",\r\n         references: {\r\n-          model: \"ResourceActions\",\r\n+          model: \"resource_actions\",\r\n           key: \"id\",\r\n         },\r\n         onUpdate: \"NO ACTION\",\r\n         onDelete: \"NO ACTION\",\r\n@@ -33,9 +33,9 @@\n         type: DataTypes.INTEGER,\r\n         allowNull: false,\r\n         comment: \"关联的资源ID\",\r\n         references: {\r\n-          model: \"Resources\",\r\n+          model: \"resources\",\r\n           key: \"id\",\r\n         },\r\n         onUpdate: \"NO ACTION\",\r\n         onDelete: \"NO ACTION\",\r\n"
                 }
             ],
             "date": 1745924977798,

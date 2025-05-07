@@ -28,13 +28,6 @@ const models = {
   CategoryType,
 };
 
-// 确保表名正确
-Object.values(models).forEach((model) => {
-  if (model && model.tableName) {
-    model.tableName = model.tableName.toLowerCase();
-  }
-});
-
 // 建立关联关系
 Object.values(models).forEach((model) => {
   if (model && typeof model.associate === "function") {

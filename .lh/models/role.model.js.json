@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 8,
+            "activePatchIndex": 9,
             "patches": [
                 {
                     "date": 1745924964063,
@@ -40,6 +40,10 @@
                 {
                     "date": 1746099011227,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,8 +17,16 @@\n       description: {\r\n         type: DataTypes.STRING,\r\n         allowNull: true,\r\n       },\r\n+      status: {\r\n+        type: DataTypes.INTEGER,\r\n+        allowNull: false,\r\n+        defaultValue: 1,\r\n+        validate: {\r\n+          isIn: [[0, 1]],\r\n+        },\r\n+      },\r\n     },\r\n     {\r\n       tableName: \"roles\",\r\n     }\r\n"
+                },
+                {
+                    "date": 1746589073853,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -34,9 +34,9 @@\n \r\n   Role.associate = (models) => {\r\n     Role.belongsToMany(models.User, {\r\n       through: {\r\n-        model: \"UserRoles\",\r\n+        model: \"user_roles\",\r\n         unique: false,\r\n       },\r\n       foreignKey: \"roleId\",\r\n       otherKey: \"userId\",\r\n@@ -44,9 +44,9 @@\n     });\r\n \r\n     Role.belongsToMany(models.Permission, {\r\n       through: {\r\n-        model: \"RolePermissions\",\r\n+        model: \"role_permissions\",\r\n         unique: false,\r\n       },\r\n       foreignKey: \"roleId\",\r\n       otherKey: \"permissionId\",\r\n@@ -54,9 +54,9 @@\n     });\r\n \r\n     Role.belongsToMany(models.Resource, {\r\n       through: {\r\n-        model: \"RoleResources\",\r\n+        model: \"role_resources\",\r\n         unique: false,\r\n       },\r\n       foreignKey: \"roleId\",\r\n       otherKey: \"resourceId\",\r\n"
                 }
             ],
             "date": 1745924964063,

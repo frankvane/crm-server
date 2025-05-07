@@ -37,7 +37,7 @@ module.exports = (sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: "Resources",
+          model: "resources",
           key: "id",
         },
         onUpdate: "NO ACTION",
@@ -45,7 +45,7 @@ module.exports = (sequelize) => {
       },
     },
     {
-      tableName: "resourceactions",
+      tableName: "resource_actions",
     }
   );
 

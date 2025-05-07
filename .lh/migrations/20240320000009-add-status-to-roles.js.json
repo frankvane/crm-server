@@ -3,11 +3,15 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 1,
             "patches": [
                 {
                     "date": 1746099178302,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1746588950366,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,16 +0,0 @@\n-\"use strict\";\r\n-\r\n-/** @type {import('sequelize-cli').Migration} */\r\n-module.exports = {\r\n-  async up(queryInterface, Sequelize) {\r\n-    await queryInterface.addColumn(\"roles\", \"status\", {\r\n-      type: Sequelize.INTEGER,\r\n-      allowNull: false,\r\n-      defaultValue: 1,\r\n-    });\r\n-  },\r\n-\r\n-  async down(queryInterface, Sequelize) {\r\n-    await queryInterface.removeColumn(\"roles\", \"status\");\r\n-  },\r\n-};\r\n\\ No newline at end of file\n"
                 }
             ],
             "date": 1746099178302,

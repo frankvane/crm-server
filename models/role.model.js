@@ -35,7 +35,7 @@ module.exports = (sequelize) => {
   Role.associate = (models) => {
     Role.belongsToMany(models.User, {
       through: {
-        model: "UserRoles",
+        model: "user_roles",
         unique: false,
       },
       foreignKey: "roleId",
@@ -45,7 +45,7 @@ module.exports = (sequelize) => {
 
     Role.belongsToMany(models.Permission, {
       through: {
-        model: "RolePermissions",
+        model: "role_permissions",
         unique: false,
       },
       foreignKey: "roleId",
@@ -55,7 +55,7 @@ module.exports = (sequelize) => {
 
     Role.belongsToMany(models.Resource, {
       through: {
-        model: "RoleResources",
+        model: "role_resources",
         unique: false,
       },
       foreignKey: "roleId",

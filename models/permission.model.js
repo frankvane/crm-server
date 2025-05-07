@@ -23,7 +23,7 @@ module.exports = (sequelize) => {
         allowNull: true,
         comment: "关联的操作ID",
         references: {
-          model: "ResourceActions",
+          model: "resource_actions",
           key: "id",
         },
         onUpdate: "NO ACTION",
@@ -34,7 +34,7 @@ module.exports = (sequelize) => {
         allowNull: false,
         comment: "关联的资源ID",
         references: {
-          model: "Resources",
+          model: "resources",
           key: "id",
         },
         onUpdate: "NO ACTION",
@@ -62,7 +62,7 @@ module.exports = (sequelize) => {
     // 与角色的多对多关系
     Permission.belongsToMany(models.Role, {
       through: {
-        model: "RolePermissions",
+        model: "role_permissions",
         unique: false,
       },
       foreignKey: "permissionId",

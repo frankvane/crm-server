@@ -8,7 +8,7 @@ module.exports = (sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: "Roles",
+          model: "roles",
           key: "id",
         },
       },
@@ -16,12 +16,13 @@ module.exports = (sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: "Resources",
+          model: "resources",
           key: "id",
         },
       },
     },
     {
+      tableName: "user_roles",
       timestamps: true,
     }
   );

@@ -30,6 +30,7 @@ module.exports = (sequelize) => {
       },
     },
     {
+      tableName: "category_types",
       indexes: [
         {
           unique: true,

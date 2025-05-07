@@ -3,11 +3,15 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 1,
             "patches": [
                 {
                     "date": 1746059002690,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1746588969319,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,88 +0,0 @@\n-\"use strict\";\r\n-\r\n-module.exports = {\r\n-  up: async (queryInterface, Sequelize) => {\r\n-    // 先检查表是否存在\r\n-    const tableExists = await queryInterface.sequelize.query(\r\n-      \"SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'ResourceActions'\"\r\n-    );\r\n-\r\n-    if (!tableExists[0].length) {\r\n-      await queryInterface.createTable(\"ResourceActions\", {\r\n-        id: {\r\n-          allowNull: false,\r\n-          autoIncrement: true,\r\n-          primaryKey: true,\r\n-          type: Sequelize.INTEGER,\r\n-        },\r\n-        name: {\r\n-          type: Sequelize.STRING,\r\n-          allowNull: false,\r\n-          comment: '操作名称，如\"添加\"、\"编辑\"',\r\n-        },\r\n-        code: {\r\n-          type: Sequelize.STRING,\r\n-          allowNull: false,\r\n-          comment: '操作代码，如\"add\"、\"edit\"、\"get\"',\r\n-          unique: true,\r\n-        },\r\n-        description: {\r\n-          type: Sequelize.STRING,\r\n-          allowNull: true,\r\n-          comment: \"操作描述\",\r\n-        },\r\n-        icon: {\r\n-          type: Sequelize.STRING,\r\n-          allowNull: true,\r\n-          comment: \"操作图标\",\r\n-        },\r\n-        sort: {\r\n-          type: Sequelize.INTEGER,\r\n-          allowNull: false,\r\n-          defaultValue: 0,\r\n-          comment: \"排序\",\r\n-        },\r\n-        needConfirm: {\r\n-          type: Sequelize.BOOLEAN,\r\n-          allowNull: false,\r\n-          defaultValue: false,\r\n-          comment: \"是否需要二次确认\",\r\n-        },\r\n-        confirmMessage: {\r\n-          type: Sequelize.STRING,\r\n-          allowNull: true,\r\n-          comment: \"确认提示信息\",\r\n-        },\r\n-        resourceId: {\r\n-          type: Sequelize.INTEGER,\r\n-          allowNull: false,\r\n-          comment: \"关联的资源ID\",\r\n-          references: {\r\n-            model: \"Resources\",\r\n-            key: \"id\",\r\n-          },\r\n-          onUpdate: \"NO ACTION\",\r\n-          onDelete: \"NO ACTION\",\r\n-        },\r\n-        createdAt: {\r\n-          allowNull: false,\r\n-          type: Sequelize.DATE,\r\n-        },\r\n-        updatedAt: {\r\n-          allowNull: false,\r\n-          type: Sequelize.DATE,\r\n-        },\r\n-      });\r\n-\r\n-      // 添加唯一索引，确保同一资源下操作代码不重复\r\n-      await queryInterface.addIndex(\"ResourceActions\", [\"resourceId\", \"code\"], {\r\n-        unique: true,\r\n-        name: \"resource_action_unique\",\r\n-      });\r\n-    }\r\n-  },\r\n-\r\n-  down: async (queryInterface, Sequelize) => {\r\n-    await queryInterface.dropTable(\"ResourceActions\");\r\n-  },\r\n-};\r\n\\ No newline at end of file\n"
                 }
             ],
             "date": 1746059002690,

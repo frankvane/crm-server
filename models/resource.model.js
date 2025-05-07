@@ -29,7 +29,7 @@ module.exports = (sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: true,
         references: {
-          model: "Resources",
+          model: "resources",
           key: "id",
         },
         onUpdate: "NO ACTION",
@@ -83,7 +83,7 @@ module.exports = (sequelize) => {
     // 与角色的多对多关系
     Resource.belongsToMany(models.Role, {
       through: {
-        model: "RoleResources",
+        model: "role_resources",
         unique: false,
       },
       foreignKey: "resourceId",

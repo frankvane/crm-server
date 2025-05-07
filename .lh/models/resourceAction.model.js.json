@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 5,
+            "activePatchIndex": 6,
             "patches": [
                 {
                     "date": 1746008161432,
@@ -28,6 +28,10 @@
                 {
                     "date": 1746059057176,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -42,8 +42,14 @@\n     resourceId: {\r\n       type: DataTypes.INTEGER,\r\n       allowNull: false,\r\n       comment: \"关联的资源ID\",\r\n+      references: {\r\n+        model: \"Resources\",\r\n+        key: \"id\",\r\n+      },\r\n+      onUpdate: \"CASCADE\",\r\n+      onDelete: \"CASCADE\",\r\n     },\r\n   });\r\n \r\n   ResourceAction.associate = (models) => {\r\n"
+                },
+                {
+                    "date": 1746589098594,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -36,17 +36,17 @@\n       resourceId: {\r\n         type: DataTypes.INTEGER,\r\n         allowNull: false,\r\n         references: {\r\n-          model: \"Resources\",\r\n+          model: \"resources\",\r\n           key: \"id\",\r\n         },\r\n         onUpdate: \"NO ACTION\",\r\n         onDelete: \"NO ACTION\",\r\n       },\r\n     },\r\n     {\r\n-      tableName: \"resourceactions\",\r\n+      tableName: \"resource_actions\",\r\n     }\r\n   );\r\n \r\n   ResourceAction.associate = (models) => {\r\n"
                 }
             ],
             "date": 1746008161432,

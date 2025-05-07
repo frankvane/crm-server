@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 10,
+            "activePatchIndex": 12,
             "patches": [
                 {
                     "date": 1745924938211,
@@ -48,6 +48,14 @@
                 {
                     "date": 1746025415055,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -10,8 +10,9 @@\n const Resource = require(\"./resource.model\")(sequelize);\n const ResourceAction = require(\"./resourceAction.model\")(sequelize);\n const RoleResource = require(\"./roleResource.model\")(sequelize);\n const RefreshToken = require(\"./refreshToken.model\")(sequelize);\n+const Category = require(\"./category.model\")(sequelize);\n const CategoryType = require(\"./categoryType.model\")(sequelize);\n \n // 统一调用 associate 方法\n const models = {\n@@ -22,8 +23,9 @@\n   Resource,\n   ResourceAction,\n   RoleResource,\n   RefreshToken,\n+  Category,\n   CategoryType,\n };\n Object.values(models).forEach((model) => {\n   if (model && typeof model.associate === \"function\") {\n"
+                },
+                {
+                    "date": 1746588766070,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -26,9 +26,18 @@\n   RefreshToken,\n   Category,\n   CategoryType,\n };\n+\n+// 确保表名正确\n Object.values(models).forEach((model) => {\n+  if (model && model.tableName) {\n+    model.tableName = model.tableName.toLowerCase();\n+  }\n+});\n+\n+// 建立关联关系\n+Object.values(models).forEach((model) => {\n   if (model && typeof model.associate === \"function\") {\n     model.associate(models);\n   }\n });\n"
+                },
+                {
+                    "date": 1746589129240,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -27,15 +27,8 @@\n   Category,\n   CategoryType,\n };\n \n-// 确保表名正确\n-Object.values(models).forEach((model) => {\n-  if (model && model.tableName) {\n-    model.tableName = model.tableName.toLowerCase();\n-  }\n-});\n-\n // 建立关联关系\n Object.values(models).forEach((model) => {\n   if (model && typeof model.associate === \"function\") {\n     model.associate(models);\n"
                 }
             ],
             "date": 1745924938211,

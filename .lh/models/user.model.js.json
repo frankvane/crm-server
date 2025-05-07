@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 3,
+            "activePatchIndex": 4,
             "patches": [
                 {
                     "date": 1745924951145,
@@ -20,6 +20,10 @@
                 {
                     "date": 1746013375960,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,32 +1,43 @@\n const { DataTypes } = require(\"sequelize\");\r\n const bcrypt = require(\"bcryptjs\");\r\n \r\n module.exports = (sequelize) => {\r\n-  const User = sequelize.define(\"User\", {\r\n-    username: {\r\n-      type: DataTypes.STRING,\r\n-      allowNull: false,\r\n-      unique: true,\r\n-    },\r\n-    password: {\r\n-      type: DataTypes.STRING,\r\n-      allowNull: false,\r\n-    },\r\n-    email: {\r\n-      type: DataTypes.STRING,\r\n-      allowNull: false,\r\n-      unique: true,\r\n-      validate: {\r\n-        isEmail: true,\r\n+  const User = sequelize.define(\r\n+    \"User\",\r\n+    {\r\n+      username: {\r\n+        type: DataTypes.STRING,\r\n+        allowNull: false,\r\n       },\r\n+      password: {\r\n+        type: DataTypes.STRING,\r\n+        allowNull: false,\r\n+      },\r\n+      email: {\r\n+        type: DataTypes.STRING,\r\n+        allowNull: true,\r\n+      },\r\n+      status: {\r\n+        type: DataTypes.INTEGER,\r\n+        allowNull: false,\r\n+        defaultValue: 1,\r\n+        validate: {\r\n+          isIn: [[0, 1]],\r\n+        },\r\n+      },\r\n     },\r\n-    status: {\r\n-      type: DataTypes.BOOLEAN,\r\n-      allowNull: false,\r\n-      defaultValue: true,\r\n-    },\r\n-  });\r\n+    {\r\n+      tableName: \"Users\",\r\n+      timestamps: true,\r\n+      indexes: [\r\n+        {\r\n+          unique: true,\r\n+          fields: [\"username\"],\r\n+        },\r\n+      ],\r\n+    }\r\n+  );\r\n \r\n   // 密码加密钩子\r\n   User.beforeCreate(async (user) => {\r\n     if (user.password) {\r\n@@ -39,6 +50,15 @@\n       user.password = await bcrypt.hash(user.password, 10);\r\n     }\r\n   });\r\n \r\n+  User.associate = (models) => {\r\n+    User.belongsToMany(models.Role, {\r\n+      through: \"UserRoles\",\r\n+      foreignKey: \"userId\",\r\n+      otherKey: \"roleId\",\r\n+      as: \"roles\",\r\n+    });\r\n+  };\r\n+\r\n   return User;\r\n };\r\n"
+                },
+                {
+                    "date": 1746589062732,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -70,9 +70,9 @@\n \r\n   User.associate = (models) => {\r\n     User.belongsToMany(models.Role, {\r\n       through: {\r\n-        model: \"UserRoles\",\r\n+        model: \"user_roles\",\r\n         unique: false,\r\n       },\r\n       foreignKey: \"userId\",\r\n       otherKey: \"roleId\",\r\n"
                 }
             ],
             "date": 1745924951145,
