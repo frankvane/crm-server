@@ -1,9 +1,9 @@
 {
-    "sourceFile": "update.md",
+    "sourceFile": "UPDATE.md",
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 10,
+            "activePatchIndex": 11,
             "patches": [
                 {
                     "date": 1746029212910,
@@ -48,6 +48,10 @@
                 {
                     "date": 1746099354055,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -21,8 +21,9 @@\n \r\n - 修复用户删除操作时的外键约束问题，添加事务支持确保数据一致性\r\n - 优化用户删除流程，先清理关联数据再删除用户记录\r\n - 修复角色控制器中 sequelize 导入错误\r\n+- 修复初始化脚本中角色创建缺少 status 字段的问题\r\n \r\n ### 优化/重构\r\n \r\n - 优化用户状态切换功能，添加事务支持确保数据一致性\r\n"
+                },
+                {
+                    "date": 1746601659888,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,13 @@\n # 更新日志（Changelog）\r\n \r\n 所有显著更改都将记录在此文件中。格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)。\r\n \r\n+## 2024-06-10\r\n+\r\n+- fix: 权限（permissions）内容已自动修正为与 seeders-old/init.js 完全一致，所有 code、name、描述、actionId、resourceId 字段均与老系统同步，确保权限点无遗漏、无差异。\r\n+- fix: 权限生成逻辑已自动遍历所有 resource_action，动态生成所有权限。\r\n+\r\n ## 生成 gitlog.txt\r\n \r\n ```bash\r\n git log --pretty=format:\"%h|%cd|%s\" --date=short --reverse > gitlog.txt && type gitlog.txt\r\n"
                 }
             ],
             "date": 1746029212910,
