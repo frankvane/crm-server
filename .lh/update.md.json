@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 11,
+            "activePatchIndex": 12,
             "patches": [
                 {
                     "date": 1746029212910,
@@ -52,6 +52,10 @@
                 {
                     "date": 1746601659888,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,13 @@\n # 更新日志（Changelog）\r\n \r\n 所有显著更改都将记录在此文件中。格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)。\r\n \r\n+## 2024-06-10\r\n+\r\n+- fix: 权限（permissions）内容已自动修正为与 seeders-old/init.js 完全一致，所有 code、name、描述、actionId、resourceId 字段均与老系统同步，确保权限点无遗漏、无差异。\r\n+- fix: 权限生成逻辑已自动遍历所有 resource_action，动态生成所有权限。\r\n+\r\n ## 生成 gitlog.txt\r\n \r\n ```bash\r\n git log --pretty=format:\"%h|%cd|%s\" --date=short --reverse > gitlog.txt && type gitlog.txt\r\n"
+                },
+                {
+                    "date": 1746607059887,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -254,4 +254,10 @@\n \r\n - 创建基础 README 文件\r\n - 添加项目描述\r\n - 添加安装说明\r\n+\r\n+## [2025-05-07]\r\n+\r\n+- fix: 修复分片存储命名规则，严格使用 index 字段，解决合并时报分片不存在和合并后文件为 0KB 的问题。\r\n+- feat: 分片上传接口兼容前端 index 字段为 chunk_index，user_id 缺失时自动填充默认值，前端无需改动即可上传。\r\n+- refactor: file.controller.js 所有方法重构，所有参数严格以前端为准，字段名、校验、返回格式全部统一。\r\n"
                 }
             ],
             "date": 1746029212910,

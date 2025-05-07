@@ -76,8 +76,11 @@ exports.mergeChunks = async (req, res) => {
     if (!file_id || !md5 || !name || !size || !total) {
       return res.json({ code: 400, message: "参数缺失", data: {} });
     }
-    const tmpDir = path.join(__dirname, "../tmp/upload");
-    const targetPath = path.join(__dirname, "../uploads", name);
+    const uploadsDir = path.join(__dirname, "../uploads");
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+    const targetPath = path.join(uploadsDir, name);
     const writeStream = fs.createWriteStream(targetPath);
     for (let i = 0; i < total; i++) {
       const chunkPath = path.join(tmpDir, `${file_id}_${i}`);
