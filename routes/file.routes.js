@@ -14,8 +14,8 @@ const storage = multer.diskStorage({
     cb(null, tmpDir);
   },
   filename: (req, file, cb) => {
-    const { file_id, chunk_index } = req.body;
-    cb(null, `${file_id}_${chunk_index}`);
+    const { file_id, index } = req.body;
+    cb(null, `${file_id}_${index}`);
   },
 });
 const upload = multer({ storage });
