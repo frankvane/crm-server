@@ -46,6 +46,10 @@ exports.statusQuery = async (req, res) => {
 // 分片上传
 exports.uploadChunk = async (req, res) => {
   try {
+    const tmpDir = path.join(__dirname, "../tmp/upload");
+    if (!fs.existsSync(tmpDir)) {
+      fs.mkdirSync(tmpDir, { recursive: true });
+    }
     let { file_id, index, user_id } = req.body;
     if (!file_id || index === undefined) {
       return res.json({ code: 400, message: "参数缺失", data: {} });
@@ -72,6 +76,10 @@ exports.uploadChunk = async (req, res) => {
 exports.mergeChunks = async (req, res) => {
   const transaction = await File.sequelize.transaction();
   try {
+    const tmpDir = path.join(__dirname, "../tmp/upload");
+    if (!fs.existsSync(tmpDir)) {
+      fs.mkdirSync(tmpDir, { recursive: true });
+    }
     const { file_id, md5, name, size, total, user_id } = req.body;
     if (!file_id || !md5 || !name || !size || !total) {
       return res.json({ code: 400, message: "参数缺失", data: {} });

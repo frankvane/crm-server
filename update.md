@@ -261,3 +261,4 @@ git log --pretty=format:"%h|%cd|%s" --date=short --reverse > gitlog.txt && type 
 - fix: 修复分片存储命名规则，严格使用 index 字段，解决合并时报分片不存在和合并后文件为 0KB 的问题。
 - feat: 分片上传接口兼容前端 index 字段为 chunk_index，user_id 缺失时自动填充默认值，前端无需改动即可上传。
 - refactor: file.controller.js 所有方法重构，所有参数严格以前端为准，字段名、校验、返回格式全部统一。
+- fix: 分片合并时自动创建 uploads 目录，解决因目录不存在导致的 ENOENT 错误。
