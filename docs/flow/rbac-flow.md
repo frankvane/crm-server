@@ -1,4 +1,4 @@
-# RBAC 权限流程说明
+# RBAC 权限流程说明（细化版）
 
 ## 1. 核心概念
 
@@ -6,7 +6,7 @@
 - **角色（Role）**：权限集合，定义一类用户的操作范围。
 - **权限（Permission）**：对资源的操作能力（如 `system:user:add`、`system:user:edit`）。
 - **资源（Resource）**：菜单、页面、功能点等，支持多级结构。
-- **资源操作（ResourceAction）**：按钮级操作（如新增、编辑、删除）。
+- **资源操作（ResourceAction）**：按钮级操作（如新增、编辑、删除），每个操作自动生成一个权限点。
 
 ## 2. 认证与鉴权流程
 
@@ -22,8 +22,12 @@ flowchart TD
 - 用户登录（/api/auth/login）返回 accessToken 和 refreshToken：
   ```json
   {
-    "accessToken": "...",
-    "refreshToken": "..."
+    "code": 200,
+    "message": "ok",
+    "data": {
+      "accessToken": "...",
+      "refreshToken": "..."
+    }
   }
   ```
 - 前端持有 accessToken 后，再调用用户信息接口（如 /api/users/me）获取：
@@ -34,9 +38,10 @@ flowchart TD
 
 ## 3. 角色-权限-资源分配关系
 
-- 一个用户可分配多个角色。
-- 一个角色可拥有多个权限、可见多个资源。
-- 权限与资源、资源操作可灵活配置，支持按钮级控制。
+- 一个用户可分配多个角色（user_roles 表）。
+- 一个角色可拥有多个权限（role_permissions 表）、可见多个资源（role_resources 表）。
+- 权限与资源操作一一对应，支持按钮级控制。
+- 资源支持多级结构，菜单、页面、按钮均为资源。
 
 ## 4. 前端路由与按钮权限控制建议
 
@@ -52,28 +57,48 @@ flowchart TD
 [用户] --登录--> [Token] --请求--> [后端认证] --RBAC校验--> [资源/接口/按钮]
 ```
 
-## 6. 前端开发接口交互建议
-
-- 登录后保存 Token，所有请求带上 Authorization 头。
-- 获取用户信息时一并返回角色清单、菜单资源、按钮权限。
-- 路由和按钮渲染均基于后端返回的权限数据，前端无需硬编码权限点。
-- 建议后端返回如下结构：
-
-```json
-{
-  "user": { "id": 1, "username": "admin", ... },
-  "roles": ["admin", "manager", "user"],
-  "routes": [ ... 菜单资源树 ... ],
-  "permissions": ["system:user:add", "system:user:edit", "system:user:delete", ...]
-}
-```
-
-## 7. 权限验证机制
+## 6. 权限验证机制
 
 - 系统使用中间件进行权限验证，位于 `middlewares/auth.js`。
 - 权限验证基于 JWT 令牌中的用户 ID，从数据库查询用户的角色及权限。
 - 权限格式必须严格匹配，如 `system:user:add`。
 - 管理员角色拥有所有系统权限。
+
+### 权限中间件伪代码
+
+```js
+// middlewares/auth.js
+module.exports = async function (req, res, next) {
+  const token = req.headers["authorization"];
+  const user = await verifyToken(token);
+  const permissions = await getUserPermissions(user.id);
+  if (!permissions.includes(req.requiredPermission)) {
+    return res.json({ code: 403, message: "无权限", data: {} });
+  }
+  next();
+};
+```
+
+## 7. 权限命名与资源编码规范
+
+- 权限命名：`system:user:add`、`system:user:edit`、`category:category:view` 等
+- 资源编码：`system:user`、`system:role`、`category:type` 等
+- 资源操作：`add`、`edit`、`delete`、`view` 等
+
+## 8. 典型接口返回结构
+
+```json
+{
+  "code": 200,
+  "message": "ok",
+  "data": {
+    "user": { "id": 1, "username": "admin", ... },
+    "roles": ["admin", "manager", "user"],
+    "routes": [ ... 菜单资源树 ... ],
+    "permissions": ["system:user:add", "system:user:edit", ...]
+  }
+}
+```
 
 ---
 

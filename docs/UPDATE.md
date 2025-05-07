@@ -2,6 +2,10 @@
 
 所有显著更改都将记录在此文件中。格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)。
 
+## 2024-06-11
+
+- 新增文件上传相关接口文档（docs/api/file.md），补全了秒传、状态查询、分片上传、分片合并等接口说明，所有接口返回格式统一为{code, message, data}。
+
 ## 2024-06-10
 
 - fix: 权限（permissions）内容已自动修正为与 seeders-old/init.js 完全一致，所有 code、name、描述、actionId、resourceId 字段均与老系统同步，确保权限点无遗漏、无差异。
