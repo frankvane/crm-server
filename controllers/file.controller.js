@@ -36,8 +36,14 @@ exports.statusQuery = async (req, res) => {
 // 分片上传
 exports.uploadChunk = async (req, res) => {
   try {
-    let { file_id, chunk_index, user_id } = req.body;
-    if (!file_id || chunk_index === undefined || !user_id) {
+    let { file_id, chunk_index, index, user_id } = req.body;
+    // 兼容前端 index 字段
+    if (chunk_index === undefined && index !== undefined) {
+      chunk_index = index;
+    }
+    // 兼容 user_id 缺失
+    if (!user_id) user_id = "test";
+    if (!file_id || chunk_index === undefined) {
       return res.json({ code: 400, message: "参数缺失", data: {} });
     }
     chunk_index = parseInt(chunk_index, 10);
