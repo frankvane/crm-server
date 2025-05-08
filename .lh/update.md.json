@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 16,
+            "activePatchIndex": 17,
             "patches": [
                 {
                     "date": 1746029212910,
@@ -72,6 +72,10 @@
                 {
                     "date": 1746687330637,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,1 +1,6 @@\n- \n\\ No newline at end of file\n+2024-06-09\r\n+\r\n+- feat: 秒传接口支持前端传递 chunk_md5s 并返回每个分片的 md5 校验结果\r\n+- feat: file_chunks 表和 FileChunk 模型增加 chunk_md5 字段用于存储分片 md5\r\n+- feat: 分片上传接口支持接收并存储 chunk_md5 字段\r\n+- docs: 文件上传接口文档补充 chunk_md5s 和 chunk_md5 字段说明\r\n"
+                },
+                {
+                    "date": 1746688362387,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,4 +3,5 @@\n - feat: 秒传接口支持前端传递 chunk_md5s 并返回每个分片的 md5 校验结果\r\n - feat: file_chunks 表和 FileChunk 模型增加 chunk_md5 字段用于存储分片 md5\r\n - feat: 分片上传接口支持接收并存储 chunk_md5 字段\r\n - docs: 文件上传接口文档补充 chunk_md5s 和 chunk_md5 字段说明\r\n+- perf: mergeChunks 方法优化，合并分片时校验每个分片 md5 并输出详细日志，遇到分片 md5 不一致时返回详细错误信息，便于排查问题\r\n"
                 }
             ],
             "date": 1746029212910,

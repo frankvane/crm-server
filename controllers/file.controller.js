@@ -109,9 +109,26 @@ exports.mergeChunks = async (req, res) => {
     }
     const targetPath = path.join(uploadsDir, name);
     const writeStream = fs.createWriteStream(targetPath);
+    // 校验每个分片的md5
+    const dbChunks = await FileChunk.findAll({ where: { file_id, status: 1 } });
     for (let i = 0; i < total; i++) {
       const chunkPath = path.join(tmpDir, `${file_id}_${i}`);
       if (!fs.existsSync(chunkPath)) throw new Error(`分片${i}不存在`);
+      const chunkBuffer = fs.readFileSync(chunkPath);
+      const chunkMd5 = crypto
+        .createHash("md5")
+        .update(chunkBuffer)
+        .digest("hex");
+      const dbChunk = dbChunks.find((c) => c.chunk_index === i);
+      if (!dbChunk) throw new Error(`数据库中未找到分片${i}`);
+      if (dbChunk.chunk_md5 && dbChunk.chunk_md5 !== chunkMd5) {
+        return res.json({
+          code: 500,
+          message: `分片${i}的MD5与数据库不一致`,
+          data: { index: i, db_md5: dbChunk.chunk_md5, real_md5: chunkMd5 },
+        });
+      }
+      console.log(`分片${i} 大小: ${chunkBuffer.length}, MD5: ${chunkMd5}`);
       await new Promise((resolve, reject) => {
         const readStream = fs.createReadStream(chunkPath);
         readStream.on("end", resolve);
@@ -124,6 +141,8 @@ exports.mergeChunks = async (req, res) => {
     // 校验MD5
     const fileBuffer = fs.readFileSync(targetPath);
     const hash = crypto.createHash("md5").update(fileBuffer).digest("hex");
+    console.log(`前端传入MD5: ${md5}`);
+    console.log(`合并后文件MD5: ${hash}`);
     if (hash !== md5) throw new Error("文件MD5校验失败");
     // 更新数据库
     await File.upsert({
