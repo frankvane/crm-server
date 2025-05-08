@@ -165,6 +165,93 @@ module.exports = {
         }),
         description: "分类列表菜单",
       });
+      // 商品订单主菜单及子菜单
+      const orderMenu = await Resource.create({
+        name: "商品订单",
+        code: "goods-order",
+        type: "menu",
+        path: "goods-order",
+        component: "/layouts/BasicLayout",
+        icon: "ShoppingCartOutlined",
+        hidden: false,
+        redirect: "noRedirect",
+        alwaysShow: true,
+        meta: JSON.stringify({
+          title: "商品订单",
+          icon: "ShoppingCartOutlined",
+          noCache: false,
+          link: null,
+        }),
+        description: "商品订单模块",
+      });
+      const albumResource = await Resource.create({
+        name: "相册管理",
+        code: "goods-order:albums",
+        type: "menu",
+        path: "albums",
+        parentId: orderMenu.id,
+        component: "/pages/goods-order/albums",
+        icon: "PictureOutlined",
+        hidden: false,
+        meta: JSON.stringify({
+          title: "相册管理",
+          icon: "PictureOutlined",
+          noCache: false,
+          link: null,
+        }),
+        description: "商品相册管理菜单",
+      });
+      const productResource = await Resource.create({
+        name: "产品管理",
+        code: "goods-order:products",
+        type: "menu",
+        path: "products",
+        parentId: orderMenu.id,
+        component: "/pages/goods-order/products",
+        icon: "GiftOutlined",
+        hidden: false,
+        meta: JSON.stringify({
+          title: "产品管理",
+          icon: "GiftOutlined",
+          noCache: false,
+          link: null,
+        }),
+        description: "商品产品管理菜单",
+      });
+      const orderResource = await Resource.create({
+        name: "订单管理",
+        code: "goods-order:orders",
+        type: "menu",
+        path: "orders",
+        parentId: orderMenu.id,
+        component: "/pages/goods-order/orders",
+        icon: "OrderedListOutlined",
+        hidden: false,
+        meta: JSON.stringify({
+          title: "订单管理",
+          icon: "OrderedListOutlined",
+          noCache: false,
+          link: null,
+        }),
+        description: "商品订单管理菜单",
+      });
+      const logisticsResource = await Resource.create({
+        name: "物流管理",
+        code: "goods-order:logistics",
+        type: "menu",
+        path: "logistics",
+        parentId: orderMenu.id,
+        component: "/pages/goods-order/logistics",
+        icon: "CarOutlined",
+        hidden: false,
+        meta: JSON.stringify({
+          title: "物流管理",
+          icon: "CarOutlined",
+          noCache: false,
+          link: null,
+        }),
+        description: "商品物流管理菜单",
+      });
 
       // 2. 创建资源操作和权限
       const createResourceActions = async (resource, actions) => {
@@ -257,6 +344,24 @@ module.exports = {
         },
         { name: "查看", code: "view", description: "查看分类" },
       ]);
+      // 商品订单相关操作
+      const commonActions = [
+        { name: "新增", code: "add", description: "新增" },
+        { name: "编辑", code: "edit", description: "编辑" },
+        {
+          name: "删除",
+          code: "delete",
+          description: "删除",
+          needConfirm: true,
+          confirmMessage: "确定要删除吗？",
+        },
+        { name: "查看", code: "view", description: "查看" },
+        { name: "导出", code: "export", description: "导出" },
+      ];
+      await createResourceActions(albumResource, commonActions);
+      await createResourceActions(productResource, commonActions);
+      await createResourceActions(orderResource, commonActions);
+      await createResourceActions(logisticsResource, commonActions);
       // 3. 创建角色
       const adminRole = await Role.create({
         name: "管理员",
@@ -290,6 +395,11 @@ module.exports = {
         categoryMenu,
         categoryTypeResource,
         categoryResource,
+        orderMenu,
+        albumResource,
+        productResource,
+        orderResource,
+        logisticsResource,
       ];
       await managerRole.setResources(managerResources);
       // 设置经理的权限
@@ -298,7 +408,11 @@ module.exports = {
         return (
           code.startsWith("permission:users:") ||
           code.startsWith("category:category-types:") ||
-          code.startsWith("category:categories:")
+          code.startsWith("category:categories:") ||
+          code.startsWith("goods-order:albums:") ||
+          code.startsWith("goods-order:products:") ||
+          code.startsWith("goods-order:orders:") ||
+          code.startsWith("goods-order:logistics:")
         );
       });
       await managerRole.setPermissions(managerPermissions);
@@ -308,6 +422,11 @@ module.exports = {
         categoryMenu,
         categoryTypeResource,
         categoryResource,
+        orderMenu,
+        albumResource,
+        productResource,
+        orderResource,
+        logisticsResource,
       ];
       await userRole.setResources(userResources);
       // 设置普通用户的权限
@@ -315,7 +434,11 @@ module.exports = {
         const code = permission.code;
         return (
           code === "category:category-types:view" ||
-          code === "category:categories:view"
+          code === "category:categories:view" ||
+          code === "goods-order:albums:view" ||
+          code === "goods-order:products:view" ||
+          code === "goods-order:orders:view" ||
+          code === "goods-order:logistics:view"
         );
       });
       await userRole.setPermissions(userPermissions);
