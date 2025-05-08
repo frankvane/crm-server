@@ -32,6 +32,11 @@ module.exports = {
         allowNull: false,
         defaultValue: Sequelize.NOW,
       },
+      chunk_md5: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        comment: "分片MD5",
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

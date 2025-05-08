@@ -31,6 +31,11 @@ module.exports = (sequelize) => {
         allowNull: false,
         defaultValue: DataTypes.NOW,
       },
+      chunk_md5: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: '分片MD5',
+      },
     },
     {
       tableName: "file_chunks",

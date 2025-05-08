@@ -10,7 +10,8 @@
     "file_id": "string", // 文件唯一ID
     "md5": "string", // 文件MD5
     "name": "string", // 文件名
-    "size": "number" // 文件大小
+    "size": "number", // 文件大小
+    "chunk_md5s": ["string"] // 分片MD5数组（可选，校验每个分片的md5）
   }
   ```
 - **响应**：
@@ -67,6 +68,7 @@
     - `index`：分片索引（数字）
     - `user_id`：用户 ID（可选）
     - `chunk`：分片文件（二进制）
+    - `chunk_md5`：分片 MD5（可选，建议传递）
 - **响应**：
   ```json
   { "code": 200, "message": "ok", "data": {} }

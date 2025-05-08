@@ -6,7 +6,7 @@ const crypto = require("crypto");
 // 秒传确认
 exports.instantCheck = async (req, res) => {
   try {
-    const { file_id, md5, name, size } = req.body;
+    const { file_id, md5, name, size, chunk_md5s } = req.body;
     if (!file_id || !md5 || !name || !size) {
       return res.json({ code: 400, message: "参数缺失", data: {} });
     }
@@ -18,7 +18,25 @@ exports.instantCheck = async (req, res) => {
         data: { uploaded: true, file },
       });
     }
-    return res.json({ code: 200, message: "ok", data: { uploaded: false } });
+    // 如果有 chunk_md5s，校验每个分片的md5
+    let chunkCheckResult = [];
+    if (Array.isArray(chunk_md5s) && chunk_md5s.length > 0) {
+      const chunks = await FileChunk.findAll({ where: { file_id, status: 1 } });
+      // 以索引为准，校验每个分片的md5
+      chunkCheckResult = chunk_md5s.map((md5, idx) => {
+        const chunk = chunks.find((c) => c.chunk_index === idx);
+        return {
+          index: idx,
+          exist: !!chunk,
+          match: chunk ? chunk.chunk_md5 === md5 : false,
+        };
+      });
+    }
+    return res.json({
+      code: 200,
+      message: "ok",
+      data: { uploaded: false, chunkCheckResult },
+    });
   } catch (err) {
     return res.json({ code: 500, message: err.message, data: {} });
   }
@@ -50,7 +68,7 @@ exports.uploadChunk = async (req, res) => {
     if (!fs.existsSync(tmpDir)) {
       fs.mkdirSync(tmpDir, { recursive: true });
     }
-    let { file_id, index, user_id } = req.body;
+    let { file_id, index, user_id, chunk_md5 } = req.body;
     if (!file_id || index === undefined) {
       return res.json({ code: 400, message: "参数缺失", data: {} });
     }
@@ -65,6 +83,7 @@ exports.uploadChunk = async (req, res) => {
       status: 1,
       user_id,
       upload_time: new Date(),
+      chunk_md5,
     });
     return res.json({ code: 200, message: "ok", data: {} });
   } catch (err) {
