@@ -133,3 +133,15 @@ EXEC sp_MSforeachtable "ALTER TABLE ? WITH CHECK CHECK CONSTRAINT ALL"
 ```bash
 sloc ./config ./controllers ./middlewares ./models ./routes ./services ./utils/ app.js
 ```
+
+## Sox
+
+需要安装 sox 工具，并且需要添加环境变量
+
+## vosk-api
+
+需要将 https://alphacephei.com/vosk/models 语音模型下载解压到 model 目录下
+
+## ffmpeg
+
+需要安装 ffmpeg 工具，并且需要添加环境变量

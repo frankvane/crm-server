@@ -10,6 +10,8 @@ const path = require("path");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const Sequelize = require("sequelize");
+const speechRoutes = require("./routes/speech.routes");
+const voskModel = require("./services/voskModel");
 
 const app = express();
 
@@ -21,6 +23,7 @@ app.use(morgan("dev"));
 
 // 配置路由
 app.use("/api", routes);
+app.use("/api/speech", speechRoutes);
 
 // 错误处理中间件
 app.use((err, req, res, next) => {
@@ -95,6 +98,9 @@ async function bootstrap() {
   try {
     // 初始化数据库
     await initializeDatabase();
+
+    // 预加载 vosk 语音模型
+    await voskModel.loadModel();
 
     // 只在非测试环境下显示启动信息
     if (process.env.NODE_ENV !== "test") {
