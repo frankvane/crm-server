@@ -9,31 +9,6 @@ const openai = new OpenAI({
   apiKey: "sk-2f64147b603644059393aec63cdd03c0",
 });
 
-function filterDeepseekOutput(text) {
-  // 过滤掉“修改说明”或“优化说明”等开头的内容，只保留正文
-  if (!text) return "";
-  // 常见的开头
-  const patterns = [
-    /^修改说明[:：\s]*/i,
-    /^优化说明[:：\s]*/i,
-    /^润色说明[:：\s]*/i,
-    /^处理结果[:：\s]*/i,
-    /^原文[:：\s]*/i,
-    /^识别结果[:：\s]*/i,
-  ];
-  let filtered = text.trim();
-  for (const pattern of patterns) {
-    filtered = filtered.replace(pattern, "");
-  }
-  // 如果还有多余的“\n”分隔，取最后一段
-  if (filtered.includes("\n")) {
-    const lines = filtered.split("\n").filter((l) => l.trim());
-    // 取最后一段非空内容
-    filtered = lines[lines.length - 1];
-  }
-  return filtered.trim();
-}
-
 exports.recognizeWav = async (req, res) => {
   try {
     let { wavPath } = req.body;
@@ -75,10 +50,10 @@ exports.recognizeWav = async (req, res) => {
       return res.status(result.code === 200 ? 400 : result.code).json(result);
     }
 
-    // 2. 用 deepseek API 进行润色（加标点、语句通顺和英文谐音词还原，但不随意修改内容）
-    const prompt = `请帮我对下面的中文语音识别文本加上合适的标点符号，并根据上下文将明显的英文谐音词（如“瑞安”还原为“React”）自动还原为正确的英文单词，但不要随意修改其它内容，只做标点、语句和英文词还原优化：\n${result.data.text}`;
+    // 2. 用 deepseek API 进行润色（只输出优化后的文本内容，不输出任何说明性内容）
+    const prompt = `请帮我对下面的中文语音识别文本加上合适的标点符号，并根据上下文将明显的英文谐音词（如“瑞安”还原为“React”）自动还原为正确的英文单词。请直接输出优化后的文本内容，不要输出任何修改说明、优化说明、润色说明等说明性内容，也不要输出原文。只输出最终优化后的文本：\n${result.data.text}`;
     const systemPrompt =
-      "你是一个语音识别文本优化助手，只做标点、语句通顺和英文谐音词还原，不随意修改其它内容。";
+      "你是一个语音识别文本优化助手，只做标点、语句通顺和英文谐音词还原，不随意修改其它内容。只输出最终优化后的文本，不要输出任何说明性内容。";
     let finalText = result.data.text;
     try {
       const completion = await openai.chat.completions.create({
@@ -89,7 +64,6 @@ exports.recognizeWav = async (req, res) => {
         model: "deepseek-chat",
       });
       finalText = completion.choices[0]?.message?.content?.trim() || finalText;
-      finalText = filterDeepseekOutput(finalText);
     } catch (e) {
       // deepseek 失败时返回原始识别内容
     }
