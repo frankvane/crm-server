@@ -8,5 +8,6 @@ router.use("/category-types", require("./categoryType.routes"));
 router.use("/roles", require("./role.routes"));
 router.use("/resources", require("./resource.routes"));
 router.use(require("./file.routes"));
+router.use(require("./chat.routes"));
 
 module.exports = router;

@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 6,
+            "activePatchIndex": 7,
             "patches": [
                 {
                     "date": 1745880394978,
@@ -32,6 +32,10 @@
                 {
                     "date": 1746603504887,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -6,6 +6,7 @@\n router.use(\"/categories\", require(\"./category.routes\"));\r\n router.use(\"/category-types\", require(\"./categoryType.routes\"));\r\n router.use(\"/roles\", require(\"./role.routes\"));\r\n router.use(\"/resources\", require(\"./resource.routes\"));\r\n+router.use(require(\"./file.routes\"));\r\n \r\n module.exports = router;\r\n"
+                },
+                {
+                    "date": 1746771702201,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -7,6 +7,7 @@\n router.use(\"/category-types\", require(\"./categoryType.routes\"));\r\n router.use(\"/roles\", require(\"./role.routes\"));\r\n router.use(\"/resources\", require(\"./resource.routes\"));\r\n router.use(require(\"./file.routes\"));\r\n+router.use(require(\"./chat.routes\"));\r\n \r\n module.exports = router;\r\n"
                 }
             ],
             "date": 1745880394978,
