@@ -99,8 +99,10 @@ async function bootstrap() {
     // 初始化数据库
     await initializeDatabase();
 
-    // 预加载 vosk 语音模型
-    await voskModel.loadModel();
+    // 仅在 VOSK_ENABLED=true 时加载 vosk 语音模型
+    if (process.env.VOSK_ENABLED === "true") {
+      await voskModel.loadModel();
+    }
 
     // 只在非测试环境下显示启动信息
     if (process.env.NODE_ENV !== "test") {
