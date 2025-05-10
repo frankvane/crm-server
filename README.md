@@ -145,3 +145,5 @@ sloc ./config ./controllers ./middlewares ./models ./routes ./services ./utils/ 
 ## ffmpeg
 
 需要安装 ffmpeg 工具，并且需要添加环境变量
+
+## 可以利用 vosk-api 实现语音识别，将语音文件转换为文本，并且将文本保存到数据库中
