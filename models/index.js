@@ -15,6 +15,8 @@ const Category = require("./category.model")(sequelize);
 const CategoryType = require("./categoryType.model")(sequelize);
 const File = require("./file.model")(sequelize);
 const FileChunk = require("./fileChunk.model")(sequelize);
+const Product = require("./product.model")(sequelize);
+const Comment = require("./comment.model")(sequelize);
 
 // 统一调用 associate 方法
 const models = {
@@ -30,6 +32,8 @@ const models = {
   CategoryType,
   File,
   FileChunk,
+  Product,
+  Comment,
 };
 
 // 建立关联关系

@@ -2,6 +2,8 @@ const { File, FileChunk } = require("../models");
 const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
+const { fileTypeFromFile } = require("file-type");
+const { generateThumbnail } = require("../utils/thumbnail");
 
 // 秒传确认
 exports.instantCheck = async (req, res) => {
@@ -99,7 +101,7 @@ exports.mergeChunks = async (req, res) => {
     if (!fs.existsSync(tmpDir)) {
       fs.mkdirSync(tmpDir, { recursive: true });
     }
-    const { file_id, md5, name, size, total, user_id } = req.body;
+    const { file_id, md5, name, size, total, user_id, category_id } = req.body;
     if (!file_id || !md5 || !name || !size || !total) {
       return res.json({ code: 400, message: "参数缺失", data: {} });
     }
@@ -145,6 +147,29 @@ exports.mergeChunks = async (req, res) => {
     console.log(`合并后文件MD5: ${hash}`);
     if (hash !== md5) throw new Error("文件MD5校验失败");
     // 更新数据库
+
+    // 读取文件类型
+    const getFileType = await fileTypeFromFile(targetPath);
+    const fileExt = getFileType.ext;
+    const fileType = getFileType.mime;
+    // 生成相对路径
+    const filePath = path.join("uploads", name);
+    let thumbnailPath = null;
+    // 生成缩略图
+    if (fileType && fileType.startsWith("image/")) {
+      const thumbName = name.replace(/(\.[^.]+)$/, "_thumb$1");
+      thumbnailPath = path.join("uploads", thumbName);
+      try {
+        await generateThumbnail(targetPath, path.join(uploadsDir, thumbName), {
+          width: 200,
+          height: 200,
+        });
+      } catch (e) {
+        console.warn("生成缩略图失败:", e.message);
+        thumbnailPath = null;
+      }
+    }
+
     await File.upsert({
       file_id,
       file_name: name,
@@ -152,6 +177,11 @@ exports.mergeChunks = async (req, res) => {
       user_id: user_id || "test",
       status: 1,
       md5,
+      category_id: category_id || 1,
+      file_ext: fileExt,
+      file_type: fileType,
+      file_path: filePath,
+      thumbnail_path: thumbnailPath,
     });
     await FileChunk.update({ status: 2 }, { where: { file_id } }); // 标记分片已合并
     await transaction.commit();
