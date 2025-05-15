@@ -29,6 +29,31 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      category_id: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+        comment: "分类id，关联category表",
+      },
+      file_ext: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: "文件后缀，如jpg、pdf等",
+      },
+      file_type: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: "文件类型，如image、video、document等",
+      },
+      file_path: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: "文件存储路径",
+      },
+      thumbnail_path: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: "缩略图路径",
+      },
     },
     {
       tableName: "files",

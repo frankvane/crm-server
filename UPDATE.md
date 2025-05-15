@@ -10,6 +10,11 @@
 
 - chore: 测试自动添加更新日志功能
 
+## 2024-06-09
+
+- 修复 Product 模型未在 models/index.js 中导出，导致 controllers/product.controller.js 中 Product 为 undefined，findAndCountAll 方法报错的问题。
+- 在 models/index.js 中补充导出 Comment 模型，解决相关依赖问题。
+
 2024-06-09
 
 - feat: 秒传接口支持前端传递 chunk_md5s 并返回每个分片的 md5 校验结果
