@@ -12,8 +12,13 @@ const bcrypt = require("bcryptjs");
 const Sequelize = require("sequelize");
 const speechRoutes = require("./routes/speech.routes");
 const voskModel = require("./services/voskModel");
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./swagger");
 
 const app = express();
+
+// 集成静态资源服务，支持apidoc.html等访问
+app.use(express.static("public"));
 
 // 配置中间件
 app.use(cors());
@@ -135,5 +140,12 @@ async function bootstrap() {
 
 // 启动应用
 bootstrap();
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// 提供原始 swagger json，供 RapiDoc 使用
+app.get("/swagger.json", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(swaggerSpec);
+});
 
 module.exports = app;
