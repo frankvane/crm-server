@@ -27,6 +27,8 @@
     "openai": "^4.98.0",
     "sequelize": "^6.37.1",
     "sharp": "^0.34.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "tedious": "^16.0.1",
     "vosk": "^0.3.39"
   },
