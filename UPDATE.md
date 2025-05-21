@@ -1,3 +1,27 @@
+2025-05-21 17:01:00 更新内容：
+1. 完善医患管理模块的接口文档
+2. 创建医疗记录(病例)的完整API文档
+3. 在 models/index.js 中注册 Patient 和 MedicalRecord 模型
+4. 在 routes/index.js 中注册患者和医疗记录路由
+
+2025-05-21 16:39:00 更新内容：
+1. 完成产品模块API的问题修复和验证
+2. 完善产品模型的字段定义和数据结构
+3. 新增评论功能的API设计和实现
+4. 优化项目目录结构
+
+## 2025-05-12 16:40:23
+
+- chore: 严格按照rules规则测试自动化日志流程
+
+## 2025-05-12 16:36:18
+
+- chore: 再次测试自动添加更新日志功能
+
+## 2025-05-12 16:34:30
+
+- chore: 测试自动添加更新日志功能
+
 ## 2024-06-09
 
 - 修复 Product 模型未在 models/index.js 中导出，导致 controllers/product.controller.js 中 Product 为 undefined，findAndCountAll 方法报错的问题。

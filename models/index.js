@@ -17,6 +17,8 @@ const File = require("./file.model")(sequelize);
 const FileChunk = require("./fileChunk.model")(sequelize);
 const Product = require("./product.model")(sequelize);
 const Comment = require("./comment.model")(sequelize);
+const Patient = require("./patient.model")(sequelize);
+const MedicalRecord = require("./medicalRecord.model")(sequelize);
 
 // 统一调用 associate 方法
 const models = {
@@ -34,6 +36,8 @@ const models = {
   FileChunk,
   Product,
   Comment,
+  Patient,
+  MedicalRecord,
 };
 
 // 建立关联关系

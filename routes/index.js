@@ -12,5 +12,7 @@ router.use(require("./chat.routes"));
 router.use(require("./speech.routes"));
 router.use("/product", require("./product.routes"));
 router.use("/comment", require("./comment.routes"));
+router.use("/patients", require("./patient.routes"));
+router.use("/medical-records", require("./medicalRecord.routes"));
 
 module.exports = router;
