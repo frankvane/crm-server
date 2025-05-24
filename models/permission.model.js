@@ -1,8 +1,75 @@
-module.exports = (sequelize, DataTypes) => {
-  return sequelize.define("Permission", {
-    name: { type: DataTypes.STRING, unique: true, allowNull: false },
-    action: { type: DataTypes.STRING, allowNull: false },
-    resource: { type: DataTypes.STRING, allowNull: false },
-    description: DataTypes.STRING,
-  });
+const { DataTypes } = require("sequelize");
+
+module.exports = (sequelize) => {
+  const Permission = sequelize.define(
+    "Permission",
+    {
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      code: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      description: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      actionId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        comment: "关联的操作ID",
+        references: {
+          model: "resource_actions",
+          key: "id",
+        },
+        onUpdate: "NO ACTION",
+        onDelete: "NO ACTION",
+      },
+      resourceId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        comment: "关联的资源ID",
+        references: {
+          model: "resources",
+          key: "id",
+        },
+        onUpdate: "NO ACTION",
+        onDelete: "NO ACTION",
+      },
+    },
+    {
+      tableName: "permissions",
+    }
+  );
+
+  Permission.associate = (models) => {
+    // 与资源的多对一关系
+    Permission.belongsTo(models.Resource, {
+      foreignKey: "resourceId",
+      as: "resource",
+    });
+
+    // 与操作的一对一关系
+    Permission.belongsTo(models.ResourceAction, {
+      foreignKey: "actionId",
+      as: "action",
+    });
+
+    // 与角色的多对多关系
+    Permission.belongsToMany(models.Role, {
+      through: {
+        model: "role_permissions",
+        unique: false,
+      },
+      foreignKey: "permissionId",
+      otherKey: "roleId",
+      as: "roles",
+    });
+  };
+
+  return Permission;
 };

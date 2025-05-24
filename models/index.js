@@ -1,30 +1,50 @@
-const Sequelize = require("sequelize");
-const dbConfig = require("../config/database");
-const sequelize = new Sequelize(dbConfig);
+const { Sequelize } = require("sequelize");
+const config = require("../config/database");
 
-const db = {};
-db.Sequelize = Sequelize;
-db.sequelize = sequelize;
+const sequelize = new Sequelize(config);
 
-db.User = require("./user.model")(sequelize, Sequelize.DataTypes);
-db.Role = require("./role.model")(sequelize, Sequelize.DataTypes);
-db.Permission = require("./permission.model")(sequelize, Sequelize.DataTypes);
-db.Category = require("./category.model")(sequelize, Sequelize.DataTypes);
-db.RefreshToken = require("./refreshToken.model")(
+// 导入模型定义
+const User = require("./user.model")(sequelize);
+const Role = require("./role.model")(sequelize);
+const Permission = require("./permission.model")(sequelize);
+const Resource = require("./resource.model")(sequelize);
+const ResourceAction = require("./resourceAction.model")(sequelize);
+const RoleResource = require("./roleResource.model")(sequelize);
+const RefreshToken = require("./refreshToken.model")(sequelize);
+const Category = require("./category.model")(sequelize);
+const CategoryType = require("./categoryType.model")(sequelize);
+const File = require("./file.model")(sequelize);
+const FileChunk = require("./fileChunk.model")(sequelize);
+const Product = require("./product.model")(sequelize);
+const Comment = require("./comment.model")(sequelize);
+const Patient = require("./patient.model")(sequelize);
+const MedicalRecord = require("./medicalRecord.model")(sequelize);
+
+// 统一调用 associate 方法
+const models = {
   sequelize,
-  Sequelize.DataTypes
-);
-db.TokenBlacklist = require("./tokenBlacklist.model")(
-  sequelize,
-  Sequelize.DataTypes
-);
+  User,
+  Role,
+  Permission,
+  Resource,
+  ResourceAction,
+  RoleResource,
+  RefreshToken,
+  Category,
+  CategoryType,
+  File,
+  FileChunk,
+  Product,
+  Comment,
+  Patient,
+  MedicalRecord,
+};
 
-db.User.belongsToMany(db.Role, { through: "UserRole" });
-db.Role.belongsToMany(db.User, { through: "UserRole" });
-db.Role.belongsToMany(db.Permission, { through: "RolePermission" });
-db.Permission.belongsToMany(db.Role, { through: "RolePermission" });
+// 建立关联关系
+Object.values(models).forEach((model) => {
+  if (model && typeof model.associate === "function") {
+    model.associate(models);
+  }
+});
 
-db.Category.hasMany(db.Category, { as: "children", foreignKey: "parentId" });
-db.Category.belongsTo(db.Category, { as: "parent", foreignKey: "parentId" });
-
-module.exports = db;
+module.exports = models;

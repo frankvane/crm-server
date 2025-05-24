@@ -9,6 +9,20 @@ module.exports = {
   dialectOptions: {
     options: {
       encrypt: false,
+      trustServerCertificate: true,
+      enableArithAbort: true,
+      validateBulkLoadParameters: true,
+      rowCollectionOnDone: true,
+      useUTC: false,
+      connectTimeout: 30000,
+      requestTimeout: 30000,
     },
   },
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000,
+  },
+  logging: false,
 };

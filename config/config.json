@@ -1,0 +1,83 @@
+{
+  "development": {
+    "username": "sa",
+    "password": "chinavane",
+    "database": "crm",
+    "host": "127.0.0.1",
+    "port": 1433,
+    "dialect": "mssql",
+    "dialectOptions": {
+      "options": {
+        "encrypt": false,
+        "trustServerCertificate": true,
+        "enableArithAbort": true,
+        "validateBulkLoadParameters": true,
+        "rowCollectionOnDone": true,
+        "useUTC": false,
+        "connectTimeout": 30000,
+        "requestTimeout": 30000,
+        "pool": {
+          "max": 5,
+          "min": 0,
+          "acquire": 30000,
+          "idle": 10000
+        }
+      }
+    },
+    "logging": false
+  },
+  "test": {
+    "username": "sa",
+    "password": "chinavane",
+    "database": "crm_test",
+    "host": "127.0.0.1",
+    "port": 1433,
+    "dialect": "mssql",
+    "dialectOptions": {
+      "options": {
+        "encrypt": false,
+        "trustServerCertificate": true,
+        "enableArithAbort": true,
+        "validateBulkLoadParameters": true,
+        "rowCollectionOnDone": true,
+        "useUTC": false,
+        "connectTimeout": 30000,
+        "requestTimeout": 30000,
+        "pool": {
+          "max": 5,
+          "min": 0,
+          "acquire": 30000,
+          "idle": 10000
+        }
+      }
+    },
+    "logging": false
+  },
+  "production": {
+    "username": "sa",
+    "password": "chinavane",
+    "database": "crm_prod",
+    "host": "127.0.0.1",
+    "port": 1433,
+    "dialect": "mssql",
+    "dialectOptions": {
+      "options": {
+        "encrypt": false,
+        "trustServerCertificate": true,
+        "enableArithAbort": true,
+        "validateBulkLoadParameters": true,
+        "rowCollectionOnDone": true,
+        "useUTC": false,
+        "connectTimeout": 30000,
+        "requestTimeout": 30000,
+        "pool": {
+          "max": 5,
+          "min": 0,
+          "acquire": 30000,
+          "idle": 10000
+        }
+      }
+    },
+    "logging": false
+  }
+}
