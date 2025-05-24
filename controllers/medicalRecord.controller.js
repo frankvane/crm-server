@@ -1,8 +1,7 @@
 const { MedicalRecord } = require("../models");
 const { Op } = require("sequelize");
 const ResponseUtil = require("../utils/response");
-// const crypto = require("crypto");
-// const privateKey = process.env.PRIVATE_KEY;
+
 // 创建病例
 exports.create = async (req, res) => {
   try {
