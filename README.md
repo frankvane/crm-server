@@ -29,6 +29,10 @@
    JWT_REFRESH_SECRET=your_refresh_secret
    ACCESS_TOKEN_EXPIRES_IN=1d
    REFRESH_TOKEN_EXPIRES_IN=7d
+   RSA_PRIVATE_KEY_PEM = `-----BEGIN RSA PRIVATE KEY-----
+   ......
+   -----END RSA PRIVATE KEY-----`
+
    ```
 3. 启动 SQL Server 并创建数据库
 

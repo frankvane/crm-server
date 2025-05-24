@@ -502,6 +502,24 @@ module.exports = {
           description: "药品储存条件分类，包括常温、冷藏等",
           status: 1,
         },
+        {
+          name:"产品分类",
+          code:"PRODUCTCLASSIFICATION",
+          description: "药品的分类，包括化学药品、抗生素、疫苗、预防药、抗肿瘤药等",
+          status:1,
+        },
+        {
+          name: "品牌",
+          code: "BRANDNAME",
+          description: "药品品牌",
+          status: 1,
+        },
+        {
+          name: "单位",
+          code: "UNIT",
+          description: "药品单位",
+          status: 1,
+        },
       ];
       const typeMap = {};
       for (const t of categoryTypes) {
