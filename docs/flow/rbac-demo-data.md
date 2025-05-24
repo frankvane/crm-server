@@ -1,31 +1,35 @@
-# RBAC DEMO 数据示例
+# RBAC DEMO 数据示例（细化版）
 
-本示例基于 seeders/init.js，便于前端开发模拟 RBAC 权限体系。
+本示例基于实际 models 结构和接口，便于前端开发模拟 RBAC 权限体系。
 
 ## 1. 角色（Role）
 
-| 角色名     | code    | 说明       |
-| ---------- | ------- | ---------- |
-| 管理员     | admin   | 系统管理员 |
-| 高级管理员 | manager | 高级管理员 |
-| 普通管理员 | user    | 普通管理员 |
+| id  | 角色名     | code    | 说明       |
+| --- | ---------- | ------- | ---------- |
+| 1   | 管理员     | admin   | 系统管理员 |
+| 2   | 高级管理员 | manager | 高级管理员 |
+| 3   | 普通管理员 | user    | 普通管理员 |
 
 ## 2. 权限（Permission）
 
-| name              | action | resource     | 描述         |
-| ----------------- | ------ | ------------ | ------------ |
-| create_user       | create | user         | 创建用户     |
-| view_users        | read   | user         | 查看用户     |
-| update_user       | update | user         | 更新用户     |
-| delete_user       | delete | user         | 删除用户     |
-| manage_roles      | manage | role         | 管理角色     |
-| view_roles        | read   | role         | 查看角色     |
-| manage_resources  | manage | resource     | 管理资源     |
-| view_resources    | read   | resource     | 查看资源     |
-| manage_categories | manage | categoryType | 管理分类类型 |
-| view_categories   | read   | categoryType | 查看分类类型 |
-| manage_category   | manage | category     | 管理分类     |
-| view_category     | read   | category     | 查看分类     |
+| id  | name         | code                     | 描述         |
+| --- | ------------ | ------------------------ | ------------ |
+| 1   | 创建用户     | system:user:add          | 创建用户     |
+| 2   | 查看用户     | system:user:view         | 查看用户     |
+| 3   | 编辑用户     | system:user:edit         | 编辑用户     |
+| 4   | 删除用户     | system:user:delete       | 删除用户     |
+| 5   | 分配角色权限 | system:role:assign       | 分配角色权限 |
+| 6   | 创建角色     | system:role:add          | 创建角色     |
+| 7   | 编辑角色     | system:role:edit         | 编辑角色     |
+| 8   | 删除角色     | system:role:delete       | 删除角色     |
+| 9   | 创建资源     | system:resource:add      | 创建资源     |
+| 10  | 编辑资源     | system:resource:edit     | 编辑资源     |
+| 11  | 删除资源     | system:resource:delete   | 删除资源     |
+| 12  | 查看资源     | system:resource:view     | 查看资源     |
+| 13  | 管理分类类型 | category:type:manage     | 分类类型管理 |
+| 14  | 查看分类类型 | category:type:view       | 查看分类类型 |
+| 15  | 管理分类     | category:category:manage | 分类管理     |
+| 16  | 查看分类     | category:category:view   | 查看分类     |
 
 ## 3. 资源菜单（Resource）
 
@@ -39,31 +43,44 @@
 
 ## 4. 按钮级操作（ResourceAction）
 
-| name | code   | 说明     |
-| ---- | ------ | -------- |
-| 新增 | add    | 新增操作 |
-| 编辑 | edit   | 编辑操作 |
-| 删除 | delete | 删除操作 |
+| id  | name | code   | resourceId | 说明     |
+| --- | ---- | ------ | ---------- | -------- |
+| 1   | 新增 | add    | 2          | 新增操作 |
+| 2   | 编辑 | edit   | 2          | 编辑操作 |
+| 3   | 删除 | delete | 2          | 删除操作 |
+| 4   | 查看 | view   | 2          | 查看操作 |
 
 ## 5. 角色-权限分配
 
-- 管理员（admin）：拥有所有权限
-- 高级管理员（manager）：仅有分类类型和分类管理的增删改查
-- 普通管理员（user）：仅有分类管理-查
+| 角色 code | 权限 code（部分）                                                                          |
+| --------- | ------------------------------------------------------------------------------------------ |
+| admin     | 所有权限                                                                                   |
+| manager   | category:type:manage, category:type:view, category:category:manage, category:category:view |
+| user      | category:category:view                                                                     |
 
 ## 6. 角色-菜单可见性
 
-- 管理员：所有菜单
-- 高级管理员：仅分类管理、分类类型管理、分类管理菜单
-- 普通管理员：仅分类管理、分类管理菜单
+| 角色 code | 可见菜单资源 code                |
+| --------- | -------------------------------- |
+| admin     | 所有菜单                         |
+| manager   | category:type, category:category |
+| user      | category:category                |
 
 ## 7. 用户（User）
 
-| 用户名  | 密码       | 角色       |
-| ------- | ---------- | ---------- |
-| admin   | admin123   | 管理员     |
-| manager | manager123 | 高级管理员 |
-| user    | user123    | 普通管理员 |
+| id  | 用户名  | 密码       | 角色 code |
+| --- | ------- | ---------- | --------- |
+| 1   | admin   | admin123   | admin     |
+| 2   | manager | manager123 | manager   |
+| 3   | user    | user123    | user      |
+
+## 8. 角色-权限-资源-操作关系示例
+
+| 角色  | 权限点                 | 菜单资源 | 按钮操作   |
+| ----- | ---------------------- | -------- | ---------- |
+| admin | system:user:add        | 用户管理 | 新增、编辑 |
+| admin | system:role:assign     | 角色管理 | 分配权限   |
+| user  | category:category:view | 分类管理 | 查看       |
 
 ---
 

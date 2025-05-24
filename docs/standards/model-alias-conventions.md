@@ -1,4 +1,4 @@
-# 模型关联别名命名规范
+# 模型关联别名命名规范（细化版）
 
 ## 核心原则
 
@@ -13,174 +13,206 @@
 - **命名规则**: 使用小写复数形式
 - **格式**: `模型名称的复数小写形式`
 - **示例**:
-  - `User -> Role`: `"roles"`
-  - `Role -> Permission`: `"permissions"`
-  - `Role -> Resource`: `"resources"`
-  - `Resource -> Role`: `"roles"`
-  - `Permission -> Role`: `"roles"`
+  - `User -> Role`: "roles"
+  - `Role -> Permission`: "permissions"
+  - `Role -> Resource`: "resources"
+  - `Resource -> Role`: "roles"
+  - `Permission -> Role`: "roles"
+  - `User -> Category`: "categories"（如有用户-分类收藏/关注等场景）
 
 ### 2. 一对多关联 (One-to-Many)
 
 - **命名规则**: 使用小写复数形式表示"多"的一方
 - **格式**: `模型名称的复数小写形式`
 - **示例**:
-  - `Resource -> ResourceAction`: `"actions"`
-  - `Resource -> Permission`: `"permissions"`
-  - `Resource -> Resource` (自引用): `"children"`
-  - `User -> RefreshToken`: `"refreshTokens"`
-  - `CategoryType -> Category`: `"categories"`
+  - `Resource -> ResourceAction`: "actions"
+  - `Resource -> Permission`: "permissions"
+  - `Resource -> Resource` (自引用): "children"
+  - `User -> RefreshToken`: "refreshTokens"
+  - `CategoryType -> Category`: "categories"
+  - `File -> FileChunk`: "chunks"
 
 ### 3. 多对一关联 (Many-to-One) 或一对一关联 (One-to-One)
 
 - **命名规则**: 使用小写单数形式
 - **格式**: `模型名称的单数小写形式`
 - **示例**:
-  - `Permission -> Resource`: `"resource"`
-  - `Permission -> ResourceAction`: `"action"`
-  - `ResourceAction -> Resource`: `"resource"`
-  - `ResourceAction -> Permission`: `"permission"`
-  - `Resource -> Resource` (自引用): `"parent"`
-  - `Category -> Category` (自引用): `"parent"`
-  - `Category -> CategoryType`: `"type"`
+  - `Permission -> Resource`: "resource"
+  - `Permission -> ResourceAction`: "action"
+  - `ResourceAction -> Resource`: "resource"
+  - `ResourceAction -> Permission`: "permission"
+  - `Resource -> Resource` (自引用): "parent"
+  - `Category -> Category` (自引用): "parent"
+  - `Category -> CategoryType`: "type"
+  - `FileChunk -> File`: "file"
 
-## 禁止的用法
+## 大文件分片相关模型别名
 
-1. **混用大小写**: 不应使用 `Roles`, `Permissions` 等首字母大写形式
-2. **不一致的复数/单数**: 同类关联必须保持一致的复数或单数形式
-3. **无意义的缩写**: 避免使用难以理解的缩写
+- `File` 一对多 `FileChunk`：`File.hasMany(FileChunk, { as: "chunks" })`
+- `FileChunk` 多对一 `File`：`FileChunk.belongsTo(File, { as: "file" })`
 
-## 代码示例
+## 分类相关模型别名
 
-### 正确示例
+- `CategoryType` 一对多 `Category`：`CategoryType.hasMany(Category, { as: "categories" })`
+- `Category` 多对一 `CategoryType`：`Category.belongsTo(CategoryType, { as: "type" })`
+- `Category` 自引用一对多：`Category.hasMany(Category, { as: "children", foreignKey: "parentId" })`
+- `Category` 自引用多对一：`Category.belongsTo(Category, { as: "parent", foreignKey: "parentId" })`
 
-```javascript
-// User 模型定义关联
+## 资源与权限相关模型别名
+
+- `Resource` 一对多 `ResourceAction`：`Resource.hasMany(ResourceAction, { as: "actions" })`
+- `ResourceAction` 多对一 `Resource`：`ResourceAction.belongsTo(Resource, { as: "resource" })`
+- `Resource` 一对多 `Permission`：`Resource.hasMany(Permission, { as: "permissions" })`
+- `Permission` 多对一 `Resource`：`Permission.belongsTo(Resource, { as: "resource" })`
+- `ResourceAction` 一对一 `Permission`：`ResourceAction.hasOne(Permission, { as: "permission" })`
+- `Permission` 多对一 `ResourceAction`：`Permission.belongsTo(ResourceAction, { as: "action" })`
+
+## 用户、角色、权限相关模型别名
+
+- `User` 多对多 `Role`：`User.belongsToMany(Role, { as: "roles", ... })`
+- `Role` 多对多 `User`：`Role.belongsToMany(User, { as: "users", ... })`
+- `Role` 多对多 `Permission`：`Role.belongsToMany(Permission, { as: "permissions", ... })`
+- `Permission` 多对多 `Role`：`Permission.belongsToMany(Role, { as: "roles", ... })`
+- `Role` 多对多 `Resource`：`Role.belongsToMany(Resource, { as: "resources", ... })`
+- `Resource` 多对多 `Role`：`Resource.belongsToMany(Role, { as: "roles", ... })`
+- `User` 一对多 `RefreshToken`：`User.hasMany(RefreshToken, { as: "refreshTokens" })`
+
+## 表结构字段示例
+
+```js
+// FileChunk
+{
+  id: INTEGER,
+  file_id: STRING, // 外键，关联File
+  chunk_index: INTEGER,
+  ...
+}
+
+// Category
+{
+  id: INTEGER,
+  typeId: INTEGER, // 外键，关联CategoryType
+  parentId: INTEGER, // 外键，自引用
+  ...
+}
+```
+
+## Sequelize 定义示例
+
+```js
+// File与FileChunk
+File.hasMany(models.FileChunk, { as: "chunks", foreignKey: "file_id" });
+FileChunk.belongsTo(models.File, { as: "file", foreignKey: "file_id" });
+
+// CategoryType与Category
+CategoryType.hasMany(models.Category, {
+  as: "categories",
+  foreignKey: "typeId",
+});
+Category.belongsTo(models.CategoryType, { as: "type", foreignKey: "typeId" });
+Category.hasMany(models.Category, { as: "children", foreignKey: "parentId" });
+Category.belongsTo(models.Category, { as: "parent", foreignKey: "parentId" });
+
+// User与Role
 User.belongsToMany(models.Role, {
   through: "UserRoles",
+  as: "roles",
   foreignKey: "userId",
   otherKey: "roleId",
-  as: "roles", // 正确: 小写复数
+});
+Role.belongsToMany(models.User, {
+  through: "UserRoles",
+  as: "users",
+  foreignKey: "roleId",
+  otherKey: "userId",
 });
 
-// Role 模型定义关联
+// Role与Permission
 Role.belongsToMany(models.Permission, {
   through: "RolePermissions",
+  as: "permissions",
   foreignKey: "roleId",
   otherKey: "permissionId",
-  as: "permissions", // 正确: 小写复数
+});
+Permission.belongsToMany(models.Role, {
+  through: "RolePermissions",
+  as: "roles",
+  foreignKey: "permissionId",
+  otherKey: "roleId",
 });
 
-// 一对多关系
+// Role与Resource
+Role.belongsToMany(models.Resource, {
+  through: "RoleResources",
+  as: "resources",
+  foreignKey: "roleId",
+  otherKey: "resourceId",
+});
+Resource.belongsToMany(models.Role, {
+  through: "RoleResources",
+  as: "roles",
+  foreignKey: "resourceId",
+  otherKey: "roleId",
+});
+
+// Resource与ResourceAction
 Resource.hasMany(models.ResourceAction, {
+  as: "actions",
   foreignKey: "resourceId",
-  as: "actions", // 正确: 小写复数
 });
-
-// 多对一关系
 ResourceAction.belongsTo(models.Resource, {
+  as: "resource",
   foreignKey: "resourceId",
-  as: "resource", // 正确: 小写单数
 });
-```
 
-### 错误示例
+// Resource与Permission
+Resource.hasMany(models.Permission, {
+  as: "permissions",
+  foreignKey: "resourceId",
+});
+Permission.belongsTo(models.Resource, {
+  as: "resource",
+  foreignKey: "resourceId",
+});
 
-```javascript
-// 避免这种方式
-User.belongsToMany(models.Role, {
-  through: "UserRoles",
+// ResourceAction与Permission
+ResourceAction.hasOne(models.Permission, {
+  as: "permission",
+  foreignKey: "actionId",
+});
+Permission.belongsTo(models.ResourceAction, {
+  as: "action",
+  foreignKey: "actionId",
+});
+
+// User与RefreshToken
+User.hasMany(models.RefreshToken, {
+  as: "refreshTokens",
   foreignKey: "userId",
-  otherKey: "roleId",
-  as: "Roles", // 错误: 首字母大写
 });
-
-// 避免这种方式
-Role.belongsToMany(models.Permission, {
-  through: "RolePermissions",
-  foreignKey: "roleId",
-  otherKey: "permissionId",
-  as: "permission", // 错误: 使用单数形式表示多对多关系
-});
+RefreshToken.belongsTo(models.User, { as: "user", foreignKey: "userId" });
 ```
 
-## 查询时的一致性
+## 常见错误场景
 
-在查询模型时，确保使用与模型定义一致的别名:
+- **错误：别名大小写不一致**
+  - 错误：`as: "Roles"` 或 `as: "Permission"`
+  - 正确：`as: "roles"`、`as: "permissions"`
+- **错误：多对多用单数**
+  - 错误：`as: "role"`（多对多）
+  - 正确：`as: "roles"`
+- **错误：一对多用单数**
+  - 错误：`as: "category"`（一对多）
+  - 正确：`as: "categories"`
 
-```javascript
-// 正确的查询方式
-const user = await User.findByPk(userId, {
-  include: [
-    {
-      model: Role,
-      as: "roles", // 与模型定义一致
-      include: [
-        {
-          model: Permission,
-          as: "permissions", // 与模型定义一致
-        },
-      ],
-    },
-  ],
-});
+## 团队协作建议
 
-// 正确的属性访问方式
-const hasPermission = user.roles.some((role) =>
-  role.permissions.some((permission) => permission.name === requiredPermission)
-);
-```
+1. 代码评审时重点关注关联别名命名，发现不一致及时修正。
+2. 新增模型或关联时，先查阅本规范，确保命名统一。
+3. 建议在 ESLint/TSLint 中自定义规则，自动检测常见命名错误。
+4. 文档和代码注释中都应明确标注别名，便于新成员快速理解。
 
-## 应用于控制器层的规范
-
-在控制器中查询或操作模型关联时，必须使用与模型定义一致的别名:
-
-```javascript
-// 控制器中的查询示例
-async getUser(req, res) {
-  const user = await User.findByPk(req.params.id, {
-    include: [
-      {
-        model: Role,
-        as: "roles", // 与模型定义一致
-      }
-    ]
-  });
-
-  // 数据处理...
-}
-```
-
-## 应用于服务层的规范
-
-服务层中的关联查询也必须遵循相同的别名规范:
-
-```javascript
-// 服务层中的方法示例
-async checkUserPermission(userId, permissionName) {
-  const user = await User.findByPk(userId, {
-    include: [
-      {
-        model: Role,
-        as: "roles", // 与模型定义一致
-        include: [
-          {
-            model: Permission,
-            as: "permissions", // 与模型定义一致
-          }
-        ]
-      }
-    ]
-  });
-
-  return user.roles.some(role =>
-    role.permissions.some(permission => permission.name === permissionName)
-  );
-}
-```
-
-## 模型架构总览
-
-下面是当前项目中所有模型的关联别名规范:
+## 模型架构总览（与当前 models 目录一致）
 
 | 模型           | 关联到              | 关联类型 | 标准别名        |
 | -------------- | ------------------- | -------- | --------------- |
@@ -203,10 +235,9 @@ async checkUserPermission(userId, permissionName) {
 | Category       | Category (parent)   | 多对一   | "parent"        |
 | Category       | Category (children) | 一对多   | "children"      |
 | Category       | CategoryType        | 多对一   | "type"          |
+| File           | FileChunk           | 一对多   | "chunks"        |
+| FileChunk      | File                | 多对一   | "file"          |
 
-## 实施建议
+---
 
-1. 使用 ESLint 规则来确保关联别名的一致性
-2. 代码审查时特别关注关联别名的命名
-3. 重构已有代码时统一采用此规范
-4. 在项目文档中引用此规范，确保所有开发人员都了解并遵循
+如有新增业务模型，请在此文档补充对应的别名规范。

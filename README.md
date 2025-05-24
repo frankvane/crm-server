@@ -29,6 +29,10 @@
    JWT_REFRESH_SECRET=your_refresh_secret
    ACCESS_TOKEN_EXPIRES_IN=1d
    REFRESH_TOKEN_EXPIRES_IN=7d
+   RSA_PRIVATE_KEY_PEM = `-----BEGIN RSA PRIVATE KEY-----
+   ......
+   -----END RSA PRIVATE KEY-----`
+
    ```
 3. 启动 SQL Server 并创建数据库
 
@@ -133,3 +137,19 @@ EXEC sp_MSforeachtable "ALTER TABLE ? WITH CHECK CHECK CONSTRAINT ALL"
 ```bash
 sloc ./config ./controllers ./middlewares ./models ./routes ./services ./utils/ app.js
 ```
+
+## Sox
+
+需要安装 sox 工具，并且需要添加环境变量
+
+## vosk-api
+
+需要将 https://alphacephei.com/vosk/models 语音模型下载解压到 model 目录下
+
+## ffmpeg
+
+需要安装 ffmpeg 工具，并且需要添加环境变量
+
+## 可以利用 vosk-api 实现语音识别，将语音文件转换为文本，并且将文本保存到数据库中
+
+## print 打印，模板设计器

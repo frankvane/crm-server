@@ -58,11 +58,11 @@ const hasPermission = (permission) => {
       }
 
       // 打印当前用户所有权限名和所需permission参数
-      console.log(
-        "用户所有权限:",
-        user.roles.flatMap((role) => role.permissions.map((p) => p.name))
-      );
-      console.log("需要的权限:", permission);
+      // console.log(
+      //   "用户所有权限:",
+      //   user.roles.flatMap((role) => role.permissions.map((p) => p.name))
+      // );
+      // console.log("需要的权限:", permission);
       const hasRequiredPermission = user.roles.some(
         (role) => role.permissions.some((p) => p.name === permission) // 使用小写，与上面定义的别名保持一致
       );
