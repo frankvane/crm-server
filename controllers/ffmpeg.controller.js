@@ -75,7 +75,15 @@ const operationHandlers = {
     outputFormat.format = audioFormat;
     return { command, outputFormat };
   },
-  gif: async (inputPath, params, fileMd5, uploadsDir) => {
+  gif: async (
+    inputPath,
+    params,
+    fileMd5,
+    uploadsDir,
+    sendProgress,
+    finishedTasks,
+    sendStageProgress
+  ) => {
     if (params.start !== undefined && params.duration) {
       const gifFileName = `${fileMd5}_clip.gif`;
       const gifPath = path.join(uploadsDir, gifFileName);
@@ -84,13 +92,22 @@ const operationHandlers = {
           .seekInput(params.start)
           .duration(params.duration)
           .toFormat("gif")
-          .on("start", (cmd) => console.log("[DEBUG] ffmpeg gif start:", cmd))
+          .on("start", (cmd) => {})
+          .on("progress", (progress) => {
+            sendStageProgress &&
+              sendStageProgress("gif", progress.percent / 100);
+            sendProgress && sendProgress(progress.percent / 100);
+          })
           .on("end", () => {
-            console.log("[DEBUG] ffmpeg gif end");
+            finishedTasks.value++;
+            sendStageProgress && sendStageProgress("gif", 1);
+            sendProgress && sendProgress(0);
             resolve();
           })
           .on("error", (err) => {
-            console.error("[DEBUG] ffmpeg gif error:", err);
+            finishedTasks.value++;
+            sendStageProgress && sendStageProgress("gif", 1);
+            sendProgress && sendProgress(0);
             reject(err);
           })
           .save(gifPath);
@@ -105,7 +122,15 @@ const operationHandlers = {
     }
     return null;
   },
-  cover: async (inputPath, params, fileMd5, uploadsDir) => {
+  cover: async (
+    inputPath,
+    params,
+    fileMd5,
+    uploadsDir,
+    sendProgress,
+    finishedTasks,
+    sendStageProgress
+  ) => {
     const coverParams = params || {};
     const screenshotFilename = `${fileMd5}_cover_${Date.now()}.jpg`;
     const screenshotFolder = path.resolve(uploadsDir);
@@ -113,13 +138,22 @@ const operationHandlers = {
       coverParams.time !== undefined ? coverParams.time : 1;
     await new Promise((resolve, reject) => {
       ffmpeg(inputPath)
-        .on("start", (cmd) => console.log("[DEBUG] ffmpeg cover start:", cmd))
+        .on("start", (cmd) => {})
+        .on("progress", (progress) => {
+          sendStageProgress &&
+            sendStageProgress("cover", progress.percent / 100);
+          sendProgress && sendProgress(progress.percent / 100);
+        })
         .on("end", () => {
-          console.log("[DEBUG] ffmpeg cover end");
+          finishedTasks.value++;
+          sendStageProgress && sendStageProgress("cover", 1);
+          sendProgress && sendProgress(0);
           resolve();
         })
         .on("error", (err) => {
-          console.error("[DEBUG] ffmpeg cover error:", err);
+          finishedTasks.value++;
+          sendStageProgress && sendStageProgress("cover", 1);
+          sendProgress && sendProgress(0);
           reject(err);
         })
         .screenshots({
@@ -142,11 +176,9 @@ const operationHandlers = {
 };
 
 exports.convertFile = async (req, res, next) => {
-  console.log("[DEBUG] 进入 convertFile 控制器，参数:", req.body);
   try {
-    const { file, operations, params } = req.body;
-
-    // Validate input
+    const { file, operations, params, taskId } = req.body;
+    const wsClients = req.app.get("wsClients");
     if (
       !file ||
       !file.file_id ||
@@ -157,35 +189,25 @@ exports.convertFile = async (req, res, next) => {
     ) {
       return res.status(400).json(ResponseUtil.error("请求参数不完整", 400));
     }
-
-    // Fetch file record
     const fileRecord = await File.findOne({ where: { file_id: file.file_id } });
     if (!fileRecord || !fileRecord.file_path) {
       return res.status(404).json(ResponseUtil.error("文件未找到", 404));
     }
-
     const inputPath = path.join(__dirname, "../", fileRecord.file_path);
     const uploadsDir = path.join(__dirname, "../uploads");
-
     if (!fs.existsSync(inputPath)) {
       return res
         .status(404)
         .json(ResponseUtil.error("文件物理路径不存在", 404));
     }
-
-    // Ensure uploads directory exists
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
-
-    // Prepare output file details
     const fileMd5 = fileRecord.md5 || Date.now();
     const originalExt = path.extname(file.name);
     let outputFileName = `converted_${fileMd5}${originalExt}`;
     let outputPath = path.join(uploadsDir, outputFileName);
     let outputFormat = { format: originalExt.replace(".", "") };
-
-    // Handle watermark preprocessing (convert to mp4 if needed)
     let tempInputPath = inputPath;
     let tempMp4Path = null;
     if (
@@ -196,18 +218,24 @@ exports.convertFile = async (req, res, next) => {
       await new Promise((resolve, reject) => {
         ffmpeg(inputPath)
           .outputOptions(["-c:v libx264", "-c:a aac", "-movflags +faststart"])
-          .save(tempMp4Path)
-          .on("end", resolve)
-          .on("error", reject);
+          .on("progress", (progress) =>
+            sendStageProgress("preprocess", progress.percent / 100)
+          )
+          .on("end", () => {
+            sendStageProgress("preprocess", 1);
+            resolve();
+          })
+          .on("error", (err) => {
+            sendStageProgress("preprocess", 1);
+            reject(err);
+          })
+          .save(tempMp4Path);
       });
       tempInputPath = tempMp4Path;
     }
-
     const result = {};
     const messages = [];
     const tasks = [];
-
-    // 优化操作顺序
     const operationOrder = [
       "clip-segment",
       "scale",
@@ -217,13 +245,25 @@ exports.convertFile = async (req, res, next) => {
       "convert",
       "cover",
     ];
-    // 保证操作顺序
     const sortedOps = operations
       .slice()
       .sort((a, b) => operationOrder.indexOf(a) - operationOrder.indexOf(b));
-    console.log("[DEBUG] 实际处理操作顺序:", sortedOps);
-
-    // Handle special operations (gif, cover)
+    let finishedTasks = { value: 0 };
+    function sendProgress(subProgress = 0) {
+      let progress = ((finishedTasks.value + subProgress) / tasks.length) * 100;
+      if (progress > 100) progress = 100;
+      if (progress < 0) progress = 0;
+    }
+    function sendStageProgress(stage, subProgress = 0) {
+      let progress = Number.isFinite(subProgress) ? subProgress * 100 : 0;
+      progress = Math.max(0, Math.min(100, progress));
+      if (wsClients && wsClients.has(taskId)) {
+        const ws = wsClients.get(taskId);
+        if (ws && ws.readyState === 1) {
+          ws.send(JSON.stringify({ type: "progress", stage, progress }));
+        }
+      }
+    }
     for (const operation of sortedOps) {
       if (["gif", "cover"].includes(operation)) {
         tasks.push(
@@ -231,7 +271,10 @@ exports.convertFile = async (req, res, next) => {
             tempInputPath,
             params[operation],
             fileMd5,
-            uploadsDir
+            uploadsDir,
+            sendProgress,
+            finishedTasks,
+            sendStageProgress
           ).then((opResult) => {
             if (opResult) {
               Object.assign(result, opResult);
@@ -241,13 +284,10 @@ exports.convertFile = async (req, res, next) => {
         );
       }
     }
-
-    // Handle视频处理操作，按优化顺序
     const videoOps = sortedOps.filter((op) => !["gif", "cover"].includes(op));
     if (videoOps.length > 0) {
       tasks.push(
         (async () => {
-          console.log("[DEBUG] 进入 normalOps 分支，操作:", videoOps);
           let command = ffmpeg(tempInputPath);
           for (const operation of videoOps) {
             const handler = operationHandlers[operation];
@@ -261,23 +301,27 @@ exports.convertFile = async (req, res, next) => {
                 command = handlerResult.command;
                 outputFormat = handlerResult.outputFormat || outputFormat;
               }
-            } else {
-              console.warn(`不支持的操作类型: ${operation}`);
             }
           }
           outputFileName = `converted_${fileMd5}.${outputFormat.format}`;
           outputPath = path.join(uploadsDir, outputFileName);
           await new Promise((resolve, reject) => {
             command
-              .on("start", (cmd) =>
-                console.log("[DEBUG] ffmpeg video start:", cmd)
-              )
+              .on("start", (cmd) => {})
+              .on("progress", (progress) => {
+                sendStageProgress("main", progress.percent / 100);
+                sendProgress(progress.percent / 100);
+              })
               .on("end", () => {
-                console.log("[DEBUG] ffmpeg video end");
+                finishedTasks.value++;
+                sendStageProgress("main", 1);
+                sendProgress(0);
                 resolve();
               })
               .on("error", (err) => {
-                console.error("[DEBUG] ffmpeg video error:", err);
+                finishedTasks.value++;
+                sendStageProgress("main", 1);
+                sendProgress(0);
                 reject(err);
               })
               .save(outputPath);
@@ -287,30 +331,22 @@ exports.convertFile = async (req, res, next) => {
             .split(path.sep)
             .join("/");
           messages.push("视频处理成功");
-          console.log("[DEBUG] 生成视频文件:", result.outputVideoPath);
         })()
       );
     }
-
     await Promise.all(tasks);
-
-    // 删除水印临时文件
+    sendProgress(0);
     if (tempMp4Path && fs.existsSync(tempMp4Path)) {
       fs.unlink(tempMp4Path, (err) => {
         if (err) {
           console.warn("删除水印临时文件失败:", tempMp4Path, err);
-        } else {
-          console.log("已删除水印临时文件:", tempMp4Path);
         }
       });
     }
-
-    console.log("[DEBUG] 最终返回 result:", result, "messages:", messages);
     return res.json(
       ResponseUtil.success(result, messages.join("、") || "处理成功")
     );
   } catch (err) {
-    console.error("[DEBUG] 捕获到异常:", err);
     next(err);
   }
 };
