@@ -6,6 +6,12 @@ const ResponseUtil = require("../utils/response");
 
 // Operation handlers for modularity
 const operationHandlers = {
+  "clip-segment": (command, params) => {
+    if (params.start !== undefined && params.duration) {
+      return command.seekInput(params.start).duration(params.duration);
+    }
+    return command;
+  },
   scale: (command, params) => {
     if (params.width && params.height) {
       return command.size(`${params.width}x${params.height}`);
@@ -28,12 +34,6 @@ const operationHandlers = {
       return command.videoFilters(
         `crop=${params.width}:${params.height}:${params.x}:${params.y}`
       );
-    }
-    return command;
-  },
-  "clip-segment": (command, params) => {
-    if (params.start !== undefined && params.duration) {
-      return command.seekInput(params.start).duration(params.duration);
     }
     return command;
   },
@@ -207,8 +207,24 @@ exports.convertFile = async (req, res, next) => {
     const messages = [];
     const tasks = [];
 
+    // 优化操作顺序
+    const operationOrder = [
+      "clip-segment",
+      "scale",
+      "compress",
+      "framerate",
+      "watermark",
+      "convert",
+      "cover",
+    ];
+    // 保证操作顺序
+    const sortedOps = operations
+      .slice()
+      .sort((a, b) => operationOrder.indexOf(a) - operationOrder.indexOf(b));
+    console.log("[DEBUG] 实际处理操作顺序:", sortedOps);
+
     // Handle special operations (gif, cover)
-    for (const operation of operations) {
+    for (const operation of sortedOps) {
       if (["gif", "cover"].includes(operation)) {
         tasks.push(
           operationHandlers[operation](
@@ -226,11 +242,12 @@ exports.convertFile = async (req, res, next) => {
       }
     }
 
-    // Handle video processing operations
-    const videoOps = operations.filter((op) => !["gif", "cover"].includes(op));
+    // Handle视频处理操作，按优化顺序
+    const videoOps = sortedOps.filter((op) => !["gif", "cover"].includes(op));
     if (videoOps.length > 0) {
       tasks.push(
         (async () => {
+          console.log("[DEBUG] 进入 normalOps 分支，操作:", videoOps);
           let command = ffmpeg(tempInputPath);
           for (const operation of videoOps) {
             const handler = operationHandlers[operation];
@@ -270,6 +287,7 @@ exports.convertFile = async (req, res, next) => {
             .split(path.sep)
             .join("/");
           messages.push("视频处理成功");
+          console.log("[DEBUG] 生成视频文件:", result.outputVideoPath);
         })()
       );
     }
