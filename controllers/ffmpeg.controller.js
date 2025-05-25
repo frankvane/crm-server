@@ -187,11 +187,12 @@ exports.convertFile = async (req, res, next) => {
 
     // Handle watermark preprocessing (convert to mp4 if needed)
     let tempInputPath = inputPath;
+    let tempMp4Path = null;
     if (
       operations.includes("watermark") &&
       path.extname(inputPath).toLowerCase() !== ".mp4"
     ) {
-      const tempMp4Path = path.join(uploadsDir, `${fileMd5}_temp.mp4`);
+      tempMp4Path = path.join(uploadsDir, `${fileMd5}_temp.mp4`);
       await new Promise((resolve, reject) => {
         ffmpeg(inputPath)
           .outputOptions(["-c:v libx264", "-c:a aac", "-movflags +faststart"])
@@ -274,6 +275,18 @@ exports.convertFile = async (req, res, next) => {
     }
 
     await Promise.all(tasks);
+
+    // 删除水印临时文件
+    if (tempMp4Path && fs.existsSync(tempMp4Path)) {
+      fs.unlink(tempMp4Path, (err) => {
+        if (err) {
+          console.warn("删除水印临时文件失败:", tempMp4Path, err);
+        } else {
+          console.log("已删除水印临时文件:", tempMp4Path);
+        }
+      });
+    }
+
     console.log("[DEBUG] 最终返回 result:", result, "messages:", messages);
     return res.json(
       ResponseUtil.success(result, messages.join("、") || "处理成功")
