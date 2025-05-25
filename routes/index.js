@@ -14,5 +14,6 @@ router.use("/product", require("./product.routes"));
 router.use("/comment", require("./comment.routes"));
 router.use("/patients", require("./patient.routes"));
 router.use("/medical-records", require("./medicalRecord.routes"));
+router.use(require("./ffmpeg.routes"));
 
 module.exports = router;
