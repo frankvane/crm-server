@@ -58,12 +58,28 @@ exports.convertFile = async (req, res, next) => {
     // 需要先处理的操作（不包括cover）
     const preOperations = operations.filter((op) => op !== "cover");
 
+    // 检查是否包含 watermark 操作
+    const hasWatermark = operations.includes("watermark");
+    let tempInputPath = inputPath;
+    // 如果有 watermark，且输入不是 mp4，先转成 mp4
+    if (hasWatermark && path.extname(inputPath).toLowerCase() !== ".mp4") {
+      const tempMp4Path = path.join(uploadsDir, `${fileMd5}_temp.mp4`);
+      await new Promise((resolve, reject) => {
+        ffmpeg(inputPath)
+          .outputOptions(["-c:v libx264", "-c:a aac", "-movflags +faststart"])
+          .save(tempMp4Path)
+          .on("end", resolve)
+          .on("error", reject);
+      });
+      tempInputPath = tempMp4Path;
+    }
+
     // 如果有cover操作，先转码生成中间文件，再截图
     if (hasCover) {
       // 1. 生成最终视频文件
       const finalVideoName = `${fileMd5}_converted${originalExt}`;
       const finalVideoPath = path.join(uploadsDir, finalVideoName);
-      let tempCommand = ffmpeg(inputPath);
+      let tempCommand = ffmpeg(tempInputPath);
       for (const operation of preOperations) {
         const operationParams = params[operation];
         if (!operationParams) continue;
@@ -165,7 +181,7 @@ exports.convertFile = async (req, res, next) => {
     }
 
     // 创建 FFmpeg 命令
-    let command = ffmpeg(inputPath);
+    let command = ffmpeg(tempInputPath);
 
     // 应用各项操作
     for (const operation of operations) {
@@ -227,37 +243,24 @@ exports.convertFile = async (req, res, next) => {
           }
           break;
         case "watermark":
-          // 简单的文字水印示例，复杂水印（图片水印、位置等）需要更复杂的 filter 链
           if (operationParams.watermarkText) {
-            // 需要安装 fontconfig 库和合适的字体文件
-            // const fontPath = '/path/to/your/font.ttf'; // 替换为实际字体路径
-            // if (!fs.existsSync(fontPath)) {
-            //     console.warn('水印字体文件不存在，无法添加水印');
-            //     break;
-            // }
             const fontSize = operationParams.fontSize || 20;
             const opacity =
               operationParams.opacity !== undefined
                 ? operationParams.opacity
                 : 1;
-            // 假设字体文件在uploads目录下，名为arial.ttf
-            const fontPath = path.join(__dirname, "../uploads", "arial.ttf"); // 示例字体路径
-            if (!fs.existsSync(fontPath)) {
-              console.warn(`水印字体文件不存在: ${fontPath}，无法添加水印`);
-              break;
-            }
-
-            command = command.videoFilters({
-              filter: "drawtext",
-              options: {
-                text: operationParams.watermarkText,
-                fontfile: fontPath, // 替换为实际字体文件路径
-                fontsize: fontSize,
-                fontcolor: `white@${opacity}`,
-                x: "(main_w-text_w)/2", // 水平居中
-                y: "main_h-text_h-10", // 底部边距10
-              },
-            });
+            // 路径与命令行一致，fontfile 路径加单引号
+            const fontPath = "C\\:/Windows/Fonts/arial.ttf";
+            const drawtext = `drawtext=fontfile='${fontPath}':text='${operationParams.watermarkText}':fontsize=${fontSize}:fontcolor=white@${opacity}:x=10:y=10`;
+            command = command.videoFilters(drawtext);
+            outputFileName = `${fileMd5}_converted.mp4`;
+            outputPath = path.join(uploadsDir, outputFileName);
+            outputFormat = "mp4";
+            command = command.outputOptions([
+              "-c:v libx264",
+              "-c:a aac",
+              "-movflags +faststart",
+            ]);
           }
           break;
         case "convert":
@@ -361,38 +364,44 @@ exports.convertFile = async (req, res, next) => {
       outputFormat = params["extract-audio"].audioFormat;
     }
 
+    const isTempFile = tempInputPath !== inputPath;
     // 执行 FFmpeg 命令
     command
       .on("start", function (commandLine) {
         console.log("Spawned Ffmpeg with command: " + commandLine);
-        // 可以发送进度信息到客户端
-        // res.write(JSON.stringify({ status: 'started', command: commandLine }) + '\n');
       })
       .on("progress", function (progress) {
         console.log("Processing: " + progress.percent + "% done");
-        // 可以发送进度信息到客户端
-        // res.write(JSON.stringify({ status: 'progress', progress: progress.percent }) + '\n');
+      })
+      .on("stderr", function (stderrLine) {
+        console.log("FFmpeg stderr:", stderrLine);
       })
       .on("error", function (err, stdout, stderr) {
         console.error("FFmpeg Error:", err.message);
         console.error("FFmpeg stderr:", stderr);
-        // res.write(JSON.stringify({ status: 'error', message: err.message, stderr: stderr }) + '\n');
-        // res.end(); // 发生错误时结束响应
-        // 调用 next 传递错误
         const ffmpegError = new Error("FFmpeg processing failed");
-        ffmpegError.status = 500; // 或者其他合适的HTTP状态码
+        ffmpegError.status = 500;
         ffmpegError.details = { message: err.message, stdout, stderr };
         next(ffmpegError);
       })
       .on("end", function (stdout, stderr) {
+        // 删除临时文件
+        if (isTempFile && fs.existsSync(tempInputPath)) {
+          fs.unlink(tempInputPath, (err) => {
+            if (err) {
+              console.warn("删除临时文件失败:", tempInputPath, err);
+            } else {
+              console.log("已删除临时文件:", tempInputPath);
+            }
+          });
+        }
         console.log("FFmpeg process finished !");
-        // res.write(JSON.stringify({ status: 'completed', outputPath: path.relative(__dirname, outputPath) }) + '\n');
-        // res.end(); // 处理完成时结束响应
+        const uploadsRelative = path
+          .relative(path.join(__dirname, ".."), outputPath)
+          .split(path.sep)
+          .join("/");
         res.json(
-          ResponseUtil.success(
-            { outputPath: path.relative(__dirname, outputPath) },
-            "文件转换成功"
-          )
+          ResponseUtil.success({ outputPath: uploadsRelative }, "文件转换成功")
         );
       })
       .save(outputPath);
