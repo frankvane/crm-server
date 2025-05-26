@@ -179,6 +179,17 @@ exports.convertFile = async (req, res, next) => {
   try {
     const { file, operations, params, taskId } = req.body;
     const wsClients = req.app.get("wsClients");
+    // ws 状态推送方法
+    function sendStatus(status) {
+      if (wsClients && wsClients.has(taskId)) {
+        const ws = wsClients.get(taskId);
+        if (ws && ws.readyState === 1) {
+          ws.send(JSON.stringify({ type: "status", status }));
+        }
+      }
+    }
+    // 可选：初始化时推送 idle
+    sendStatus("idle");
     if (
       !file ||
       !file.file_id ||
@@ -264,6 +275,7 @@ exports.convertFile = async (req, res, next) => {
         }
       }
     }
+    sendStatus("converting"); // 任务开始
     for (const operation of sortedOps) {
       if (["gif", "cover"].includes(operation)) {
         tasks.push(
@@ -343,10 +355,20 @@ exports.convertFile = async (req, res, next) => {
         }
       });
     }
+    sendStatus("completed"); // 任务完成
     return res.json(
       ResponseUtil.success(result, messages.join("、") || "处理成功")
     );
   } catch (err) {
+    // 任务失败时推送 failed
+    const wsClients = req.app.get("wsClients");
+    const { taskId } = req.body || {};
+    if (wsClients && wsClients.has(taskId)) {
+      const ws = wsClients.get(taskId);
+      if (ws && ws.readyState === 1) {
+        ws.send(JSON.stringify({ type: "status", status: "failed" }));
+      }
+    }
     next(err);
   }
 };
