@@ -140,57 +140,64 @@ exports.mergeChunks = async (req, res) => {
       fs.unlinkSync(chunkPath);
     }
     writeStream.end();
-    // 校验MD5
-    const fileBuffer = fs.readFileSync(targetPath);
-    const hash = crypto.createHash("md5").update(fileBuffer).digest("hex");
-    console.log(`前端传入MD5: ${md5}`);
-    console.log(`合并后文件MD5: ${hash}`);
-    if (hash !== md5) throw new Error("文件MD5校验失败");
-    // 更新数据库
-
-    // 读取文件类型
-    console.log("尝试检测文件类型:", targetPath); // 添加日志
-    const getFileType = await FileType.fromFile(targetPath);
-    console.log("文件类型检测结果:", getFileType); // 添加日志
-
-
-    const fileExt = getFileType.ext;
-    const fileType = getFileType.mime;
-    // 生成相对路径
-    const filePath = path.join("uploads", name);
-    let thumbnailPath = null;
-    // 生成缩略图
-    if (fileType && fileType.startsWith("image/")) {
-      const thumbName = name.replace(/(\.[^.]+)$/, "_thumb$1");
-      thumbnailPath = path.join("uploads", thumbName);
+    // 将后续操作放入finish回调，确保写入完成后再处理
+    writeStream.on("finish", async () => {
       try {
-        await generateThumbnail(targetPath, path.join(uploadsDir, thumbName), {
-          width: 200,
-          height: 200,
+        // 校验MD5
+        const fileBuffer = fs.readFileSync(targetPath);
+        const hash = crypto.createHash("md5").update(fileBuffer).digest("hex");
+        console.log(`前端传入MD5: ${md5}`);
+        console.log(`合并后文件MD5: ${hash}`);
+        if (hash !== md5) throw new Error("文件MD5校验失败");
+        // 读取文件类型
+        console.log("尝试检测文件类型:", targetPath); // 添加日志
+        const getFileType = await FileType.fromFile(targetPath);
+        console.log("文件类型检测结果:", getFileType); // 添加日志
+        const fileExt = getFileType.ext;
+        const fileType = getFileType.mime;
+        // 生成相对路径
+        const filePath = path.join("uploads", name);
+        let thumbnailPath = null;
+        // 生成缩略图
+        if (fileType && fileType.startsWith("image/")) {
+          const thumbName = name.replace(/(\.[^.]+)$/, "_thumb$1");
+          thumbnailPath = path.join("uploads", thumbName);
+          try {
+            await generateThumbnail(
+              targetPath,
+              path.join(uploadsDir, thumbName),
+              {
+                width: 200,
+                height: 200,
+              }
+            );
+            console.log("缩略图生成成功");
+          } catch (e) {
+            console.warn("生成缩略图失败:", e.message);
+            thumbnailPath = null;
+          }
+        }
+        await File.upsert({
+          file_id,
+          file_name: name,
+          size,
+          user_id: user_id || "test",
+          status: 1,
+          md5,
+          category_id: category_id || 1,
+          file_ext: fileExt,
+          file_type: fileType,
+          file_path: filePath,
+          thumbnail_path: thumbnailPath,
         });
-        console.log("缩略图生成成功");
-      } catch (e) {
-        console.warn("生成缩略图失败:", e.message);
-        thumbnailPath = null;
+        await FileChunk.update({ status: 2 }, { where: { file_id } }); // 标记分片已合并
+        await transaction.commit();
+        return res.json({ code: 200, message: "ok", data: {} });
+      } catch (err) {
+        await transaction.rollback();
+        return res.json({ code: 500, message: err.message, data: {} });
       }
-    }
-
-    await File.upsert({
-      file_id,
-      file_name: name,
-      size,
-      user_id: user_id || "test",
-      status: 1,
-      md5,
-      category_id: category_id || 1,
-      file_ext: fileExt,
-      file_type: fileType,
-      file_path: filePath,
-      thumbnail_path: thumbnailPath,
     });
-    await FileChunk.update({ status: 2 }, { where: { file_id } }); // 标记分片已合并
-    await transaction.commit();
-    return res.json({ code: 200, message: "ok", data: {} });
   } catch (err) {
     await transaction.rollback();
     return res.json({ code: 500, message: err.message, data: {} });
