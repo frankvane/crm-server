@@ -96,6 +96,13 @@ exports.uploadChunk = async (req, res) => {
 // 分片合并
 exports.mergeChunks = async (req, res) => {
   const transaction = await File.sequelize.transaction();
+  let transactionRolledBack = false;
+  async function safeRollback() {
+    if (!transactionRolledBack) {
+      transactionRolledBack = true;
+      await transaction.rollback();
+    }
+  }
   try {
     const tmpDir = path.join(__dirname, "../tmp/upload");
     if (!fs.existsSync(tmpDir)) {
@@ -103,27 +110,71 @@ exports.mergeChunks = async (req, res) => {
     }
     const { file_id, md5, name, size, total, user_id, category_id } = req.body;
     if (!file_id || !md5 || !name || !size || !total) {
+      await safeRollback();
       return res.json({ code: 400, message: "参数缺失", data: {} });
     }
     const uploadsDir = path.join(__dirname, "../uploads");
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
+    // 检查目录写权限
+    try {
+      fs.accessSync(uploadsDir, fs.constants.W_OK);
+    } catch (e) {
+      await safeRollback();
+      return res.json({
+        code: 500,
+        message: "uploads目录不可写: " + e.message,
+        data: {},
+      });
+    }
     const targetPath = path.join(uploadsDir, name);
-    const writeStream = fs.createWriteStream(targetPath);
+    let writeStream;
+    try {
+      writeStream = fs.createWriteStream(targetPath);
+    } catch (e) {
+      await safeRollback();
+      return res.json({
+        code: 500,
+        message: "创建写入流失败: " + e.message,
+        data: {},
+      });
+    }
+    // 捕获写入流错误
+    let writeStreamError = null;
+    writeStream.on("error", async (err) => {
+      writeStreamError = err;
+      await safeRollback();
+      return res.json({
+        code: 500,
+        message: "写入文件失败: " + err.message,
+        data: {},
+      });
+    });
     // 校验每个分片的md5
     const dbChunks = await FileChunk.findAll({ where: { file_id, status: 1 } });
     for (let i = 0; i < total; i++) {
       const chunkPath = path.join(tmpDir, `${file_id}_${i}`);
-      if (!fs.existsSync(chunkPath)) throw new Error(`分片${i}不存在`);
+      if (!fs.existsSync(chunkPath)) {
+        await safeRollback();
+        return res.json({ code: 500, message: `分片${i}不存在`, data: {} });
+      }
       const chunkBuffer = fs.readFileSync(chunkPath);
       const chunkMd5 = crypto
         .createHash("md5")
         .update(chunkBuffer)
         .digest("hex");
       const dbChunk = dbChunks.find((c) => c.chunk_index === i);
-      if (!dbChunk) throw new Error(`数据库中未找到分片${i}`);
+      if (!dbChunk) {
+        await safeRollback();
+        return res.json({
+          code: 500,
+          message: `数据库中未找到分片${i}`,
+          data: {},
+        });
+      }
       if (dbChunk.chunk_md5 && dbChunk.chunk_md5 !== chunkMd5) {
+        await safeRollback();
         return res.json({
           code: 500,
           message: `分片${i}的MD5与数据库不一致`,
@@ -194,12 +245,12 @@ exports.mergeChunks = async (req, res) => {
         await transaction.commit();
         return res.json({ code: 200, message: "ok", data: {} });
       } catch (err) {
-        await transaction.rollback();
+        await safeRollback();
         return res.json({ code: 500, message: err.message, data: {} });
       }
     });
   } catch (err) {
-    await transaction.rollback();
+    await safeRollback();
     return res.json({ code: 500, message: err.message, data: {} });
   }
 };
