@@ -334,7 +334,7 @@ exports.downloadChunk = async (req, res) => {
         .json({ code: 404, message: "文件不存在", data: {} });
     }
 
-    const { filePath, fileName } = foundFile;
+    const { filePath, fileName, md5 } = foundFile;
 
     // 检查文件状态
     const stats = fs.statSync(filePath);
@@ -366,6 +366,24 @@ exports.downloadChunk = async (req, res) => {
     res.setHeader("Accept-Ranges", "bytes");
     res.setHeader("Content-Length", end - start + 1);
     res.setHeader("Content-Type", fileType);
+    res.setHeader("X-File-Size", stats.size);
+    res.setHeader("X-File-Name", encodeURIComponent(fileName));
+    res.setHeader("X-File-Type", fileType);
+    res.setHeader("X-File-Id", file_id);
+    res.setHeader("X-Total-Chunks", Math.ceil(stats.size / chunkSize));
+    res.setHeader("X-Chunk-Index", chunkIndex);
+    res.setHeader("X-Chunk-Size", chunkSize);
+
+    // 检查If-Range头，支持恢复下载
+    const ifRange = req.headers["if-range"];
+    if (ifRange && ifRange !== `"${md5}"`) {
+      // ETag不匹配，客户端可能有过期或损坏的文件副本
+      return res.status(412).json({
+        code: 412,
+        message: "文件已更改，请重新开始下载",
+        data: { fileId: file_id },
+      });
+    }
 
     // 创建读取流并计算MD5
     const fileStream = fs.createReadStream(filePath, { start, end });
@@ -375,17 +393,46 @@ exports.downloadChunk = async (req, res) => {
     const passThrough = new (require("stream").PassThrough)();
     fileStream.pipe(passThrough);
 
+    // 计算分片MD5
+    let chunkBuffer = Buffer.alloc(0);
     passThrough.on("data", (chunk) => {
       hash.update(chunk);
+      // 如果分片不大（小于50MB），收集数据用于MD5计算
+      if (end - start + 1 < 50 * 1024 * 1024) {
+        chunkBuffer = Buffer.concat([chunkBuffer, chunk]);
+      }
     });
 
     passThrough.on("end", () => {
-      const chunkMd5 = hash.digest("hex");
+      let chunkMd5;
+      if (chunkBuffer.length > 0 && chunkBuffer.length === end - start + 1) {
+        // 如果收集了完整数据，直接使用它计算MD5
+        chunkMd5 = crypto.createHash("md5").update(chunkBuffer).digest("hex");
+      } else {
+        // 否则使用流式计算的结果
+        chunkMd5 = hash.digest("hex");
+      }
       res.setHeader("X-Chunk-MD5", chunkMd5);
+
+      // 保存分片MD5到缓存，便于后续验证
+      if (!fileIdCache.has(filePath + "_chunks")) {
+        fileIdCache.set(filePath + "_chunks", {});
+      }
+      const chunkCache = fileIdCache.get(filePath + "_chunks");
+      chunkCache[chunkIndex] = chunkMd5;
     });
 
     // 发送文件分片到客户端
     passThrough.pipe(res);
+
+    // 监听客户端断开连接
+    req.on("close", () => {
+      if (!res.writableEnded) {
+        console.log(`客户端在下载分片${chunkIndex}时断开连接`);
+        fileStream.destroy();
+        passThrough.destroy();
+      }
+    });
   } catch (err) {
     console.error("下载文件分片失败:", err);
     return res.status(500).json({ code: 500, message: err.message, data: {} });
@@ -429,6 +476,24 @@ exports.getDownloadInfo = async (req, res) => {
       recommendedChunkSize = 10 * 1024 * 1024; // 10MB
     }
 
+    // 获取分片的MD5缓存（如果有）
+    const chunksCache = fileIdCache.get(filePath + "_chunks") || {};
+    const totalChunks = Math.ceil(stats.size / recommendedChunkSize);
+
+    // 检查已下载的分片
+    const downloadedChunks = [];
+    if (req.query.checkChunks === "true") {
+      // 如果客户端请求检查已下载的分片
+      for (let i = 0; i < totalChunks; i++) {
+        if (chunksCache[i]) {
+          downloadedChunks.push({
+            index: i,
+            md5: chunksCache[i],
+          });
+        }
+      }
+    }
+
     return res.json({
       code: 200,
       message: "ok",
@@ -442,12 +507,16 @@ exports.getDownloadInfo = async (req, res) => {
         lastModified: stats.mtime.toISOString(),
         supportsRanges: true,
         recommendedChunkSize,
-        totalChunks: Math.ceil(stats.size / recommendedChunkSize),
+        totalChunks,
+        downloadedChunks:
+          downloadedChunks.length > 0 ? downloadedChunks : undefined,
         urls: {
           download: `/file/download/${file_id}`,
           chunk: `/file/download/${file_id}/chunk/{index}`,
           info: `/file/download/${file_id}/info`,
         },
+        supportsPause: true,
+        supportsResume: true,
       },
     });
   } catch (err) {
