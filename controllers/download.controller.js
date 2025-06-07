@@ -12,8 +12,7 @@ const fileIdCache = new Map();
  */
 exports.getFileList = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search } = req.query;
-    const offset = (parseInt(page, 10) - 1) * parseInt(limit, 10);
+    const { search } = req.query;
 
     // 读取download目录中的文件
     const downloadDir = path.join(__dirname, "../download");
@@ -87,17 +86,11 @@ exports.getFileList = async (req, res) => {
       );
     }
 
-    // 分页
-    const total = files.length;
-    files = files.slice(offset, offset + parseInt(limit, 10));
-
     return res.json({
       code: 200,
       message: "ok",
       data: {
-        total,
-        page: parseInt(page, 10),
-        limit: parseInt(limit, 10),
+        total: files.length,
         files,
       },
     });
