@@ -53,6 +53,7 @@ exports.statusQuery = async (req, res) => {
     }
     const chunks = await FileChunk.findAll({ where: { file_id, status: 1 } });
     const chunkIndexes = chunks.map((c) => c.chunk_index);
+
     return res.json({
       code: 200,
       message: "ok",

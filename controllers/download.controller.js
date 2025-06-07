@@ -343,6 +343,7 @@ exports.downloadChunk = async (req, res) => {
 
     // 获取请求中的分片大小，默认5MB
     const chunkSize = parseInt(req.query.chunkSize, 10) || 5 * 1024 * 1024;
+    console.log(chunkSize, "<<<<");
 
     // 计算分片范围
     const start = chunkIndex * chunkSize;
