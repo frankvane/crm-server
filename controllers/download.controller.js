@@ -1,7 +1,6 @@
 const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
-const FileType = require("file-type");
 
 // 文件ID缓存，避免重复计算MD5
 const fileIdCache = new Map();
@@ -44,7 +43,7 @@ exports.getFileList = async (req, res) => {
             fileId = cachedInfo.fileId;
             md5 = cachedInfo.md5;
           } else {
-            // 修改时间变化，仅计算文件的前10MB进行MD5计算
+            // 修改时间变化，计算文件MD5
             md5 = calculatePartialMd5(filePath);
             fileId = md5.substring(0, 8);
             fileIdCache.set(filePath, {
@@ -54,7 +53,7 @@ exports.getFileList = async (req, res) => {
             });
           }
         } else {
-          // 仅计算文件的前10MB进行MD5计算
+          // 计算文件MD5
           md5 = calculatePartialMd5(filePath);
           fileId = md5.substring(0, 8);
           fileIdCache.set(filePath, {
@@ -343,7 +342,6 @@ exports.downloadChunk = async (req, res) => {
 
     // 获取请求中的分片大小，默认5MB
     const chunkSize = parseInt(req.query.chunkSize, 10) || 5 * 1024 * 1024;
-    console.log(chunkSize, "<<<<");
 
     // 计算分片范围
     const start = chunkIndex * chunkSize;
@@ -563,30 +561,30 @@ function findFileById(dirPath, fileId) {
   for (const fileName of files) {
     const filePath = path.join(dirPath, fileName);
     try {
-      // 检查文件是否已在缓存中
-      if (fileIdCache.has(filePath)) {
-        const cachedInfo = fileIdCache.get(filePath);
-        const stats = fs.statSync(filePath);
-        // 检查修改时间是否变化
-        if (
-          cachedInfo.mtime === stats.mtime.getTime() &&
-          cachedInfo.fileId === fileId
-        ) {
-          return { filePath, fileName, md5: cachedInfo.md5 };
-        }
-      }
-
-      // 计算文件的部分MD5
-      const md5 = calculatePartialMd5(filePath);
-      const computedFileId = md5.substring(0, 8);
-
-      // 更新缓存
+      // 计算文件的MD5并检查
       const stats = fs.statSync(filePath);
-      fileIdCache.set(filePath, {
-        fileId: computedFileId,
-        md5,
-        mtime: stats.mtime.getTime(),
-      });
+      let md5, computedFileId;
+
+      // 检查文件是否已在缓存中且修改时间未变
+      if (
+        fileIdCache.has(filePath) &&
+        fileIdCache.get(filePath).mtime === stats.mtime.getTime()
+      ) {
+        const cachedInfo = fileIdCache.get(filePath);
+        md5 = cachedInfo.md5;
+        computedFileId = cachedInfo.fileId;
+      } else {
+        // 计算文件的部分MD5
+        md5 = calculatePartialMd5(filePath);
+        computedFileId = md5.substring(0, 8);
+
+        // 更新缓存
+        fileIdCache.set(filePath, {
+          fileId: computedFileId,
+          md5,
+          mtime: stats.mtime.getTime(),
+        });
+      }
 
       // 比较ID
       if (computedFileId === fileId) {
