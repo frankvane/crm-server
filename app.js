@@ -12,7 +12,27 @@ const bcrypt = require("bcryptjs");
 const Sequelize = require("sequelize");
 const speechRoutes = require("./routes/speech.routes");
 const voskModel = require("./services/voskModel");
+const http = require("http");
+const WebSocket = require("ws");
 const app = express();
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
+const wsClients = new Map(); // key: taskId, value: ws
+
+wss.on("connection", function connection(ws, req) {
+  ws.on("message", function incoming(message) {
+    try {
+      const { taskId } = JSON.parse(message);
+      if (taskId) {
+        wsClients.set(taskId, ws);
+        ws.on("close", () => wsClients.delete(taskId));
+      }
+    } catch (e) {}
+  });
+});
+
+app.set("wsClients", wsClients);
 
 // 配置中间件
 app.use(cors());
@@ -108,7 +128,7 @@ async function bootstrap() {
 
       // 启动服务器
       const PORT = process.env.PORT || 3000;
-      app.listen(PORT, () => {
+      server.listen(PORT, () => {
         console.log(`✓ 服务器运行在 http://localhost:${PORT}`);
         console.log("----------------------------------------");
         console.log("默认管理员账号：");
